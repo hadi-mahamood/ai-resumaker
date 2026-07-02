@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResuMake AI - Premium AI Resume Builder</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Editor -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <div>
+                        <span class="logo-text">ResuMake AI</span>
+                        <div class="save-status"><span class="save-dot"></span> Saved Locally</div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="premium-badge">Pro</span>
+                    <button class="settings-btn" id="settings-toggle-btn" onclick="toggleSettingsPanel()" title="Gemini API Settings"><i class="fa-solid fa-gear"></i></button>
+                </div>
+            </div>
+
+            <!-- Gemini Settings Panel -->
+            <div id="settings-panel" class="settings-panel">
+                <div class="settings-panel-inner">
+                    <h4 style="font-size:0.8rem; text-transform:uppercase; margin-bottom:6px; color:#a5b4fc;"><i class="fa-solid fa-key"></i> Gemini API Key</h4>
+                    <p style="font-size:0.7rem; color:var(--text-secondary); line-height:1.4; margin-bottom:8px;">
+                        Add your Gemini API Key to enable real-time advanced LLM generations instead of offline mocks.
+                    </p>
+                    <div class="form-row" style="grid-template-columns:1fr auto; gap:6px;">
+                        <input type="password" id="api-key-input" placeholder="AIzaSy..." style="padding:6px 10px; font-size:0.8rem;">
+                        <button class="btn btn-primary" onclick="saveApiKey()" style="padding:6px 14px; font-size:0.8rem;"><i class="fa-solid fa-save"></i> Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-content">
+                
+                <!-- Target Job Section -->
+                <div class="accordion-item active" id="sec-target">
+                    <div class="accordion-header" onclick="toggleAccordion('sec-target')">
+                        <div class="accordion-title">
+                            <i class="fa-solid fa-bullseye"></i>
+                            <span>Target Role</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="sidebar-badge" id="badge-target">0%</span>
+                            <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div class="form-group">
+                                <label for="target-job">Target Job Title</label>
+                                <input type="text" id="target-job" placeholder="e.g., Senior Software Engineer" value="Software Developer">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Details Section -->
+                <div class="accordion-item" id="sec-personal">
+                    <div class="accordion-header" onclick="toggleAccordion('sec-personal')">
+                        <div class="accordion-title">
+                            <i class="fa-solid fa-user"></i>
+                            <span>Personal Details</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="sidebar-badge" id="badge-personal">0%</span>
+                            <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div class="form-group">
+                                <label for="input-name">Full Name</label>
+                                <input type="text" id="input-name" placeholder="John Doe">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-title">Professional Title</label>
+                                <input type="text" id="input-title" placeholder="e.g., Full Stack Engineer">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="input-email">Email</label>
+                                    <input type="email" id="input-email" placeholder="john.doe@example.com">
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-phone">Phone</label>
+                                    <input type="tel" id="input-phone" placeholder="+1 (555) 000-0000">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="input-location">Location</label>
+                                    <input type="text" id="input-location" placeholder="San Francisco, CA">
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-website">Website / Portfolio</label>
+                                    <input type="text" id="input-website" placeholder="linkedin.com/in/johndoe">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Regional Details Section -->
+                <div class="accordion-item" id="sec-regional">
+                    <div class="accordion-header" onclick="toggleAccordion('sec-regional')">
+                        <div class="accordion-title">
+                            <i class="fa-solid fa-earth-americas"></i>
+                            <span>Regional & Additional Details</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="sidebar-badge" id="badge-regional">0%</span>
+                            <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="input-dob">Date of Birth</label>
+                                    <input type="text" id="input-dob" placeholder="e.g. 15 Jan 1998">
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-nationality">Nationality</label>
+                                    <input type="text" id="input-nationality" placeholder="e.g. Indian">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="input-visa">Visa / Residency Status</label>
+                                    <input type="text" id="input-visa" placeholder="e.g. Golden Visa / Employment">
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-marital">Marital Status / Gender</label>
+                                    <input type="text" id="input-marital" placeholder="e.g. Single / Male">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-languages">Languages (Comma separated)</label>
+                                <input type="text" id="input-languages" placeholder="e.g. English (Fluent), Hindi (Native)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Work Experience Section -->
+                <div class="accordion-item" id="sec-experience">
+                    <div class="accordion-header" onclick="toggleAccordion('sec-experience')">
+                        <div class="accordion-title">
+                            <i class="fa-solid fa-briefcase"></i>
+                            <span>Work Experience</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="sidebar-badge" id="badge-exp">0</span>
+                            <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div id="experience-list" class="list-container">
+                                <!-- Experience cards populated dynamically by app.js -->
+                            </div>
+                            <button class="btn-add" onclick="addExperience()"><i class="fa-solid fa-plus"></i> Add Work Experience</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education Section -->
+                <div class="accordion-item" id="sec-education">
+                    <div class="accordion-header" onclick="toggleAccordion('sec-education')">
+                        <div class="accordion-title">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>Education</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="sidebar-badge" id="badge-edu">0</span>
+                            <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div id="education-list" class="list-container">
+                                <!-- Education cards populated dynamically by app.js -->
+                            </div>
+                            <button class="btn-add" onclick="addEducation()"><i class="fa-solid fa-plus"></i> Add Education</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Section -->
+                <div class="accordion-item" id="sec-skills">
+                    <div class="accordion-header" onclick="toggleAccordion('sec-skills')">
+                        <div class="accordion-title">
+                            <i class="fa-solid fa-brain"></i>
+                            <span>Skills & Expertise</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="sidebar-badge" id="badge-skills">0</span>
+                            <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div class="form-group">
+                                <label>Current Skills (Press Enter to add)</label>
+                                <div class="tags-input-container" id="skills-tags-container">
+                                    <input type="text" id="skill-input" placeholder="Type and hit Enter...">
+                                </div>
+                            </div>
+                            <button class="btn-add" onclick="openAISkills()"><i class="fa-solid fa-wand-magic-sparkles"></i> Suggest Missing Skills</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects Section -->
+                <div class="accordion-item" id="sec-projects">
+                    <div class="accordion-header" onclick="toggleAccordion('sec-projects')">
+                        <div class="accordion-title">
+                            <i class="fa-solid fa-diagram-project"></i>
+                            <span>Projects</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="sidebar-badge" id="badge-proj">0</span>
+                            <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div id="projects-list" class="list-container">
+                                <!-- Project cards populated dynamically by app.js -->
+                            </div>
+                            <button class="btn-add" onclick="addProject()"><i class="fa-solid fa-plus"></i> Add Project</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- Preview & Output Area -->
+        <main class="preview-container">
+            <div class="toolbar">
+                <div class="template-selector">
+                    <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);"><i class="fa-solid fa-filter" style="margin-right: 4px;"></i> Layout Filter</span>
+                    <select id="template-filter" onchange="switchTemplate(this.value)" class="template-select-dropdown">
+                        <optgroup label="General / Functional">
+                            <option value="modern" selected>Modern (Global Tech)</option>
+                            <option value="classic">Classic (Traditional Business)</option>
+                            <option value="executive">Executive (Two-Column Corporate)</option>
+                        </optgroup>
+                        <optgroup label="Regional / International Standards">
+                            <option value="gcc">GCC (Middle East / Gulf Region)</option>
+                            <option value="india">India (Academic Metrics & Declaration)</option>
+                            <option value="europe">Europe (Europass / CEFR Languages)</option>
+                            <option value="us">US / Canada (Strict Chronological B&W)</option>
+                            <option value="uk">UK / Commonwealth (Career Profile)</option>
+                            <option value="asia">Asia / Pacific (Sidebar Certifications)</option>
+                            <option value="latam">Latin America (Formal Profile Details)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="actions">
+                    <!-- ATS Score Indicator -->
+                    <div class="ats-container" onclick="openATSModal()">
+                        <div class="ats-badge" id="toolbar-ats-badge">0</div>
+                        <div class="ats-text">
+                            <div class="ats-label">ATS Score</div>
+                            <div class="ats-score-detail" id="toolbar-ats-status">Calculating...</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="openAICoverLetter()">
+                        <i class="fa-solid fa-envelope-open-text"></i> Cover Letter
+                    </button>
+                    <button class="btn btn-primary" onclick="exportPDF()">
+                        <i class="fa-solid fa-file-pdf"></i> Download PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable Workspace for A4 Sheet -->
+            <div class="preview-workspace">
+                <div class="resume-sheet t-modern" id="resume-sheet">
+                    <!-- Live Resume structure filled by javascript -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Drawer Panel -->
+    <div class="ai-panel" id="ai-panel">
+        <div class="ai-header">
+            <div class="ai-header-title">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span id="ai-panel-title">AI Assistant</span>
+            </div>
+            <button class="ai-close-btn" onclick="closeAIPanel()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="ai-body" id="ai-panel-body">
+            <!-- Dynamic AI Cards (Rewrite, Suggestion, Cover Letter) -->
+        </div>
+    </div>
+
+    <!-- ATS Details Modal -->
+    <div class="ats-modal" id="ats-modal">
+        <div class="ats-modal-card">
+            <div class="ats-modal-header">
+                <h3 style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-circle-nodes" style="color: var(--success);"></i> ATS Compatibility Audit
+                </h3>
+                <button class="ats-modal-close" onclick="closeATSModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="ats-modal-body">
+                <div class="ats-score-display">
+                    <div class="ats-gauge" id="ats-modal-gauge" style="--score: 0;">
+                        <span class="ats-gauge-num" id="ats-modal-score">0%</span>
+                    </div>
+                    <span style="font-weight: 600; margin-top: 5px;" id="ats-modal-status">Poor Compatibility</span>
+                </div>
+
+                <div class="ats-modal-subtitle">System Analysis Details</div>
+                <div class="ats-suggestion-list" id="ats-modal-suggestions">
+                    <!-- Suggested checks -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div class="toast" id="toast-notify">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-message">Resume Auto-saved!</span>
+    </div>
+
+    <!-- Script dependencies -->
+    <script src="ai.js"></script>
+    <script src="ats.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

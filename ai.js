@@ -1,0 +1,255 @@
+/**
+ * ResuMake AI - AI Assistant Module
+ * 
+ * Implements:
+ * 1. AI Work Experience Rewriter (ATS optimized with action verbs & quantified metrics)
+ * 2. AI Skill Recommender (Domain-specific suggestions)
+ * 3. AI Cover Letter Generator (Tailored multi-paragraph template)
+ * 
+ * Supports both an intelligent offline rule-based generator (instant) and 
+ * provides a hook for direct Gemini API integration.
+ */
+
+const AIService = {
+    // Optional API configuration if user wants to supply their own key
+    apiKey: localStorage.getItem('gemini_api_key') || '',
+    
+    // Core database of keywords and templates for high-quality mock/offline generation
+    knowledgeBase: {
+        skills: {
+            "software": ["React.js", "Node.js", "Python", "Docker", "Git/GitHub", "REST APIs", "PostgreSQL", "System Architecture", "Agile Methodologies", "Unit Testing", "AWS", "CI/CD Pipelines", "Problem Solving", "Collaboration"],
+            "web": ["HTML5/CSS3", "JavaScript (ES6+)", "TypeScript", "React", "Next.js", "Tailwind CSS", "Vite", "Responsive Design", "Web Performance Optimization", "SEO Best Practices", "Git", "UX/UI Design Principles"],
+            "data": ["Python", "SQL", "Pandas & NumPy", "Machine Learning", "Tableau/PowerBI", "R", "Data Visualization", "Statistical Analysis", "Data Warehousing", "Feature Engineering", "Scikit-Learn", "Analytical Thinking"],
+            "design": ["Figma", "Adobe Creative Suite", "UI/UX Design", "Wireframing", "Prototyping", "User Research", "Information Architecture", "Design Systems", "HTML/CSS Basics", "Interaction Design", "Creative Thinking", "Communication"],
+            "product": ["Product Roadmap", "User Personas", "Agile/Scrum", "Market Research", "Jira/Confluence", "Data Analytics", "A/B Testing", "Stakeholder Management", "Product Lifecycle", "Strategic Planning", "Leadership"],
+            "marketing": ["SEO/SEM", "Google Analytics", "Content Strategy", "Copywriting", "Social Media Marketing", "Email Campaigns", "A/B Testing", "Brand Management", "Market Analysis", "CRM Tools (HubSpot)", "Creativity"],
+            "generic": ["Project Management", "Team Leadership", "Strategic Planning", "Communication", "Problem Solving", "Time Management", "Critical Thinking", "Adaptability", "Collaboration", "Customer Relations"]
+        },
+        
+        verbs: [
+            "Spearheaded", "Engineered", "Optimized", "Architected", "Pioneered", 
+            "Accelerated", "Orchestrated", "Revamped", "Synthesized", "Formulated",
+            "Cultivated", "Maximize", "Decreased", "Standardized", "Transformed"
+        ],
+        
+        metrics: [
+            "boosting application load times by 35%",
+            "saving 8 hours of manual deployment work per week",
+            "resulting in a 42% reduction in production crash rates",
+            "increasing customer conversion rate by 18% in the first quarter",
+            "reducing server infrastructure costs by 22%",
+            "increasing team productivity by 15% through workflow automation",
+            "delivering the project 2 weeks ahead of schedule",
+            "improving test coverage from 45% to 88%"
+        ],
+        
+        coverLetters: {
+            opening: [
+                "I am writing to express my strong interest in the [Role] position at your company. With a solid foundation in [Skill] and hands-on experience building efficient solutions, I am confident in my ability to make an immediate impact on your engineering initiatives.",
+                "It is with great enthusiasm that I submit my application for the [Role] opportunity. As a dedicated professional specializing in [Skill], I have consistently driven technical excellence and successfully delivered user-centric solutions throughout my career."
+            ],
+            body: [
+                "In my previous roles, I have focused on designing scalable architectures and writing clean, maintainable code. I have a proven track record of collaborating across cross-functional teams to translate complex business requirements into robust software. For instance, I successfully leveraged [Skill] and related frameworks to build systems that significantly optimized performance and streamlined key workflows.",
+                "My technical expertise is complemented by my strong problem-solving skills and commitment to continuous learning. During my recent work, I spearheaded several feature developments, utilizing [Skill] to construct responsive, high-performance interfaces and backend APIs. I am passionate about engineering workflows and thrive in collaborative environments that push the boundaries of technology."
+            ],
+            closing: [
+                "I welcome the opportunity to discuss how my technical skills and background align with your team's needs. Thank you for your time and consideration.",
+                "I am excited about the prospect of contributing to your team's mission. I look forward to the possibility of discussing my application further. Thank you for evaluating my candidacy."
+            ]
+        }
+    },
+
+    /**
+     * Determines the job category based on a job title string
+     */
+    detectCategory(title) {
+        title = title.toLowerCase();
+        if (title.includes("software") || title.includes("developer") || title.includes("engineer") || title.includes("backend") || title.includes("full stack")) {
+            if (title.includes("web") || title.includes("frontend")) return "web";
+            return "software";
+        }
+        if (title.includes("data") || title.includes("analyst") || title.includes("science") || title.includes("ml") || title.includes("ai")) return "data";
+        if (title.includes("design") || title.includes("ux") || title.includes("ui") || title.includes("product designer")) return "design";
+        if (title.includes("product") || title.includes("manager") || title.includes("owner")) return "product";
+        if (title.includes("market") || title.includes("growth") || title.includes("seo")) return "marketing";
+        return "generic";
+    },
+
+    /**
+     * AI Work Experience Rewriter
+     * Uses template metrics and strong action verbs to polish text
+     */
+    async rewriteExperience(text, jobTitle) {
+        if (this.apiKey) {
+            return await this.callGeminiAPI(`Rewrite this job description for a "${jobTitle}" role using strong action verbs, quantify achievements where possible, and optimize it for ATS systems. Output ONLY the rewritten paragraphs as bullet points:\n\n${text}`);
+        }
+        
+        // Offline / Mock engine
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (!text || text.trim().length < 10) {
+                    resolve("- Spearheaded development of core product features, improving system performance and usability.\n- Collaborated with cross-functional teams to design and deploy scalable architectures.\n- Optimized data pipelines and code structures, reducing average load times by 25%.");
+                    return;
+                }
+
+                // Clean the input text, split by sentences or bullets
+                let lines = text.split(/[.\n]+/).map(l => l.trim()).filter(l => l.length > 5);
+                let rewrittenLines = [];
+                
+                let usedVerbs = new Set();
+                let usedMetrics = new Set();
+
+                for (let i = 0; i < Math.max(3, lines.length); i++) {
+                    let line = lines[i] || "Responsible for maintaining and developing software applications.";
+                    
+                    // Select a unique verb and metric
+                    let verb = this.knowledgeBase.verbs.find(v => !usedVerbs.has(v)) || this.knowledgeBase.verbs[Math.floor(Math.random() * this.knowledgeBase.verbs.length)];
+                    usedVerbs.add(verb);
+                    
+                    let metric = this.knowledgeBase.metrics.find(m => !usedMetrics.has(m)) || this.knowledgeBase.metrics[Math.floor(Math.random() * this.knowledgeBase.metrics.length)];
+                    usedMetrics.add(metric);
+
+                    // Clean the original line of common weak verbs/starters
+                    let cleanLine = line
+                        .replace(/^(I was|responsible for|helped to|worked on|developed|designed|managed|made|created|did)\s+/i, '')
+                        .replace(/^\-/, '')
+                        .trim();
+                    
+                    // Capitalize first letter of cleaned line
+                    cleanLine = cleanLine.charAt(0).toUpperCase() + cleanLine.slice(1);
+                    if (!cleanLine.endsWith('.')) cleanLine += '';
+
+                    // Construct rewritten sentence
+                    let bullet = `- ${verb} ${cleanLine.toLowerCase().replace(/[\.]+$/, '')}, ${metric}.`;
+                    rewrittenLines.push(bullet);
+                }
+
+                resolve(rewrittenLines.join('\n'));
+            }, 1000); // Simulated delay
+        });
+    },
+
+    /**
+     * AI Skill Suggester
+     */
+    async suggestSkills(existingSkills, jobTitle) {
+        if (this.apiKey) {
+            return await this.callGeminiAPI(`Based on this target job "${jobTitle}" and existing skills [${existingSkills.join(', ')}], recommend exactly 10 relevant technical and soft skills as a comma-separated list. Output ONLY the comma-separated skills:`);
+        }
+
+        // Offline / Mock engine
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                let category = this.detectCategory(jobTitle);
+                let pool = this.knowledgeBase.skills[category] || this.knowledgeBase.skills["generic"];
+                
+                // Filter out skills the user already has
+                let existingLower = existingSkills.map(s => s.toLowerCase());
+                let suggestions = pool.filter(s => !existingLower.includes(s.toLowerCase()));
+                
+                // If we don't have enough, add some generic ones
+                if (suggestions.length < 10) {
+                    let genericPool = this.knowledgeBase.skills["generic"];
+                    for (let g of genericPool) {
+                        if (!existingLower.includes(g.toLowerCase()) && !suggestions.includes(g)) {
+                            suggestions.push(g);
+                        }
+                    }
+                }
+                
+                // Return exactly 10
+                resolve(suggestions.slice(0, 10).join(', '));
+            }, 800);
+        });
+    },
+
+    /**
+     * AI Cover Letter Generator
+     */
+    async generateCoverLetter(resumeData) {
+        let name = resumeData.name || "John Doe";
+        let role = resumeData.targetJob || "Software Developer";
+        let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 3).join(', ') : "Software Engineering";
+        let company = "Hiring Manager";
+        
+        if (this.apiKey) {
+            return await this.callGeminiAPI(`Write a highly professional and compelling cover letter. Candidate Name: ${name}. Target Role: ${role}. Skills: ${resumeData.skills.join(', ')}. Experience Summary: ${JSON.stringify(resumeData.experience)}. Output ONLY the letter text with greetings and signature. No markdown comments or brackets:`);
+        }
+
+        // Offline / Mock engine
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                let dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                
+                let greeting = `Dear Hiring Manager,`;
+                
+                let openingTpl = this.knowledgeBase.coverLetters.opening[Math.floor(Math.random() * this.knowledgeBase.coverLetters.opening.length)];
+                let opening = openingTpl.replace('[Role]', role).replace('[Skill]', skills);
+                
+                let bodyTpl = this.knowledgeBase.coverLetters.body[Math.floor(Math.random() * this.knowledgeBase.coverLetters.body.length)];
+                let body = bodyTpl.replace('[Role]', role).replace(/\[Skill\]/g, skills);
+                
+                // Incorporate work experience details if available
+                let experienceDetail = "";
+                if (resumeData.experience && resumeData.experience.length > 0) {
+                    let latestExp = resumeData.experience[0];
+                    experienceDetail = `In my recent role as ${latestExp.role} at ${latestExp.company}, I focused on implementing features, collaborating with engineering teams, and optimizing technical solutions to meet business milestones.`;
+                } else {
+                    experienceDetail = "I have developed strong competencies in modern software development methodologies and enjoy working on complex technical challenges.";
+                }
+                
+                let closing = this.knowledgeBase.coverLetters.closing[Math.floor(Math.random() * this.knowledgeBase.coverLetters.closing.length)];
+                
+                let letter = `${dateStr}\n\n${greeting}\n\n${opening}\n\n${body}\n\n${experienceDetail}\n\n${closing}\n\nSincerely,\n\n${name}`;
+                
+                resolve(letter);
+            }, 1200);
+        });
+    },
+
+    /**
+     * Gemini API Client Call (Fallback if API Key provided)
+     */
+    async callGeminiAPI(promptText) {
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: promptText
+                        }]
+                    }]
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text.trim();
+        } catch (error) {
+            console.error("Gemini API call failed, falling back to local intelligence: ", error);
+            // Flash notification of failure in dev tools, but fallback gracefully to mock
+            return "Gemini API Error. Please check your API key in development settings or connection. Falling back to local offline AI results:\n\n" + await this.offlineFallback(promptText);
+        }
+    },
+
+    /**
+     * Basic prompt parser for offline fallback in case user API key fails
+     */
+    async offlineFallback(prompt) {
+        if (prompt.includes("Rewrite")) {
+            return await this.rewriteExperience("Sample developer description", "Software Developer");
+        } else if (prompt.includes("recommend")) {
+            return await this.suggestSkills([], "Software Developer");
+        } else {
+            return "Sincerely,\nJohn Doe";
+        }
+    }
+};

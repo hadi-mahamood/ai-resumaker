@@ -1,0 +1,2020 @@
+/**
+ * ResuMake AI - Main Application Controller
+ * 
+ * Manages state synchronization, dynamic list builders, tags rendering,
+ * template compilers (Modern, Classic, Executive), local storage preservation,
+ * AI Assistant drawer interface, ATS auditing triggers, and native PDF layout.
+ */
+
+// Core App State
+let state = {
+    targetJob: "Software Developer",
+    name: "Alex Mercer",
+    title: "Full Stack Software Engineer",
+    email: "alex.mercer@dev.io",
+    phone: "+1 (555) 321-9876",
+    location: "Seattle, WA",
+    website: "github.com/alex-mercer",
+    dob: "12 Oct 1998",
+    nationality: "Indian",
+    visaStatus: "Employment Visa (GCC Eligible)",
+    maritalStatus: "Single / Male",
+    languages: "English (Native), Hindi (Native), Arabic (Basic)",
+    skills: ["React.js", "JavaScript (ES6+)", "Node.js", "Python", "REST APIs", "SQL", "Git/GitHub", "Docker"],
+    experience: [
+        {
+            id: "exp-1",
+            company: "TechNova Solutions",
+            role: "Software Engineer",
+            date: "Jan 2024 - Present",
+            desc: "- Spearheaded development of core web application dashboard, improving speed by 35%.\n- Collaborated with 5 engineers to design REST API endpoints and integrate them with React UI.\n- Integrated automated unit tests, increasing system reliability by 25%."
+        },
+        {
+            id: "exp-2",
+            company: "Quantum Code Inc",
+            role: "Junior Web Developer",
+            date: "Jun 2022 - Dec 2023",
+            desc: "- Developed and maintained robust websites for client projects using JavaScript, HTML, and CSS.\n- Revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%.\n- Debugged production issues, resolving an average of 10+ critical issues weekly."
+        }
+    ],
+    education: [
+        {
+            id: "edu-1",
+            institution: "University of Washington",
+            degree: "Bachelor of Science in Computer Science",
+            date: "2018 - 2022",
+            desc: "Graduated with Honors. Specialized in Software Architecture and Database Systems."
+        }
+    ],
+    projects: [
+        {
+            id: "proj-1",
+            title: "DevPortfolio Generator",
+            role: "Creator",
+            desc: "An open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites. Gained 150+ stars on GitHub."
+        }
+    ],
+    activeTemplate: "modern"
+};
+
+// Accordion Logic
+function toggleAccordion(itemId) {
+    const item = document.getElementById(itemId);
+    const isActive = item.classList.contains('active');
+    
+    // Deactivate all accordions
+    document.querySelectorAll('.accordion-item').forEach(acc => {
+        acc.classList.remove('active');
+    });
+
+    // Toggle target
+    if (!isActive) {
+        item.classList.add('active');
+    }
+}
+
+// Initialize Application
+document.addEventListener("DOMContentLoaded", () => {
+    // Load from local storage if exists
+    const savedState = localStorage.getItem('resumake_state');
+    if (savedState) {
+        try {
+            state = JSON.parse(savedState);
+        } catch (e) {
+            console.error("Failed to parse saved state, using default values.");
+        }
+    }
+
+    // Set initial values in inputs
+    setFormFields();
+    
+    // Bind event listeners
+    bindInputEvents();
+
+    // Populate API key input if exists
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey && document.getElementById("api-key-input")) {
+        document.getElementById("api-key-input").value = savedKey;
+    }
+
+    // Update sidebar indicators initially
+    updateSidebarBadges();
+    
+    // Render list items
+    renderExperienceList();
+    renderEducationList();
+    renderProjectsList();
+    renderSkillsTags();
+
+    // Render preview
+    renderResumePreview();
+    
+    // Switch templates to active one
+    switchTemplate(state.activeTemplate);
+});
+
+// Sync state data to form inputs
+function setFormFields() {
+    document.getElementById("target-job").value = state.targetJob || "";
+    document.getElementById("input-name").value = state.name || "";
+    document.getElementById("input-title").value = state.title || "";
+    document.getElementById("input-email").value = state.email || "";
+    document.getElementById("input-phone").value = state.phone || "";
+    document.getElementById("input-location").value = state.location || "";
+    document.getElementById("input-website").value = state.website || "";
+    if (document.getElementById("input-dob")) document.getElementById("input-dob").value = state.dob || "";
+    if (document.getElementById("input-nationality")) document.getElementById("input-nationality").value = state.nationality || "";
+    if (document.getElementById("input-visa")) document.getElementById("input-visa").value = state.visaStatus || "";
+    if (document.getElementById("input-marital")) document.getElementById("input-marital").value = state.maritalStatus || "";
+    if (document.getElementById("input-languages")) document.getElementById("input-languages").value = state.languages || "";
+}
+
+// Bind standard text input keyup events to auto-save and update preview
+function bindInputEvents() {
+    const textInputs = [
+        { id: "target-job", key: "targetJob" },
+        { id: "input-name", key: "name" },
+        { id: "input-title", key: "title" },
+        { id: "input-email", key: "email" },
+        { id: "input-phone", key: "phone" },
+        { id: "input-location", key: "location" },
+        { id: "input-website", key: "website" },
+        { id: "input-dob", key: "dob" },
+        { id: "input-nationality", key: "nationality" },
+        { id: "input-visa", key: "visaStatus" },
+        { id: "input-marital", key: "maritalStatus" },
+        { id: "input-languages", key: "languages" }
+    ];
+
+    textInputs.forEach(item => {
+        const el = document.getElementById(item.id);
+        if (el) {
+            el.addEventListener("input", (e) => {
+                state[item.key] = e.target.value;
+                autoSave();
+                renderResumePreview();
+            });
+        }
+    });
+
+    // Skill input listener
+    const skillInput = document.getElementById("skill-input");
+    skillInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            const val = skillInput.value.trim();
+            if (val && !state.skills.includes(val)) {
+                state.skills.push(val);
+                skillInput.value = "";
+                renderSkillsTags();
+                autoSave();
+                renderResumePreview();
+                showToast("Skill added successfully!");
+            }
+        }
+    });
+}
+
+// Auto Save State Helper
+let saveTimeout;
+function autoSave() {
+    clearTimeout(saveTimeout);
+    
+    // Pulse save indicator status
+    const saveDot = document.querySelector(".save-dot");
+    const saveStatus = document.querySelector(".save-status");
+    if (saveDot) {
+        saveDot.classList.add("saving");
+        if (saveStatus) saveStatus.innerHTML = '<span class="save-dot saving"></span> Saving...';
+    }
+
+    saveTimeout = setTimeout(() => {
+        localStorage.setItem('resumake_state', JSON.stringify(state));
+        updateATSScore();
+        updateSidebarBadges();
+        if (saveDot) {
+            saveDot.classList.remove("saving");
+            if (saveStatus) saveStatus.innerHTML = '<span class="save-dot"></span> Saved Locally';
+        }
+    }, 500);
+}
+
+// Toast Alert Manager
+function showToast(message) {
+    const toast = document.getElementById("toast-notify");
+    const toastMsg = document.getElementById("toast-message");
+    toastMsg.innerText = message;
+    toast.classList.add("show");
+    
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
+}
+
+/* ==========================================
+   DYNAMIC LIST RENDERERS & BUILDERS
+   ========================================== */
+
+// Skills Tags builder
+function renderSkillsTags() {
+    const container = document.getElementById("skills-tags-container");
+    const input = document.getElementById("skill-input");
+    
+    // Clear old tags
+    container.querySelectorAll('.tag').forEach(t => t.remove());
+
+    state.skills.forEach(skill => {
+        const tag = document.createElement("div");
+        tag.className = "tag";
+        tag.innerHTML = `${skill} <span class="tag-remove" onclick="removeSkill('${skill}')">&times;</span>`;
+        container.insertBefore(tag, input);
+    });
+}
+
+function removeSkill(skill) {
+    state.skills = state.skills.filter(s => s !== skill);
+    renderSkillsTags();
+    autoSave();
+    renderResumePreview();
+}
+
+// Experience List Builder
+function renderExperienceList() {
+    const container = document.getElementById("experience-list");
+    container.innerHTML = "";
+
+    state.experience.forEach((exp, idx) => {
+        const card = document.createElement("div");
+        card.className = "list-item-card";
+        card.innerHTML = `
+            <div class="list-item-card-header">
+                <span class="card-drag-handle"><i class="fa-solid fa-grip-vertical"></i> Experience #${idx + 1}</span>
+                <button class="list-item-delete" onclick="deleteExperience('${exp.id}')" title="Delete Experience"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Company</label>
+                    <input type="text" value="${exp.company}" oninput="updateExperience('${exp.id}', 'company', this.value)" placeholder="e.g. Google">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <input type="text" value="${exp.role}" oninput="updateExperience('${exp.id}', 'role', this.value)" placeholder="e.g. Lead Engineer">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Date Range</label>
+                <input type="text" value="${exp.date}" oninput="updateExperience('${exp.id}', 'date', this.value)" placeholder="e.g. Jan 2022 - Present">
+            </div>
+            <div class="form-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <label>Description / Accomplishments</label>
+                    <button class="ai-btn ai-btn-accent" style="padding: 2px 8px; font-size: 0.7rem; border-radius: 4px;" onclick="openAIEngine('${exp.id}')">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI Rewrite
+                    </button>
+                </div>
+                <textarea oninput="updateExperience('${exp.id}', 'desc', this.value)" placeholder="Include bullet points for achievements...">${exp.desc}</textarea>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function addExperience() {
+    const newExp = {
+        id: "exp-" + Date.now(),
+        company: "",
+        role: "",
+        date: "",
+        desc: ""
+    };
+    state.experience.push(newExp);
+    renderExperienceList();
+    autoSave();
+    renderResumePreview();
+}
+
+function updateExperience(id, field, value) {
+    const idx = state.experience.findIndex(e => e.id === id);
+    if (idx !== -1) {
+        state.experience[idx][field] = value;
+        autoSave();
+        renderResumePreview();
+    }
+}
+
+function deleteExperience(id) {
+    state.experience = state.experience.filter(e => e.id !== id);
+    renderExperienceList();
+    autoSave();
+    renderResumePreview();
+}
+
+// Education List Builder
+function renderEducationList() {
+    const container = document.getElementById("education-list");
+    container.innerHTML = "";
+
+    state.education.forEach((edu, idx) => {
+        const card = document.createElement("div");
+        card.className = "list-item-card";
+        card.innerHTML = `
+            <div class="list-item-card-header">
+                <span class="card-drag-handle"><i class="fa-solid fa-grip-vertical"></i> Education #${idx + 1}</span>
+                <button class="list-item-delete" onclick="deleteEducation('${edu.id}')" title="Delete Education"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Institution</label>
+                    <input type="text" value="${edu.institution}" oninput="updateEducation('${edu.id}', 'institution', this.value)" placeholder="e.g. Stanford University">
+                </div>
+                <div class="form-group">
+                    <label>Degree / Certificate</label>
+                    <input type="text" value="${edu.degree}" oninput="updateEducation('${edu.id}', 'degree', this.value)" placeholder="e.g. MS in Computer Science">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Timeline / Dates</label>
+                <input type="text" value="${edu.date}" oninput="updateEducation('${edu.id}', 'date', this.value)" placeholder="e.g. 2018 - 2020">
+            </div>
+            <div class="form-group">
+                <label>Additional Info (Optional)</label>
+                <textarea oninput="updateEducation('${edu.id}', 'desc', this.value)" placeholder="GPA, notable courses...">${edu.desc}</textarea>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function addEducation() {
+    const newEdu = {
+        id: "edu-" + Date.now(),
+        institution: "",
+        degree: "",
+        date: "",
+        desc: ""
+    };
+    state.education.push(newEdu);
+    renderEducationList();
+    autoSave();
+    renderResumePreview();
+}
+
+function updateEducation(id, field, value) {
+    const idx = state.education.findIndex(e => e.id === id);
+    if (idx !== -1) {
+        state.education[idx][field] = value;
+        autoSave();
+        renderResumePreview();
+    }
+}
+
+function deleteEducation(id) {
+    state.education = state.education.filter(e => e.id !== id);
+    renderEducationList();
+    autoSave();
+    renderResumePreview();
+}
+
+// Projects List Builder
+function renderProjectsList() {
+    const container = document.getElementById("projects-list");
+    container.innerHTML = "";
+
+    state.projects.forEach((proj, idx) => {
+        const card = document.createElement("div");
+        card.className = "list-item-card";
+        card.innerHTML = `
+            <div class="list-item-card-header">
+                <span class="card-drag-handle"><i class="fa-solid fa-grip-vertical"></i> Project #${idx + 1}</span>
+                <button class="list-item-delete" onclick="deleteProject('${proj.id}')" title="Delete Project"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" value="${proj.title}" oninput="updateProject('${proj.id}', 'title', this.value)" placeholder="e.g. E-Commerce Backend">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <input type="text" value="${proj.role}" oninput="updateProject('${proj.id}', 'role', this.value)" placeholder="e.g. Sole Architect">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description / Technical Details</label>
+                <textarea oninput="updateProject('${proj.id}', 'desc', this.value)" placeholder="Describe features, stack used...">${proj.desc}</textarea>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function addProject() {
+    const newProj = {
+        id: "proj-" + Date.now(),
+        title: "",
+        role: "",
+        desc: ""
+    };
+    state.projects.push(newProj);
+    renderProjectsList();
+    autoSave();
+    renderResumePreview();
+}
+
+function updateProject(id, field, value) {
+    const idx = state.projects.findIndex(e => e.id === id);
+    if (idx !== -1) {
+        state.projects[idx][field] = value;
+        autoSave();
+        renderResumePreview();
+    }
+}
+
+function deleteProject(id) {
+    state.projects = state.projects.filter(p => p.id !== id);
+    renderProjectsList();
+    autoSave();
+    renderResumePreview();
+}
+
+/* ==========================================
+   RESUME TEMPLATE COMPILERS (PREVIEW RENDERING)
+   ========================================== */
+
+function switchTemplate(templateName) {
+    state.activeTemplate = templateName;
+    
+    // Sync filter dropdown if exists
+    const filter = document.getElementById("template-filter");
+    if (filter) {
+        filter.value = templateName;
+    }
+    
+    // Update toolbar active button (legacy support)
+    document.querySelectorAll('.template-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.innerText.toLowerCase() === templateName) {
+            btn.classList.add('active');
+        }
+    });
+
+    const sheet = document.getElementById("resume-sheet");
+    // Swap template style class
+    sheet.className = `resume-sheet t-${templateName}`;
+    
+    autoSave();
+    renderResumePreview();
+}
+
+function renderResumePreview() {
+    const sheet = document.getElementById("resume-sheet");
+    sheet.innerHTML = "";
+    
+    const template = state.activeTemplate;
+    
+    if (template === "modern") {
+        sheet.innerHTML = compileModernTemplate();
+    } else if (template === "classic") {
+        sheet.innerHTML = compileClassicTemplate();
+    } else if (template === "executive") {
+        sheet.innerHTML = compileExecutiveTemplate();
+    } else if (template === "gcc") {
+        sheet.innerHTML = compileGCCTemplate();
+    } else if (template === "india") {
+        sheet.innerHTML = compileIndiaTemplate();
+    } else if (template === "europe") {
+        sheet.innerHTML = compileEuropeTemplate();
+    } else if (template === "us") {
+        sheet.innerHTML = compileUSTemplate();
+    } else if (template === "uk") {
+        sheet.innerHTML = compileUKTemplate();
+    } else if (template === "asia") {
+        sheet.innerHTML = compileAsiaTemplate();
+    } else if (template === "latam") {
+        sheet.innerHTML = compileLATAMTemplate();
+    }
+    
+    // Trigger score checking
+    updateATSScore();
+}
+
+// Template 1 Compiler: Modern layout
+function compileModernTemplate() {
+    let name = state.name || "YOUR NAME";
+    let title = state.title || "Target Professional Title";
+    
+    let contacts = [];
+    if (state.email) contacts.push(`<i class="fa-solid fa-envelope"></i> ${state.email}`);
+    if (state.phone) contacts.push(`<i class="fa-solid fa-phone"></i> ${state.phone}`);
+    if (state.location) contacts.push(`<i class="fa-solid fa-location-dot"></i> ${state.location}`);
+    if (state.website) contacts.push(`<i class="fa-solid fa-globe"></i> ${state.website}`);
+    let contactBar = contacts.length > 0 ? `<div class="resume-contact-bar">${contacts.join(' | ')}</div>` : '';
+
+    // Experience compilation
+    let expHTML = "";
+    if (state.experience && state.experience.length > 0) {
+        let items = state.experience.map(exp => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title">${exp.role || "Job Role"}</span> at 
+                        <span class="item-subtitle">${exp.company || "Company Name"}</span>
+                    </div>
+                    <span class="item-date">${exp.date || "Timeline"}</span>
+                </div>
+                <div class="item-desc">${formatMultiline(exp.desc || "Responsibility bullets...")}</div>
+            </div>
+        `).join('');
+        expHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Experience</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Education compilation
+    let eduHTML = "";
+    if (state.education && state.education.length > 0) {
+        let items = state.education.map(edu => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title">${edu.degree || "Degree Details"}</span>
+                    </div>
+                    <span class="item-date">${edu.date || "Graduation Year"}</span>
+                </div>
+                <div class="item-subtitle">${edu.institution || "College Name"}</div>
+                ${edu.desc ? `<div class="item-desc" style="margin-top:2px;">${edu.desc}</div>` : ''}
+            </div>
+        `).join('');
+        eduHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Education</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Projects compilation
+    let projHTML = "";
+    if (state.projects && state.projects.length > 0) {
+        let items = state.projects.map(proj => `
+            <div class="project-item">
+                <div class="item-header">
+                    <span class="item-title">${proj.title || "Project Name"}</span>
+                    <span class="item-subtitle">${proj.role || "Role"}</span>
+                </div>
+                <div class="item-desc" style="margin-top:2px;">${formatMultiline(proj.desc || "Description...")}</div>
+            </div>
+        `).join('');
+        projHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Projects</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Skills compilation
+    let skillsHTML = "";
+    if (state.skills && state.skills.length > 0) {
+        let badges = state.skills.map(s => `<span class="skill-badge-preview">${s}</span>`).join('');
+        skillsHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Skills</h2>
+                <div class="resume-section-content">
+                    <div class="skills-list-preview">${badges}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <header class="resume-header">
+            <h1 class="resume-name">${name}</h1>
+            <div class="resume-title">${title}</div>
+            ${contactBar}
+        </header>
+        ${expHTML}
+        ${skillsHTML}
+        ${projHTML}
+        ${eduHTML}
+    `;
+}
+
+// Template 2 Compiler: Classic layout
+function compileClassicTemplate() {
+    let name = state.name || "YOUR NAME";
+    let title = state.title || "Target Professional Title";
+    
+    let contacts = [];
+    if (state.email) contacts.push(state.email);
+    if (state.phone) contacts.push(state.phone);
+    if (state.location) contacts.push(state.location);
+    if (state.website) contacts.push(state.website);
+    let contactBar = contacts.length > 0 ? `<div class="resume-contact-bar">${contacts.join('   •   ')}</div>` : '';
+
+    // Experience
+    let expHTML = "";
+    if (state.experience && state.experience.length > 0) {
+        let items = state.experience.map(exp => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title">${exp.company || "Company"}</span> — 
+                        <span class="item-subtitle">${exp.role || "Role"}</span>
+                    </div>
+                    <span class="item-date">${exp.date || "Dates"}</span>
+                </div>
+                <div class="item-desc">${formatMultiline(exp.desc || "Bullet achievements...")}</div>
+            </div>
+        `).join('');
+        expHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Professional Experience</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Skills
+    let skillsHTML = "";
+    if (state.skills && state.skills.length > 0) {
+        let badges = state.skills.map(s => `<span class="skill-badge-preview">${s}</span>`).join('');
+        skillsHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Key Competencies</h2>
+                <div class="resume-section-content">
+                    <div class="skills-list-preview">${badges}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Projects
+    let projHTML = "";
+    if (state.projects && state.projects.length > 0) {
+        let items = state.projects.map(proj => `
+            <div class="project-item">
+                <div class="item-header">
+                    <span class="item-title">${proj.title || "Project"}</span>
+                    <span class="item-subtitle">${proj.role || "Role"}</span>
+                </div>
+                <div class="item-desc">${formatMultiline(proj.desc || "Description...")}</div>
+            </div>
+        `).join('');
+        projHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Technical Projects</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Education
+    let eduHTML = "";
+    if (state.education && state.education.length > 0) {
+        let items = state.education.map(edu => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title">${edu.institution || "School"}</span> — 
+                        <span class="item-subtitle">${edu.degree || "Degree"}</span>
+                    </div>
+                    <span class="item-date">${edu.date || "Dates"}</span>
+                </div>
+                ${edu.desc ? `<div class="item-desc">${edu.desc}</div>` : ''}
+            </div>
+        `).join('');
+        eduHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Education</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    return `
+        <header class="resume-header">
+            <h1 class="resume-name">${name}</h1>
+            <div class="resume-title">${title}</div>
+            ${contactBar}
+        </header>
+        ${expHTML}
+        ${skillsHTML}
+        ${projHTML}
+        ${eduHTML}
+    `;
+}
+
+// Template 3 Compiler: Executive Sidebar layout
+function compileExecutiveTemplate() {
+    let name = state.name || "YOUR NAME";
+    let title = state.title || "Target Professional Title";
+    
+    // Assemble sidebar contact column
+    let contactItems = [];
+    if (state.email) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-envelope" style="width:14px; margin-right:4px;"></i> ${state.email}</div>`);
+    if (state.phone) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-phone" style="width:14px; margin-right:4px;"></i> ${state.phone}</div>`);
+    if (state.location) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-location-dot" style="width:14px; margin-right:4px;"></i> ${state.location}</div>`);
+    if (state.website) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-globe" style="width:14px; margin-right:4px;"></i> ${state.website}</div>`);
+    let contactBox = contactItems.length > 0 ? `<div class="contact-info-list">${contactItems.join('')}</div>` : '';
+
+    // Skills
+    let skillsHTML = "";
+    if (state.skills && state.skills.length > 0) {
+        let badges = state.skills.map(s => `<span class="skill-badge-preview">${s}</span>`).join('');
+        skillsHTML = `
+            <div class="resume-section" style="margin-top: 15px;">
+                <h2 class="resume-section-title">Expertise</h2>
+                <div style="margin-top: 8px;">${badges}</div>
+            </div>
+        `;
+    }
+
+    // Experience
+    let expHTML = "";
+    if (state.experience && state.experience.length > 0) {
+        let items = state.experience.map(exp => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <span class="item-title">${exp.role || "Role"}</span>
+                    <span class="item-subtitle">${exp.company || "Company"}</span>
+                    <span class="item-date">${exp.date || "Dates"}</span>
+                </div>
+                <div class="item-desc">${formatMultiline(exp.desc || "Accomplishments...")}</div>
+            </div>
+        `).join('');
+        expHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Professional Experience</h2>
+                <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">${items}</div>
+            </div>
+        `;
+    }
+
+    // Projects
+    let projHTML = "";
+    if (state.projects && state.projects.length > 0) {
+        let items = state.projects.map(proj => `
+            <div class="project-item">
+                <div class="item-header">
+                    <span class="item-title">${proj.title || "Project"}</span>
+                    <span class="item-subtitle">${proj.role || "Role"}</span>
+                </div>
+                <div class="item-desc">${formatMultiline(proj.desc || "Details...")}</div>
+            </div>
+        `).join('');
+        projHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Projects</h2>
+                <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">${items}</div>
+            </div>
+        `;
+    }
+
+    // Education
+    let eduHTML = "";
+    if (state.education && state.education.length > 0) {
+        let items = state.education.map(edu => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <span class="item-title">${edu.degree || "Degree"}</span>
+                    <span class="item-subtitle">${edu.institution || "Institution"}</span>
+                    <span class="item-date">${edu.date || "Dates"}</span>
+                </div>
+                ${edu.desc ? `<div class="item-desc" style="margin-top:2px;">${edu.desc}</div>` : ''}
+            </div>
+        `).join('');
+        eduHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Education</h2>
+                <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">${items}</div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="sidebar-col">
+            <header class="resume-header">
+                <h1 class="resume-name">${name}</h1>
+                <div class="resume-title">${title}</div>
+            </header>
+            ${contactBox}
+            ${skillsHTML}
+        </div>
+        <div class="main-col">
+            ${expHTML}
+            ${projHTML}
+            ${eduHTML}
+        </div>
+    `;
+}
+
+function compileGCCTemplate() {
+    let name = state.name || "YOUR NAME";
+    let title = state.title || "Target Professional Title";
+    
+    let contacts = [];
+    if (state.email) contacts.push(`<i class="fa-solid fa-envelope"></i> ${state.email}`);
+    if (state.phone) contacts.push(`<i class="fa-solid fa-phone"></i> ${state.phone}`);
+    if (state.location) contacts.push(`<i class="fa-solid fa-location-dot"></i> ${state.location}`);
+    if (state.website) contacts.push(`<i class="fa-solid fa-globe"></i> ${state.website}`);
+    let contactBar = contacts.length > 0 ? `<div class="resume-contact-bar">${contacts.join(' | ')}</div>` : '';
+
+    // GCC specific info block
+    let gccMeta = [];
+    if (state.dob) gccMeta.push(`<strong>DOB:</strong> ${state.dob}`);
+    if (state.nationality) gccMeta.push(`<strong>Nationality:</strong> ${state.nationality}`);
+    if (state.visaStatus) gccMeta.push(`<strong>Visa Status:</strong> ${state.visaStatus}`);
+    if (state.maritalStatus) gccMeta.push(`<strong>Marital Status:</strong> ${state.maritalStatus}`);
+    if (state.languages) gccMeta.push(`<strong>Languages:</strong> ${state.languages}`);
+    
+    let gccMetaBox = gccMeta.length > 0 ? `
+        <div class="gcc-meta-box">
+            <div class="gcc-meta-grid">
+                ${gccMeta.map(m => `<div class="gcc-meta-item">${m}</div>`).join('')}
+            </div>
+        </div>
+    ` : '';
+
+    // Experience
+    let expHTML = "";
+    if (state.experience && state.experience.length > 0) {
+        let items = state.experience.map(exp => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title">${exp.role || "Job Role"}</span> at 
+                        <span class="item-subtitle">${exp.company || "Company Name"}</span>
+                    </div>
+                    <span class="item-date">${exp.date || "Timeline"}</span>
+                </div>
+                <div class="item-desc">${formatMultiline(exp.desc || "Responsibility bullets...")}</div>
+            </div>
+        `).join('');
+        expHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Professional Experience</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Skills
+    let skillsHTML = "";
+    if (state.skills && state.skills.length > 0) {
+        let badges = state.skills.map(s => `<span class="skill-badge-preview">${s}</span>`).join('');
+        skillsHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Core Competencies</h2>
+                <div class="resume-section-content">
+                    <div class="skills-list-preview">${badges}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Projects
+    let projHTML = "";
+    if (state.projects && state.projects.length > 0) {
+        let items = state.projects.map(proj => `
+            <div class="project-item">
+                <div class="item-header">
+                    <span class="item-title">${proj.title || "Project Name"}</span>
+                    <span class="item-subtitle">${proj.role || "Role"}</span>
+                </div>
+                <div class="item-desc" style="margin-top:2px;">${formatMultiline(proj.desc || "Description...")}</div>
+            </div>
+        `).join('');
+        projHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Key Projects</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Education
+    let eduHTML = "";
+    if (state.education && state.education.length > 0) {
+        let items = state.education.map(edu => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title">${edu.degree || "Degree"}</span>
+                    </div>
+                    <span class="item-date">${edu.date || "Dates"}</span>
+                </div>
+                <div class="item-subtitle">${edu.institution || "Institution"}</div>
+                ${edu.desc ? `<div class="item-desc">${edu.desc}</div>` : ''}
+            </div>
+        `).join('');
+        eduHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Education</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    return `
+        <header class="resume-header">
+            <h1 class="resume-name">${name}</h1>
+            <div class="resume-title">${title}</div>
+            ${contactBar}
+        </header>
+        ${gccMetaBox}
+        ${expHTML}
+        ${skillsHTML}
+        ${projHTML}
+        ${eduHTML}
+    `;
+}
+
+function compileIndiaTemplate() {
+    let name = state.name || "YOUR NAME";
+    let title = state.title || "Target Professional Title";
+    
+    let contacts = [];
+    if (state.email) contacts.push(state.email);
+    if (state.phone) contacts.push(state.phone);
+    if (state.location) contacts.push(state.location);
+    if (state.website) contacts.push(state.website);
+    let contactBar = contacts.length > 0 ? `<div class="resume-contact-bar">${contacts.join('  |  ')}</div>` : '';
+
+    // Skills (Top)
+    let skillsHTML = "";
+    if (state.skills && state.skills.length > 0) {
+        let badges = state.skills.map(s => `<span class="skill-badge-preview">${s}</span>`).join('');
+        skillsHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Technical & Professional Skills</h2>
+                <div class="resume-section-content">
+                    <div class="skills-list-preview">${badges}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Experience
+    let expHTML = "";
+    if (state.experience && state.experience.length > 0) {
+        let items = state.experience.map(exp => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <strong class="item-title">${exp.role || "Job Role"}</strong> — 
+                        <span class="item-subtitle">${exp.company || "Company"}</span>
+                    </div>
+                    <span class="item-date">${exp.date || "Timeline"}</span>
+                </div>
+                <div class="item-desc">${formatMultiline(exp.desc || "Accomplishments...")}</div>
+            </div>
+        `).join('');
+        expHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Professional Work Experience</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Projects
+    let projHTML = "";
+    if (state.projects && state.projects.length > 0) {
+        let items = state.projects.map(proj => `
+            <div class="project-item">
+                <div class="item-header">
+                    <strong class="item-title">${proj.title || "Project Title"}</strong>
+                    <span class="item-subtitle">(${proj.role || "Role"})</span>
+                </div>
+                <div class="item-desc" style="margin-top:2px;">${formatMultiline(proj.desc || "Details...")}</div>
+            </div>
+        `).join('');
+        projHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Academic & Personal Projects</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Education
+    let eduHTML = "";
+    if (state.education && state.education.length > 0) {
+        let rows = state.education.map(edu => `
+            <tr>
+                <td style="border: 1px solid #d1d5db; padding: 6px; font-weight:600; font-size:0.82rem;">${edu.degree || "Degree"}</td>
+                <td style="border: 1px solid #d1d5db; padding: 6px; font-size:0.82rem;">${edu.institution || "Board/University"}</td>
+                <td style="border: 1px solid #d1d5db; padding: 6px; text-align:center; font-size:0.82rem;">${edu.date || "Year"}</td>
+                <td style="border: 1px solid #d1d5db; padding: 6px; font-size:0.82rem;">${edu.desc || "Details"}</td>
+            </tr>
+        `).join('');
+        eduHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Education History</h2>
+                <div class="resume-section-content">
+                    <table style="width:100%; border-collapse:collapse; margin-top:5px;">
+                        <thead>
+                            <tr style="background:#f3f4f6; color:#111;">
+                                <th style="border: 1px solid #d1d5db; padding: 6px; text-align:left; font-size:0.8rem; text-transform:uppercase;">Degree / Course</th>
+                                <th style="border: 1px solid #d1d5db; padding: 6px; text-align:left; font-size:0.8rem; text-transform:uppercase;">University / Board</th>
+                                <th style="border: 1px solid #d1d5db; padding: 6px; text-align:center; font-size:0.8rem; text-transform:uppercase;">Year</th>
+                                <th style="border: 1px solid #d1d5db; padding: 6px; text-align:left; font-size:0.8rem; text-transform:uppercase;">Score / Specialization</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    // Personal Declaration (Very common in Indian resumes)
+    let personalHTML = "";
+    let personalItems = [];
+    if (state.dob) personalItems.push(`<tr><td style="width:150px; font-weight:600; font-size:0.82rem; padding: 4px 0;">Date of Birth:</td><td style="font-size:0.82rem; padding: 4px 0;">${state.dob}</td></tr>`);
+    if (state.nationality) personalItems.push(`<tr><td style="font-weight:600; font-size:0.82rem; padding: 4px 0;">Nationality:</td><td style="font-size:0.82rem; padding: 4px 0;">${state.nationality}</td></tr>`);
+    if (state.maritalStatus) personalItems.push(`<tr><td style="font-weight:600; font-size:0.82rem; padding: 4px 0;">Marital Status:</td><td style="font-size:0.82rem; padding: 4px 0;">${state.maritalStatus}</td></tr>`);
+    if (state.languages) personalItems.push(`<tr><td style="font-weight:600; font-size:0.82rem; padding: 4px 0;">Languages Known:</td><td style="font-size:0.82rem; padding: 4px 0;">${state.languages}</td></tr>`);
+
+    if (personalItems.length > 0) {
+        personalHTML = `
+            <div class="resume-section" style="page-break-inside:avoid;">
+                <h2 class="resume-section-title">Personal Profile Details</h2>
+                <div class="resume-section-content">
+                    <table style="width:100%; border-collapse:collapse; margin-top:5px;">
+                        ${personalItems.join('')}
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <header class="resume-header">
+            <h1 class="resume-name">${name}</h1>
+            <div class="resume-title">${title}</div>
+            ${contactBar}
+        </header>
+        ${skillsHTML}
+        ${expHTML}
+        ${projHTML}
+        ${eduHTML}
+        ${personalHTML}
+    `;
+}
+
+function compileEuropeTemplate() {
+    let name = state.name || "YOUR NAME";
+    let title = state.title || "Target Professional Title";
+    
+    let contacts = [];
+    if (state.email) contacts.push(`<div class="europe-contact-item"><i class="fa-solid fa-envelope"></i> ${state.email}</div>`);
+    if (state.phone) contacts.push(`<div class="europe-contact-item"><i class="fa-solid fa-phone"></i> ${state.phone}</div>`);
+    if (state.location) contacts.push(`<div class="europe-contact-item"><i class="fa-solid fa-location-dot"></i> ${state.location}</div>`);
+    if (state.website) contacts.push(`<div class="europe-contact-item"><i class="fa-solid fa-globe"></i> ${state.website}</div>`);
+    if (state.dob) contacts.push(`<div class="europe-contact-item"><i class="fa-solid fa-calendar-days"></i> DOB: ${state.dob}</div>`);
+    if (state.nationality) contacts.push(`<div class="europe-contact-item"><i class="fa-solid fa-flag"></i> Nationality: ${state.nationality}</div>`);
+    if (state.visaStatus) contacts.push(`<div class="europe-contact-item"><i class="fa-solid fa-id-card"></i> ${state.visaStatus}</div>`);
+    let contactCol = contacts.length > 0 ? `<div class="europe-contact-col">${contacts.join('')}</div>` : '';
+
+    // Languages (Europass specific format)
+    let langHTML = "";
+    if (state.languages) {
+        let items = state.languages.split(',').map(l => {
+            let parts = l.trim().split('(');
+            let name = parts[0].trim();
+            let level = parts[1] ? parts[1].replace(')', '').trim() : 'Professional';
+            // Map to CEFR standard if possible
+            let cefr = "C1";
+            if (level.toLowerCase().includes("native") || level.toLowerCase().includes("fluent")) cefr = "C2";
+            else if (level.toLowerCase().includes("basic")) cefr = "A2";
+            else if (level.toLowerCase().includes("conversational")) cefr = "B2";
+
+            return `
+                <div class="europe-lang-item">
+                    <span class="europe-lang-name">${name}</span>
+                    <span class="europe-lang-level">${level} (${cefr})</span>
+                </div>
+            `;
+        }).join('');
+        langHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Languages</h2>
+                <div class="resume-section-content" style="display:flex; flex-direction:column; gap:6px; margin-top:5px;">${items}</div>
+            </div>
+        `;
+    }
+
+    // Experience
+    let expHTML = "";
+    if (state.experience && state.experience.length > 0) {
+        let items = state.experience.map(exp => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title">${exp.role || "Job Role"}</span>
+                    </div>
+                    <span class="item-date">${exp.date || "Timeline"}</span>
+                </div>
+                <div class="item-subtitle" style="color: #0d47a1; font-weight:600;">${exp.company || "Company"}</div>
+                <div class="item-desc">${formatMultiline(exp.desc || "Bullet achievements...")}</div>
+            </div>
+        `).join('');
+        expHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Work Experience</h2>
+                <div class="resume-section-content" style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">${items}</div>
+            </div>
+        `;
+    }
+
+    // Education
+    let eduHTML = "";
+    if (state.education && state.education.length > 0) {
+        let items = state.education.map(edu => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title">${edu.degree || "Degree"}</span>
+                    </div>
+                    <span class="item-date">${edu.date || "Dates"}</span>
+                </div>
+                <div class="item-subtitle" style="color: #0d47a1; font-weight:600;">${edu.institution || "Institution"}</div>
+                ${edu.desc ? `<div class="item-desc">${edu.desc}</div>` : ''}
+            </div>
+        `).join('');
+        eduHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Education and Training</h2>
+                <div class="resume-section-content" style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">${items}</div>
+            </div>
+        `;
+    }
+
+    // Projects
+    let projHTML = "";
+    if (state.projects && state.projects.length > 0) {
+        let items = state.projects.map(proj => `
+            <div class="project-item">
+                <div class="item-header">
+                    <span class="item-title">${proj.title || "Project"}</span>
+                    <span class="item-date">${proj.role || "Role"}</span>
+                </div>
+                <div class="item-desc">${formatMultiline(proj.desc || "Details...")}</div>
+            </div>
+        `).join('');
+        projHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Projects</h2>
+                <div class="resume-section-content" style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">${items}</div>
+            </div>
+        `;
+    }
+
+    // Skills
+    let skillsHTML = "";
+    if (state.skills && state.skills.length > 0) {
+        let badges = state.skills.map(s => `<span class="skill-badge-preview">${s}</span>`).join('');
+        skillsHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Digital Skills</h2>
+                <div class="resume-section-content">
+                    <div class="skills-list-preview">${badges}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="europe-layout">
+            <div class="europe-left-col">
+                <header class="resume-header">
+                    <h1 class="resume-name" style="font-size:1.6rem; color:#0d47a1; margin-bottom:2px;">${name}</h1>
+                    <div class="resume-title" style="color:#555; font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">${title}</div>
+                </header>
+                ${contactCol}
+                ${langHTML}
+            </div>
+            <div class="europe-right-col">
+                ${expHTML}
+                ${skillsHTML}
+                ${projHTML}
+                ${eduHTML}
+            </div>
+        </div>
+    `;
+}
+
+function compileUSTemplate() {
+    let name = state.name || "YOUR NAME";
+    let title = state.title || "Target Professional Title";
+    
+    let contacts = [];
+    if (state.email) contacts.push(state.email);
+    if (state.phone) contacts.push(state.phone);
+    if (state.location) contacts.push(state.location);
+    if (state.website) contacts.push(state.website);
+    let contactBar = contacts.length > 0 ? `<div class="resume-contact-bar">${contacts.join('  |  ')}</div>` : '';
+
+    // Experience
+    let expHTML = "";
+    if (state.experience && state.experience.length > 0) {
+        let items = state.experience.map(exp => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title" style="font-weight:700;">${exp.company || "Company Name"}</span> — 
+                        <span class="item-subtitle">${exp.role || "Job Role"}</span>
+                    </div>
+                    <span class="item-date">${exp.date || "Timeline"}</span>
+                </div>
+                <div class="item-desc">${formatMultiline(exp.desc || "Responsibility bullets...")}</div>
+            </div>
+        `).join('');
+        expHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Professional Experience</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Education
+    let eduHTML = "";
+    if (state.education && state.education.length > 0) {
+        let items = state.education.map(edu => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title" style="font-weight:700;">${edu.institution || "College Name"}</span>
+                    </div>
+                    <span class="item-date">${edu.date || "Timeline"}</span>
+                </div>
+                <div class="item-subtitle">${edu.degree || "Degree"}</div>
+                ${edu.desc ? `<div class="item-desc" style="margin-top:2px;">${edu.desc}</div>` : ''}
+            </div>
+        `).join('');
+        eduHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Education</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Projects
+    let projHTML = "";
+    if (state.projects && state.projects.length > 0) {
+        let items = state.projects.map(proj => `
+            <div class="project-item">
+                <div class="item-header">
+                    <span class="item-title" style="font-weight:700;">${proj.title || "Project Name"}</span>
+                    <span class="item-subtitle">${proj.role || "Role"}</span>
+                </div>
+                <div class="item-desc" style="margin-top:2px;">${formatMultiline(proj.desc || "Description...")}</div>
+            </div>
+        `).join('');
+        projHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Technical Projects</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Skills
+    let skillsHTML = "";
+    if (state.skills && state.skills.length > 0) {
+        let list = state.skills.join(', ');
+        skillsHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Skills & Technologies</h2>
+                <div class="resume-section-content">
+                    <p style="font-size:0.82rem; line-height:1.4;">${list}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <header class="resume-header">
+            <h1 class="resume-name">${name}</h1>
+            <div class="resume-title">${title}</div>
+            ${contactBar}
+        </header>
+        ${expHTML}
+        ${eduHTML}
+        ${projHTML}
+        ${skillsHTML}
+    `;
+}
+
+function compileUKTemplate() {
+    let name = state.name || "YOUR NAME";
+    let title = state.title || "Target Professional Title";
+    
+    let contacts = [];
+    if (state.email) contacts.push(state.email);
+    if (state.phone) contacts.push(state.phone);
+    if (state.location) contacts.push(state.location);
+    if (state.website) contacts.push(state.website);
+    let contactBar = contacts.length > 0 ? `<div class="resume-contact-bar">${contacts.join('  |  ')}</div>` : '';
+
+    // Career profile summary
+    let profileHTML = `
+        <div class="resume-section">
+            <h2 class="resume-section-title">Professional Profile</h2>
+            <div class="resume-section-content">
+                <p style="font-size:0.83rem; line-height:1.5;">
+                    A highly motivated and results-driven professional specializing in ${state.skills.slice(0, 3).join(', ')}. Proven track record of architecting robust systems and driving product achievements within fast-paced teams. Committed to implementing clean, scalable software frameworks.
+                </p>
+            </div>
+        </div>
+    `;
+
+    // Experience
+    let expHTML = "";
+    if (state.experience && state.experience.length > 0) {
+        let items = state.experience.map(exp => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title" style="font-weight:700;">${exp.role || "Job Role"}</span>
+                    </div>
+                    <span class="item-date">${exp.date || "Dates"}</span>
+                </div>
+                <div class="item-subtitle" style="font-weight:600; color:#555;">${exp.company || "Company Name"}</div>
+                <div class="item-desc">${formatMultiline(exp.desc || "Bullet achievements...")}</div>
+            </div>
+        `).join('');
+        expHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Employment History</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Education
+    let eduHTML = "";
+    if (state.education && state.education.length > 0) {
+        let items = state.education.map(edu => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title" style="font-weight:700;">${edu.degree || "Degree"}</span>
+                    </div>
+                    <span class="item-date">${edu.date || "Dates"}</span>
+                </div>
+                <div class="item-subtitle">${edu.institution || "College Name"}</div>
+                ${edu.desc ? `<div class="item-desc">${edu.desc}</div>` : ''}
+            </div>
+        `).join('');
+        eduHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Education & Qualifications</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Skills
+    let skillsHTML = "";
+    if (state.skills && state.skills.length > 0) {
+        let list = state.skills.join(', ');
+        skillsHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Key Skills & Core Competencies</h2>
+                <div class="resume-section-content">
+                    <p style="font-size:0.82rem; line-height:1.4;">${list}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // References (UK classic addition)
+    let referencesHTML = `
+        <div class="resume-section" style="page-break-inside:avoid;">
+            <h2 class="resume-section-title">References</h2>
+            <div class="resume-section-content">
+                <p style="font-size:0.8rem; font-style:italic; color:#555;">Professional references are available upon request.</p>
+            </div>
+        </div>
+    `;
+
+    return `
+        <header class="resume-header">
+            <h1 class="resume-name">${name}</h1>
+            <div class="resume-title">${title}</div>
+            ${contactBar}
+        </header>
+        ${profileHTML}
+        ${expHTML}
+        ${skillsHTML}
+        ${eduHTML}
+        ${referencesHTML}
+    `;
+}
+
+function compileAsiaTemplate() {
+    let name = state.name || "YOUR NAME";
+    let title = state.title || "Target Professional Title";
+
+    // Left sidebar
+    let contactCol = `
+        <div class="asia-contact-box">
+            <div class="asia-meta-title">Contact</div>
+            ${state.email ? `<div class="asia-meta-item"><i class="fa-solid fa-envelope"></i> ${state.email}</div>` : ''}
+            ${state.phone ? `<div class="asia-meta-item"><i class="fa-solid fa-phone"></i> ${state.phone}</div>` : ''}
+            ${state.location ? `<div class="asia-meta-item"><i class="fa-solid fa-location-dot"></i> ${state.location}</div>` : ''}
+            ${state.website ? `<div class="asia-meta-item"><i class="fa-solid fa-globe"></i> ${state.website}</div>` : ''}
+        </div>
+    `;
+
+    let metaCol = "";
+    let metaItems = [];
+    if (state.dob) metaItems.push(`<div class="asia-meta-item"><strong>DOB:</strong> ${state.dob}</div>`);
+    if (state.nationality) metaItems.push(`<div class="asia-meta-item"><strong>Nationality:</strong> ${state.nationality}</div>`);
+    if (state.languages) metaItems.push(`<div class="asia-meta-item"><strong>Languages:</strong> ${state.languages}</div>`);
+
+    if (metaItems.length > 0) {
+        metaCol = `
+            <div class="asia-contact-box">
+                <div class="asia-meta-title">Personal Info</div>
+                ${metaItems.join('')}
+            </div>
+        `;
+    }
+
+    let skillsHTML = "";
+    if (state.skills && state.skills.length > 0) {
+        let badges = state.skills.map(s => `<span class="skill-badge-preview">${s}</span>`).join('');
+        skillsHTML = `
+            <div class="asia-contact-box">
+                <div class="asia-meta-title">Skills</div>
+                <div class="skills-list-preview" style="gap:4px; flex-wrap:wrap; display:flex;">${badges}</div>
+            </div>
+        `;
+    }
+
+    // Right pane - Experience
+    let expHTML = "";
+    if (state.experience && state.experience.length > 0) {
+        let items = state.experience.map(exp => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title" style="font-weight:700;">${exp.role || "Job Role"}</span>
+                    </div>
+                    <span class="item-date">${exp.date || "Timeline"}</span>
+                </div>
+                <div class="item-subtitle" style="font-weight:600; color:#555;">${exp.company || "Company"}</div>
+                <div class="item-desc">${formatMultiline(exp.desc || "Accomplishments...")}</div>
+            </div>
+        `).join('');
+        expHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Professional Experience</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Projects
+    let projHTML = "";
+    if (state.projects && state.projects.length > 0) {
+        let items = state.projects.map(proj => `
+            <div class="project-item">
+                <div class="item-header">
+                    <span class="item-title" style="font-weight:700;">${proj.title || "Project"}</span>
+                    <span class="item-subtitle">(${proj.role || "Role"})</span>
+                </div>
+                <div class="item-desc">${formatMultiline(proj.desc || "Details...")}</div>
+            </div>
+        `).join('');
+        projHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Key Projects</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Education
+    let eduHTML = "";
+    if (state.education && state.education.length > 0) {
+        let items = state.education.map(edu => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title" style="font-weight:700;">${edu.degree || "Degree"}</span>
+                    </div>
+                    <span class="item-date">${edu.date || "Timeline"}</span>
+                </div>
+                <div class="item-subtitle">${edu.institution || "Institution"}</div>
+                ${edu.desc ? `<div class="item-desc">${edu.desc}</div>` : ''}
+            </div>
+        `).join('');
+        eduHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Education History</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="asia-layout">
+            <div class="asia-left-col">
+                <header class="resume-header">
+                    <h1 class="resume-name" style="font-size:1.6rem; color:#0f172a; margin-bottom:2px;">${name}</h1>
+                    <div class="resume-title" style="color:#0284c7; font-size:0.85rem; font-weight:600; text-transform:uppercase;">${title}</div>
+                </header>
+                ${contactCol}
+                ${metaCol}
+                ${skillsHTML}
+            </div>
+            <div class="asia-right-col">
+                ${expHTML}
+                ${projHTML}
+                ${eduHTML}
+            </div>
+        </div>
+    `;
+}
+
+function compileLATAMTemplate() {
+    let name = state.name || "YOUR NAME";
+    let title = state.title || "Target Professional Title";
+    
+    let contacts = [];
+    if (state.email) contacts.push(`<i class="fa-solid fa-envelope"></i> ${state.email}`);
+    if (state.phone) contacts.push(`<i class="fa-solid fa-phone"></i> ${state.phone}`);
+    if (state.location) contacts.push(`<i class="fa-solid fa-location-dot"></i> ${state.location}`);
+    if (state.website) contacts.push(`<i class="fa-solid fa-globe"></i> ${state.website}`);
+    let contactBar = contacts.length > 0 ? `<div class="resume-contact-bar">${contacts.join('  |  ')}</div>` : '';
+
+    // LATAM personal meta row
+    let latamMeta = [];
+    if (state.dob) latamMeta.push(`Fecha de Nacimiento: ${state.dob}`);
+    if (state.nationality) latamMeta.push(`Nacionalidad: ${state.nationality}`);
+    if (state.maritalStatus) latamMeta.push(`Estado Civil: ${state.maritalStatus}`);
+    if (state.languages) latamMeta.push(`Idiomas: ${state.languages}`);
+
+    let latamMetaBox = latamMeta.length > 0 ? `
+        <div class="latam-meta-box">
+            ${latamMeta.map(m => `<div class="latam-meta-item">${m}</div>`).join('')}
+        </div>
+    ` : '';
+
+    // Experience
+    let expHTML = "";
+    if (state.experience && state.experience.length > 0) {
+        let items = state.experience.map(exp => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title" style="font-weight:700;">${exp.role || "Puesto"}</span> — 
+                        <span class="item-subtitle">${exp.company || "Empresa"}</span>
+                    </div>
+                    <span class="item-date">${exp.date || "Período"}</span>
+                </div>
+                <div class="item-desc">${formatMultiline(exp.desc || "Logros y responsabilidades...")}</div>
+            </div>
+        `).join('');
+        expHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Experiencia Profesional</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Education
+    let eduHTML = "";
+    if (state.education && state.education.length > 0) {
+        let items = state.education.map(edu => `
+            <div class="experience-item">
+                <div class="item-header">
+                    <div>
+                        <span class="item-title" style="font-weight:700;">${edu.degree || "Título / Certificación"}</span>
+                    </div>
+                    <span class="item-date">${edu.date || "Fecha"}</span>
+                </div>
+                <div class="item-subtitle">${edu.institution || "Institución Educativa"}</div>
+                ${edu.desc ? `<div class="item-desc">${edu.desc}</div>` : ''}
+            </div>
+        `).join('');
+        eduHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Educación y Formación</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    // Skills
+    let skillsHTML = "";
+    if (state.skills && state.skills.length > 0) {
+        let badges = state.skills.map(s => `<span class="skill-badge-preview">${s}</span>`).join('');
+        skillsHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Habilidades y Competencias</h2>
+                <div class="resume-section-content">
+                    <div class="skills-list-preview">${badges}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Projects
+    let projHTML = "";
+    if (state.projects && state.projects.length > 0) {
+        let items = state.projects.map(proj => `
+            <div class="project-item">
+                <div class="item-header">
+                    <span class="item-title" style="font-weight:700;">${proj.title || "Proyecto"}</span>
+                    <span class="item-subtitle">(${proj.role || "Rol"})</span>
+                </div>
+                <div class="item-desc" style="margin-top:2px;">${formatMultiline(proj.desc || "Detalles...")}</div>
+            </div>
+        `).join('');
+        projHTML = `
+            <div class="resume-section">
+                <h2 class="resume-section-title">Proyectos Destacados</h2>
+                <div class="resume-section-content">${items}</div>
+            </div>
+        `;
+    }
+
+    return `
+        <header class="resume-header">
+            <h1 class="resume-name">${name}</h1>
+            <div class="resume-title">${title}</div>
+            ${contactBar}
+        </header>
+        ${latamMetaBox}
+        ${expHTML}
+        ${eduHTML}
+        ${skillsHTML}
+        ${projHTML}
+    `;
+}
+
+// Convert newline bullet summaries into standard HTML bullet lists or breaks
+function formatMultiline(str) {
+    if (!str) return "";
+    let lines = str.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    let bullets = [];
+    let paragraphs = [];
+
+    lines.forEach(l => {
+        if (l.startsWith('-') || l.startsWith('•') || l.startsWith('*')) {
+            let clean = l.replace(/^[\-\•\*]\s*/, '');
+            bullets.push(`<li>${clean}</li>`);
+        } else {
+            paragraphs.push(l);
+        }
+    });
+
+    let output = "";
+    if (paragraphs.length > 0) {
+        output += paragraphs.map(p => `<p style="margin-bottom:6px;">${p}</p>`).join('');
+    }
+    if (bullets.length > 0) {
+        output += `<ul style="padding-left:16px; margin-top:4px; display:flex; flex-direction:column; gap:4px;">${bullets.join('')}</ul>`;
+    }
+    return output || str;
+}
+
+/* ==========================================
+   ATS WIDGET & MODAL LOGIC
+   ========================================== */
+
+function updateATSScore() {
+    const report = ATSAuditor.audit(state);
+    
+    // Update toolbar indicator
+    const tbBadge = document.getElementById("toolbar-ats-badge");
+    const tbStatus = document.getElementById("toolbar-ats-status");
+    
+    tbBadge.innerText = report.score;
+    tbStatus.innerText = report.status;
+    
+    // Set colors based on scoring range
+    tbBadge.className = "ats-badge";
+    if (report.score < 60) {
+        tbBadge.classList.add("low");
+    } else if (report.score < 80) {
+        tbBadge.classList.add("medium");
+    }
+
+    // Modal elements
+    document.getElementById("ats-modal-score").innerText = `${report.score}%`;
+    document.getElementById("ats-modal-status").innerText = report.status;
+    
+    const gauge = document.getElementById("ats-modal-gauge");
+    gauge.style.setProperty('--score', report.score);
+    
+    const list = document.getElementById("ats-modal-suggestions");
+    list.innerHTML = "";
+    
+    report.suggestions.forEach(s => {
+        let icon = "fa-circle-check";
+        if (s.type === "warning") icon = "fa-circle-exclamation";
+        if (s.type === "danger") icon = "fa-circle-xmark";
+        
+        const item = document.createElement("div");
+        item.className = `ats-suggestion-item ${s.type}`;
+        item.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${s.text}</span>`;
+        list.appendChild(item);
+    });
+}
+
+function openATSModal() {
+    updateATSScore();
+    document.getElementById("ats-modal").classList.add("open");
+}
+
+function closeATSModal() {
+    document.getElementById("ats-modal").classList.remove("open");
+}
+
+/* ==========================================
+   AI PANEL / DRAWER LOGIC
+   ========================================== */
+
+function openAIPanel(titleText) {
+    document.getElementById("ai-panel-title").innerText = titleText;
+    document.getElementById("ai-panel").classList.add("open");
+}
+
+function closeAIPanel() {
+    document.getElementById("ai-panel").classList.remove("open");
+}
+
+// AI: Experience rewriter drawer trigger
+function openAIEngine(expId) {
+    const exp = state.experience.find(e => e.id === expId);
+    if (!exp) return;
+
+    openAIPanel("AI Bullet Optimization");
+    
+    const body = document.getElementById("ai-panel-body");
+    body.innerHTML = `
+        <div class="ai-card">
+            <div class="ai-card-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Experience Rewriter</div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+                This tool rewrites weak summaries using strong action verbs (e.g. <em>Spearheaded</em>, <em>Optimized</em>) and embeds calculated metrics.
+            </p>
+            <div class="form-group" style="margin-top: 8px;">
+                <label>Current Description</label>
+                <textarea id="ai-rewrite-input" style="min-height:100px;">${exp.desc || ""}</textarea>
+            </div>
+            
+            <button class="btn btn-primary" style="justify-content:center; margin-top: 4px;" onclick="runAIEperienceRewrite('${expId}')">
+                <i class="fa-solid fa-wand-magic"></i> Generate Optimization
+            </button>
+        </div>
+        
+        <div id="ai-rewrite-result-card" class="ai-card" style="display:none;">
+            <div class="ai-card-title"><i class="fa-solid fa-square-poll-horizontal"></i> Optimized Result</div>
+            <div class="ai-result-box" id="ai-rewrite-result"></div>
+            <div class="ai-btn-group">
+                <button class="ai-btn ai-btn-accent" onclick="applyExperienceRewrite('${expId}')">Apply to Resume</button>
+                <button class="ai-btn ai-btn-outline" onclick="runAIEperienceRewrite('${expId}')">Regenerate</button>
+            </div>
+        </div>
+    `;
+}
+
+async function runAIEperienceRewrite(expId) {
+    const textInput = document.getElementById("ai-rewrite-input").value;
+    const resultCard = document.getElementById("ai-rewrite-result-card");
+    const resultBox = document.getElementById("ai-rewrite-result");
+
+    resultCard.style.display = "flex";
+    resultBox.className = "ai-result-box loading";
+    resultBox.innerHTML = '<div class="ai-spinner"></div>';
+
+    // Call AIService
+    const optimized = await AIService.rewriteExperience(textInput, state.targetJob);
+    
+    resultBox.className = "ai-result-box";
+    resultBox.innerText = optimized;
+}
+
+function applyExperienceRewrite(expId) {
+    const rewritten = document.getElementById("ai-rewrite-result").innerText;
+    updateExperience(expId, 'desc', rewritten);
+    renderExperienceList();
+    closeAIPanel();
+    showToast("AI rewrite applied!");
+}
+
+// AI: Suggest Skills drawer trigger
+function openAISkills() {
+    openAIPanel("AI Skills Suggestions");
+    const body = document.getElementById("ai-panel-body");
+    
+    body.innerHTML = `
+        <div class="ai-card">
+            <div class="ai-card-title"><i class="fa-solid fa-brain"></i> Suggest Missing Skills</div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+                Analyzing your target job title (<em>${state.targetJob}</em>) and existing keywords to extract relevant skills that resume screeners look for.
+            </p>
+            <button class="btn btn-primary" style="justify-content:center; margin-top: 8px;" onclick="runAISkillsSuggestion()">
+                <i class="fa-solid fa-wand-magic"></i> Scan and Recommend
+            </button>
+        </div>
+        
+        <div id="ai-skills-result-card" class="ai-card" style="display:none;">
+            <div class="ai-card-title"><i class="fa-solid fa-tags"></i> Recommended Additions</div>
+            <p style="font-size: 0.78rem; color: var(--text-muted);">Click skills to add them to your resume:</p>
+            <div class="skills-list-preview" id="ai-skills-suggestions-list" style="margin: 8px 0; gap:8px;"></div>
+            <button class="ai-btn ai-btn-outline" style="width:100%" onclick="closeAIPanel()">Done</button>
+        </div>
+    `;
+}
+
+async function runAISkillsSuggestion() {
+    const resultCard = document.getElementById("ai-skills-result-card");
+    const container = document.getElementById("ai-skills-suggestions-list");
+    
+    resultCard.style.display = "flex";
+    container.className = "skills-list-preview loading";
+    container.innerHTML = '<div class="ai-spinner" style="margin:20px auto;"></div>';
+
+    const suggestions = await AIService.suggestSkills(state.skills, state.targetJob);
+    
+    container.className = "skills-list-preview";
+    container.innerHTML = "";
+    
+    const items = suggestions.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    items.forEach(skill => {
+        const span = document.createElement("span");
+        span.className = "skill-badge-preview";
+        span.style.cursor = "pointer";
+        span.style.background = "rgba(99,102,241,0.15)";
+        span.style.color = "#a5b4fc";
+        span.style.border = "1px solid rgba(99,102,241,0.3)";
+        span.style.transition = "transform 0.2s";
+        
+        span.innerHTML = `<i class="fa-solid fa-plus" style="font-size:0.6rem; margin-right:4px;"></i> ${skill}`;
+        span.onclick = () => {
+            if (!state.skills.includes(skill)) {
+                state.skills.push(skill);
+                renderSkillsTags();
+                autoSave();
+                renderResumePreview();
+                span.style.opacity = "0.4";
+                span.style.pointerEvents = "none";
+                showToast(`Added ${skill}!`);
+            }
+        };
+        container.appendChild(span);
+    });
+}
+
+// AI: Cover Letter drawer trigger
+function openAICoverLetter() {
+    openAIPanel("AI Cover Letter Generator");
+    const body = document.getElementById("ai-panel-body");
+    
+    body.innerHTML = `
+        <div class="ai-card">
+            <div class="ai-card-title"><i class="fa-solid fa-envelope-open-text"></i> Cover Letter Writer</div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+                Synthesizes your personal info, experiences, and skills into a formal target letter for a <em>${state.targetJob}</em> application.
+            </p>
+            <button class="btn btn-primary" style="justify-content:center; margin-top: 8px;" onclick="runAICoverLetter()">
+                <i class="fa-solid fa-wand-magic"></i> Generate Cover Letter
+            </button>
+        </div>
+        
+        <div id="ai-cl-result-card" class="ai-card" style="display:none; flex: 1; min-height: 350px;">
+            <div class="ai-card-title" style="justify-content:space-between; width:100%;">
+                <span><i class="fa-solid fa-file-text"></i> Tailored Document</span>
+                <button class="ai-btn ai-btn-outline" style="padding:2px 8px; font-size:0.75rem;" onclick="copyCoverLetter()"><i class="fa-solid fa-copy"></i> Copy</button>
+            </div>
+            <textarea id="ai-cl-result-text" style="flex:1; background:rgba(0,0,0,0.3); color:var(--text-primary); font-family:var(--font-mono); font-size:0.78rem; line-height:1.4; border:1px solid rgba(255,255,255,0.05); resize:none; overflow-y:auto; padding:10px; border-radius:6px;"></textarea>
+            <button class="ai-btn ai-btn-accent" style="width:100%" onclick="closeAIPanel()">Close Panel</button>
+        </div>
+    `;
+}
+
+async function runAICoverLetter() {
+    const resultCard = document.getElementById("ai-cl-result-card");
+    const textTarget = document.getElementById("ai-cl-result-text");
+    
+    resultCard.style.display = "flex";
+    textTarget.value = "Drafting cover letter... Please wait.";
+    
+    const letter = await AIService.generateCoverLetter(state);
+    textTarget.value = letter;
+}
+
+function copyCoverLetter() {
+    const txt = document.getElementById("ai-cl-result-text");
+    txt.select();
+    document.execCommand("copy");
+    showToast("Cover letter copied to clipboard!");
+}
+
+/* ==========================================
+   PDF EXPORTER LOGIC
+   ========================================== */
+
+function exportPDF() {
+    // We trigger standard window printing.
+    // CSS @media print is optimized to isolate the A4 sheet, scaling it to paper full width.
+    showToast("Opening Print Wizard. Choose 'Save as PDF' to download.");
+    
+    setTimeout(() => {
+        window.print();
+    }, 500);
+}
+
+/* ==========================================
+   SIDEBAR PREMIUM INTERACTIONS & KEY SYNC
+   ========================================== */
+
+function toggleSettingsPanel() {
+    const panel = document.getElementById("settings-panel");
+    const btn = document.getElementById("settings-toggle-btn");
+    panel.classList.toggle("open");
+    btn.classList.toggle("active");
+}
+
+function saveApiKey() {
+    const input = document.getElementById("api-key-input");
+    const key = input.value.trim();
+    localStorage.setItem('gemini_api_key', key);
+    AIService.apiKey = key;
+    showToast(key ? "Gemini API Key saved!" : "Gemini API Key removed. Using offline mock.");
+    toggleSettingsPanel();
+}
+
+function updateSidebarBadges() {
+    // 0. Target role details progress
+    const badgeTarget = document.getElementById("badge-target");
+    if (badgeTarget) {
+        const val = state.title || "";
+        const targetFilled = val.trim().length > 0;
+        badgeTarget.innerText = targetFilled ? "100%" : "0%";
+        if (targetFilled) {
+            badgeTarget.classList.add("success");
+        } else {
+            badgeTarget.classList.remove("success");
+        }
+    }
+
+    // 1. Personal details progress
+    const personalFields = [state.name, state.title, state.email, state.phone, state.location];
+    const personalFilled = personalFields.filter(f => f && f.trim().length > 0).length;
+    const personalPct = Math.round((personalFilled / personalFields.length) * 100);
+    const badgePersonal = document.getElementById("badge-personal");
+    if (badgePersonal) {
+        badgePersonal.innerText = `${personalPct}%`;
+        if (personalPct === 100) {
+            badgePersonal.classList.add("success");
+        } else {
+            badgePersonal.classList.remove("success");
+        }
+    }
+
+    // 2. Regional details progress
+    const regionalFields = [state.dob, state.nationality, state.visaStatus, state.maritalStatus, state.languages];
+    const regionalFilled = regionalFields.filter(f => f && f.trim().length > 0).length;
+    const regionalPct = Math.round((regionalFilled / regionalFields.length) * 100);
+    const badgeRegional = document.getElementById("badge-regional");
+    if (badgeRegional) {
+        badgeRegional.innerText = `${regionalPct}%`;
+        if (regionalPct === 100) {
+            badgeRegional.classList.add("success");
+        } else {
+            badgeRegional.classList.remove("success");
+        }
+    }
+
+    // 3. Experience Count
+    const badgeExp = document.getElementById("badge-exp");
+    if (badgeExp) badgeExp.innerText = state.experience ? state.experience.length : 0;
+
+    // 4. Education Count
+    const badgeEdu = document.getElementById("badge-edu");
+    if (badgeEdu) badgeEdu.innerText = state.education ? state.education.length : 0;
+
+    // 5. Skills Count
+    const badgeSkills = document.getElementById("badge-skills");
+    if (badgeSkills) badgeSkills.innerText = state.skills ? state.skills.length : 0;
+
+    // 6. Projects Count
+    const badgeProj = document.getElementById("badge-proj");
+    if (badgeProj) badgeProj.innerText = state.projects ? state.projects.length : 0;
+}
