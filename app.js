@@ -73,6 +73,18 @@ function toggleAccordion(itemId) {
     }
 }
 
+function expandAllAccordions() {
+    document.querySelectorAll('.accordion-item').forEach(acc => {
+        acc.classList.add('active');
+    });
+}
+
+function collapseAllAccordions() {
+    document.querySelectorAll('.accordion-item').forEach(acc => {
+        acc.classList.remove('active');
+    });
+}
+
 // Initialize Application
 document.addEventListener("DOMContentLoaded", () => {
     // Load from local storage if exists

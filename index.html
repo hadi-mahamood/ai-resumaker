@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=4.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -43,6 +43,15 @@
 
             <div class="sidebar-content">
                 
+                <div class="sidebar-utils">
+                    <span class="utils-title"><i class="fa-solid fa-list-check"></i> Form Sections</span>
+                    <div class="utils-actions">
+                        <button class="util-link-btn" onclick="expandAllAccordions()"><i class="fa-solid fa-expand"></i> Expand All</button>
+                        <span class="util-separator">|</span>
+                        <button class="util-link-btn" onclick="collapseAllAccordions()"><i class="fa-solid fa-compress"></i> Collapse All</button>
+                    </div>
+                </div>
+
                 <!-- Target Job Section -->
                 <div class="accordion-item active" id="sec-target">
                     <div class="accordion-header" onclick="toggleAccordion('sec-target')">
