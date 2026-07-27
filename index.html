@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=5.0">
+    <link rel="stylesheet" href="style.css?v=6.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -259,6 +259,9 @@
         <!-- Preview & Output Area -->
         <main class="preview-container">
             <div class="toolbar">
+                <button class="menu-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar Menu">
+                    <i class="fa-solid fa-bars"></i> <span>Menu</span>
+                </button>
                 <div class="template-selector">
                     <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);"><i class="fa-solid fa-filter" style="margin-right: 4px;"></i> Layout Filter</span>
                     <select id="template-filter" onchange="switchTemplate(this.value)" class="template-select-dropdown">
@@ -300,8 +303,10 @@
 
             <!-- Scrollable Workspace for A4 Sheet -->
             <div class="preview-workspace">
-                <div class="resume-sheet t-modern" id="resume-sheet">
-                    <!-- Live Resume structure filled by javascript -->
+                <div class="resume-sheet-scaler" id="resume-sheet-scaler">
+                    <div class="resume-sheet t-modern" id="resume-sheet">
+                        <!-- Live Resume structure filled by javascript -->
+                    </div>
                 </div>
             </div>
         </main>
@@ -345,6 +350,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Sidebar Drawer Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <!-- Floating Toast Notification -->
     <div class="toast" id="toast-notify">

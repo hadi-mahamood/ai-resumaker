@@ -123,6 +123,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Switch templates to active one
     switchTemplate(state.activeTemplate);
+
+    // Dynamic A4 Sheet Preview Scaling
+    resizeResumePreview();
+    window.addEventListener("resize", resizeResumePreview);
 });
 
 // Sync state data to form inputs
@@ -507,6 +511,9 @@ function renderResumePreview() {
     
     // Trigger score checking
     updateATSScore();
+
+    // Scale sheet dynamically
+    resizeResumePreview();
 }
 
 // Template 1 Compiler: Modern layout
@@ -2029,4 +2036,39 @@ function updateSidebarBadges() {
     // 6. Projects Count
     const badgeProj = document.getElementById("badge-proj");
     if (badgeProj) badgeProj.innerText = state.projects ? state.projects.length : 0;
+}
+
+function resizeResumePreview() {
+    const workspace = document.querySelector(".preview-workspace");
+    const scaler = document.getElementById("resume-sheet-scaler");
+    const sheet = document.getElementById("resume-sheet");
+    if (!workspace || !scaler || !sheet) return;
+
+    const pad = parseFloat(window.getComputedStyle(workspace).paddingLeft) * 2;
+    const workspaceWidth = workspace.clientWidth - pad;
+    const sheetWidth = 794;
+
+    if (workspaceWidth < sheetWidth) {
+        const scale = workspaceWidth / sheetWidth;
+        sheet.style.transform = `scale(${scale})`;
+        sheet.style.transformOrigin = "top center";
+        const scaledHeight = sheet.offsetHeight * scale;
+        scaler.style.height = `${scaledHeight}px`;
+    } else {
+        sheet.style.transform = "none";
+        scaler.style.height = "auto";
+    }
+}
+
+function toggleSidebar() {
+    const sidebar = document.querySelector(".sidebar");
+    const overlay = document.getElementById("sidebar-overlay");
+    if (sidebar && overlay) {
+        const isOpen = sidebar.classList.toggle("open");
+        if (isOpen) {
+            overlay.classList.add("active");
+        } else {
+            overlay.classList.remove("active");
+        }
+    }
 }
