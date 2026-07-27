@@ -363,6 +363,8 @@ const ATSAuditor = {
 
 // Global ATS Dashboard Data Reference
 let pendingOptimizations = null;
+let optimizationCache = null;
+let lastCachedStateString = "";
 
 const countryExpectations = {
     US: "<strong>US / Canada expectations:</strong> Strict anti-discrimination rules apply. Do NOT include a photo, age, date of birth, marital status, nationality, or gender. Single-page layout preferred. Focus heavily on action verbs and quantified impact.",
@@ -632,8 +634,23 @@ window.optimizeResumeData = async function(resumeState) {
     const jdText = document.getElementById("ats-jd-text").value || resumeState.targetJob || "Software Engineer";
     const selectedCountry = document.getElementById("ats-country-select").value || "US";
     
-    if (apiKey) {
-        const promptText = `
+    // Check Cache
+    const currentStateString = JSON.stringify({
+        resume: resumeState,
+        jd: jdText,
+        country: selectedCountry
+    });
+    
+    if (optimizationCache && lastCachedStateString === currentStateString) {
+        console.log("Serving ATS optimization results from cache.");
+        return optimizationCache;
+    }
+    
+    if (!apiKey) {
+        throw new Error("AI optimization requires an API key. Configure OpenAI, Gemini, or Claude in Settings.");
+    }
+    
+    const promptText = `
 You are an expert ATS Resume Optimizer.
 Analyze the following resume and target job description (or job title).
 Country context: ${selectedCountry}.
@@ -648,7 +665,10 @@ Strict guidelines:
 1. Do NOT invent, fabricate, or add any false qualifications, schools, certifications, employment history, names, dates, or skills.
 2. Polish the summary to make it highly engaging and professional.
 3. Enhance work experience and project description bullet points using strong action verbs and quantified achievements.
-4. Output ONLY a valid raw JSON object. Do not include markdown wraps or block comments.
+4. Detect missing high-priority keywords from the job description.
+5. Provide actionable formatting improvements.
+6. Check grammar and provide a list of verified spelling/grammar corrections.
+7. Output ONLY a valid raw JSON object. Do not include markdown wraps or block comments.
 
 Expected Output Format:
 {
@@ -662,6 +682,8 @@ Expected Output Format:
   },
   "strengths": ["Clear section headers", "Quantified business metrics"],
   "improvements": ["Optimize keyword density for ${selectedCountry}"],
+  "missingKeywords": ["Docker", "CI/CD"],
+  "suggestedKeywords": ["TypeScript", "AWS"],
   "optimizedSummary": "Optimized summary text here...",
   "optimizedExperience": [
     {"id": "exp_id_1", "desc": "Rewritten experience bullets..."},
@@ -669,34 +691,39 @@ Expected Output Format:
   ],
   "optimizedProjects": [
     {"id": "proj_id_1", "desc": "Rewritten project bullets..."}
+  ],
+  "grammarFixes": [
+    "Corrected past-tense verb usage on all previous experience bullet points.",
+    "Ensured consistent terminal periods on bullet statements."
+  ],
+  "formattingSuggestions": [
+    "Switching to Classic or US Standard template will eliminate visual parsing anomalies."
   ]
 }
 `;
-        try {
-            const resultText = await window.callGeminiOptimizerAPI(apiKey, promptText);
-            let cleaned = resultText.trim();
-            if (cleaned.startsWith("```json")) {
-                cleaned = cleaned.substring(7);
-            } else if (cleaned.startsWith("```")) {
-                cleaned = cleaned.substring(3);
-            }
-            if (cleaned.endsWith("```")) {
-                cleaned = cleaned.substring(0, cleaned.length - 3);
-            }
-            cleaned = cleaned.trim();
-            
-            const parsed = JSON.parse(cleaned);
-            return parsed;
-        } catch (err) {
-            console.error("Gemini optimization failed, running local optimization:", err);
-            return window.mockLocalOptimization(resumeState);
+    try {
+        const resultText = await window.callGeminiOptimizerAPI(apiKey, promptText);
+        let cleaned = resultText.trim();
+        if (cleaned.startsWith("```json")) {
+            cleaned = cleaned.substring(7);
+        } else if (cleaned.startsWith("```")) {
+            cleaned = cleaned.substring(3);
         }
-    } else {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(window.mockLocalOptimization(resumeState));
-            }, 1500);
-        });
+        if (cleaned.endsWith("```")) {
+            cleaned = cleaned.substring(0, cleaned.length - 3);
+        }
+        cleaned = cleaned.trim();
+        
+        const parsed = JSON.parse(cleaned);
+        
+        // Cache the parsed result
+        optimizationCache = parsed;
+        lastCachedStateString = currentStateString;
+        
+        return parsed;
+    } catch (err) {
+        console.error("Gemini optimization failed:", err);
+        throw new Error(`Gemini API Error: Invalid API key or connection timeout. Please verify your API key in Settings.`);
     }
 };
 
@@ -954,9 +981,9 @@ window.fetchAIOptimizationDetails = function() {
     if (!container) return;
     
     container.innerHTML = `
-        <div class="ats-opt-loading" style="padding: 40px 0;">
-            <div class="loading-spinner"></div>
-            <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px;">Gemini AI is analyzing and refactoring your resume details...</span>
+        <div class="ats-opt-loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0;">
+            <div class="loading-spinner" style="border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-bottom: 12px;"></div>
+            <span style="font-size: 0.8rem; color: var(--text-secondary); text-align: center;">Gemini AI is analyzing your complete resume and job criteria...</span>
         </div>
     `;
     
@@ -967,6 +994,19 @@ window.fetchAIOptimizationDetails = function() {
         if (valBox) valBox.innerText = `${optimizedData.atsScore}%`;
         
         window.renderAIOptimizerSuggestions(state, optimizedData);
+    }).catch(err => {
+        container.innerHTML = `
+            <div class="ats-suggestion-item danger" style="padding: 20px; display: flex; gap: 12px; border-radius: 8px;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.5rem; margin-top: 2px;"></i>
+                <div>
+                    <h4 style="margin: 0 0 6px 0; color: white;">Optimization Failed</h4>
+                    <p style="margin: 0; font-size: 0.8rem; line-height: 1.4; color: #fecaca;">
+                        ${err.message}
+                    </p>
+                </div>
+            </div>
+            <button class="btn btn-secondary" style="margin-top: 20px; width: 100%; justify-content: center;" onclick="window.fetchAIOptimizationDetails()"><i class="fa-solid fa-rotate-right"></i> Retry Optimization</button>
+        `;
     });
 };
 
