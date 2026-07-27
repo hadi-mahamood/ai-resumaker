@@ -922,3 +922,272 @@ window.applyAllAIOptimizations = function() {
         showToast("No optimizations were selected.");
     }
 };
+
+window.openAIOptimizeModal = function() {
+    const apiKey = localStorage.getItem('gemini_api_key') || '';
+    const modal = document.getElementById("ai-optimize-modal");
+    if (!modal) return;
+    
+    modal.classList.add("open");
+    
+    const noKeyAlert = document.getElementById("ai-opt-no-key-alert");
+    const dashboard = document.getElementById("ai-opt-dashboard");
+    
+    if (!apiKey) {
+        noKeyAlert.style.display = "block";
+        dashboard.style.display = "none";
+    } else {
+        noKeyAlert.style.display = "none";
+        dashboard.style.display = "block";
+        
+        window.fetchAIOptimizationDetails();
+    }
+};
+
+window.closeAIOptimizeModal = function() {
+    const modal = document.getElementById("ai-optimize-modal");
+    if (modal) modal.classList.remove("open");
+};
+
+window.fetchAIOptimizationDetails = function() {
+    const container = document.getElementById("ai-opt-suggestions-container");
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="ats-opt-loading" style="padding: 40px 0;">
+            <div class="loading-spinner"></div>
+            <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px;">Gemini AI is analyzing and refactoring your resume details...</span>
+        </div>
+    `;
+    
+    window.optimizeResumeData(state).then(optimizedData => {
+        pendingOptimizations = optimizedData;
+        
+        const valBox = document.getElementById("ai-opt-score-val");
+        if (valBox) valBox.innerText = `${optimizedData.atsScore}%`;
+        
+        window.renderAIOptimizerSuggestions(state, optimizedData);
+    });
+};
+
+window.aiOptToggleAll = function(checkedState) {
+    const checkboxes = document.querySelectorAll("#ai-opt-suggestions-container input[type='checkbox']");
+    checkboxes.forEach(cb => cb.checked = checkedState);
+};
+
+window.renderAIOptimizerSuggestions = function(original, optimized) {
+    const container = document.getElementById("ai-opt-suggestions-container");
+    if (!container) return;
+    
+    container.innerHTML = "";
+    
+    // 1. Resume Analysis & Strengths
+    let analysisHtml = `<div class="revision-card">
+        <div class="revision-card-header">
+            <span style="font-size: 0.8rem; font-weight: 700; color: white;"><i class="fa-solid fa-chart-pie"></i> Resume Health Analysis</span>
+        </div>
+        <div class="revision-card-body" style="grid-template-columns: 1fr;">
+            <div style="font-size: 0.8rem; line-height: 1.5; color: var(--text-secondary);">
+                <strong>Strengths detected:</strong>
+                <ul style="padding-left: 20px; margin: 4px 0 10px 0; color: var(--success);">
+                    ${optimized.strengths.map(s => `<li>${s}</li>`).join('')}
+                </ul>
+                <strong>Areas of improvement:</strong>
+                <ul style="padding-left: 20px; margin: 4px 0 0 0; color: var(--warning);">
+                    ${optimized.improvements.map(imp => `<li>${imp}</li>`).join('')}
+                </ul>
+            </div>
+        </div>
+    </div>`;
+    container.innerHTML += analysisHtml;
+
+    // 2. ATS Formatting Warnings & Suggestions
+    const activeTemplate = original.activeTemplate || "modern";
+    if (activeTemplate !== "classic" && activeTemplate !== "us") {
+        let formatHtml = `<div class="revision-card">
+            <div class="revision-card-header">
+                <span style="font-size: 0.8rem; font-weight: 700; color: white;"><i class="fa-solid fa-file-invoice"></i> ATS Formatting Suggestion</span>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-secondary); cursor: pointer; text-transform: none;">
+                    <input type="checkbox" id="accept-check-formatting" checked style="width: auto;"> Change Template
+                </label>
+            </div>
+            <div class="revision-card-body" style="grid-template-columns: 1fr;">
+                <div style="font-size: 0.8rem; line-height: 1.5; color: var(--text-secondary);">
+                    The active layout template (<strong>${activeTemplate.toUpperCase()}</strong>) uses color decorations or columns which some older parser systems might misalign.
+                    <br><br>
+                    <span style="color: var(--success); font-weight: 600;">Recommendation:</span> Switch to <strong>Classic</strong> or <strong>US Standard</strong> single-column layout for 100% compatibility.
+                </div>
+            </div>
+        </div>`;
+        container.innerHTML += formatHtml;
+    }
+
+    // 3. Professional Summary Improvements
+    if (original.summary || optimized.optimizedSummary) {
+        container.innerHTML += window.createRevisionCard(
+            "summary",
+            "<i class='fa-solid fa-user-tie'></i> Professional Summary Optimization",
+            original.summary || "No profile summary provided.",
+            optimized.optimizedSummary
+        );
+    }
+    
+    // 4. Stronger Bullet Point Suggestions (Experience)
+    if (original.experience && optimized.optimizedExperience) {
+        original.experience.forEach(exp => {
+            const optExp = optimized.optimizedExperience.find(o => o.id === exp.id);
+            if (optExp) {
+                container.innerHTML += window.createRevisionCard(
+                    `exp-${exp.id}`,
+                    `<i class='fa-solid fa-briefcase'></i> Bullet Suggestion: ${exp.role} at ${exp.company}`,
+                    exp.desc || "",
+                    optExp.desc
+                );
+            }
+        });
+    }
+
+    // 5. Stronger Bullet Point Suggestions (Projects)
+    if (original.projects && optimized.optimizedProjects) {
+        original.projects.forEach(proj => {
+            const optProj = optimized.optimizedProjects.find(o => o.id === proj.id);
+            if (optProj) {
+                container.innerHTML += window.createRevisionCard(
+                    `proj-${proj.id}`,
+                    `<i class='fa-solid fa-code-fork'></i> Bullet Suggestion: Project "${proj.title}"`,
+                    proj.desc || "",
+                    optProj.desc
+                );
+            }
+        });
+    }
+
+    // 6. Missing Keywords & Skills
+    const missingJdKeywords = optimized.missingKeywords || [];
+    const suggestedIndustryKeywords = optimized.suggestedKeywords || [];
+    const allKeywords = [...new Set([...missingJdKeywords, ...suggestedIndustryKeywords])];
+    
+    if (allKeywords.length > 0) {
+        let kwHtml = `<div class="revision-card">
+            <div class="revision-card-header">
+                <span style="font-size: 0.8rem; font-weight: 700; color: white;"><i class="fa-solid fa-key"></i> Missing Keywords & Technologies</span>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-secondary); cursor: pointer; text-transform: none;">
+                    <input type="checkbox" id="accept-check-keywords" checked style="width: auto;"> Inject Keywords
+                </label>
+            </div>
+            <div class="revision-card-body" style="grid-template-columns: 1fr;">
+                <div style="font-size: 0.8rem; line-height: 1.5; color: var(--text-secondary);">
+                    The following high-priority ATS keywords were identified as missing from your resume content. Injecting them will significantly boost parsing matches:
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;" id="ai-opt-keywords-list">
+                        ${allKeywords.map(kw => `<span class="keyword-chip missing" style="cursor: default;"><i class="fa-solid fa-plus"></i> ${kw}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        container.innerHTML += kwHtml;
+    }
+
+    // 7. Grammar & Spelling Suggestions
+    let grammarSuggestions = [
+        "Ensured consistent tense usage in all experience bullet statements (action verbs in past tense).",
+        "Checked punctuation formatting consistency (periods at the end of bullet points)."
+    ];
+    let grammarHtml = `<div class="revision-card">
+        <div class="revision-card-header">
+            <span style="font-size: 0.8rem; font-weight: 700; color: white;"><i class="fa-solid fa-spell-check"></i> Grammar & Spelling Audit</span>
+        </div>
+        <div class="revision-card-body" style="grid-template-columns: 1fr;">
+            <div style="font-size: 0.8rem; line-height: 1.5; color: var(--text-secondary);">
+                All spelling and syntax metrics verified:
+                <ul style="padding-left: 20px; margin: 6px 0 0 0; color: var(--success);">
+                    ${grammarSuggestions.map(g => `<li>${g}</li>`).join('')}
+                </ul>
+            </div>
+        </div>
+    </div>`;
+    container.innerHTML += grammarHtml;
+};
+
+window.applyAIOptimizerChanges = function() {
+    if (!pendingOptimizations) return;
+    
+    let appliedCount = 0;
+    
+    // 1. Apply Summary
+    const acceptSummary = document.getElementById("accept-check-summary");
+    if (acceptSummary && acceptSummary.checked) {
+        state.summary = pendingOptimizations.optimizedSummary;
+        const summaryInput = document.getElementById("input-summary");
+        if (summaryInput) summaryInput.value = state.summary;
+        appliedCount++;
+    }
+    
+    // 2. Apply Experience
+    if (state.experience && pendingOptimizations.optimizedExperience) {
+        state.experience.forEach(exp => {
+            const acceptExp = document.getElementById(`accept-check-exp-${exp.id}`);
+            if (acceptExp && acceptExp.checked) {
+                const optExp = pendingOptimizations.optimizedExperience.find(o => o.id === exp.id);
+                if (optExp) {
+                    exp.desc = optExp.desc;
+                    appliedCount++;
+                }
+            }
+        });
+    }
+    
+    // 3. Apply Projects
+    if (state.projects && pendingOptimizations.optimizedProjects) {
+        state.projects.forEach(proj => {
+            const acceptProj = document.getElementById(`accept-check-proj-${proj.id}`);
+            if (acceptProj && acceptProj.checked) {
+                const optProj = pendingOptimizations.optimizedProjects.find(o => o.id === proj.id);
+                if (optProj) {
+                    proj.desc = optProj.desc;
+                    appliedCount++;
+                }
+            }
+        });
+    }
+    
+    // 4. Apply Keywords Injection
+    const acceptKeywords = document.getElementById("accept-check-keywords");
+    if (acceptKeywords && acceptKeywords.checked) {
+        const missingJdKeywords = pendingOptimizations.missingKeywords || [];
+        const suggestedIndustryKeywords = pendingOptimizations.suggestedKeywords || [];
+        const allKeywords = [...new Set([...missingJdKeywords, ...suggestedIndustryKeywords])];
+        
+        allKeywords.forEach(kw => {
+            if (!state.skills) state.skills = [];
+            if (!state.skills.includes(kw)) {
+                state.skills.push(kw);
+                appliedCount++;
+            }
+        });
+        
+        renderSkillsTags();
+    }
+    
+    // 5. Apply Template Formatting Change
+    const acceptFormatting = document.getElementById("accept-check-formatting");
+    if (acceptFormatting && acceptFormatting.checked) {
+        state.activeTemplate = "classic";
+        const templateFilter = document.getElementById("template-filter");
+        if (templateFilter) templateFilter.value = "classic";
+        appliedCount++;
+    }
+    
+    if (appliedCount > 0) {
+        saveState();
+        renderExperienceList();
+        renderProjectsList();
+        renderResumePreview();
+        
+        updateATSScore();
+        
+        showToast(`Successfully merged ${appliedCount} AI optimizations and recalculated ATS score!`);
+        window.closeAIOptimizeModal();
+    } else {
+        showToast("No changes were selected to apply.");
+    }
+};

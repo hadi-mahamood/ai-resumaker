@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=7.0">
+    <link rel="stylesheet" href="style.css?v=8.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -292,6 +292,11 @@
                         </div>
                     </div>
 
+                    <!-- Optimize with AI Button -->
+                    <button class="btn btn-premium" id="tb-ai-optimize-btn" onclick="openAIOptimizeModal()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Optimize with AI
+                    </button>
+
                     <button class="btn btn-secondary" onclick="openAICoverLetter()">
                         <i class="fa-solid fa-envelope-open-text"></i> Cover Letter
                     </button>
@@ -455,6 +460,58 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dedicated AI Optimization Modal -->
+    <div class="ats-modal" id="ai-optimize-modal">
+        <div class="ats-modal-card" style="max-width: 800px;">
+            <div class="ats-modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-wand-magic-sparkles" style="color: #a78bfa; font-size: 1.4rem;"></i>
+                    <div>
+                        <h3 style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">AI Resume Optimizer</h3>
+                        <span style="font-size: 0.72rem; color: var(--text-secondary);">Direct ATS formatting, grammar, and bullet-point refactoring</span>
+                    </div>
+                </div>
+                <button class="ats-modal-close" onclick="closeAIOptimizeModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="ats-modal-body" id="ai-opt-modal-body">
+                <!-- If no API Key: -->
+                <div class="ai-opt-no-key-alert" id="ai-opt-no-key-alert" style="display: none;">
+                    <div class="ats-suggestion-item danger" style="padding: 20px; display: flex; gap: 12px; border-radius: 8px;">
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.5rem; margin-top: 2px;"></i>
+                        <div>
+                            <h4 style="margin: 0 0 6px 0; color: white;">API Key Required</h4>
+                            <p style="margin: 0; font-size: 0.8rem; line-height: 1.4; color: #fecaca;">
+                                AI optimization requires an API key. Configure OpenAI, Gemini, or Claude in Settings.
+                            </p>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: 20px; width: 100%; justify-content: center;" onclick="closeAIOptimizeModal(); toggleSettingsPanel();"><i class="fa-solid fa-gear"></i> Open API Settings</button>
+                </div>
+                
+                <!-- If API Key is present: -->
+                <div class="ai-opt-dashboard" id="ai-opt-dashboard" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div class="opt-overall-score-box">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Overall ATS Score</span>
+                            <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--success); margin: 4px 0 0 0;" id="ai-opt-score-val">0%</h2>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 8px 14px;" onclick="aiOptToggleAll(false)"><i class="fa-solid fa-xmark"></i> Reject All</button>
+                            <button class="btn btn-success" style="font-size: 0.8rem; padding: 8px 14px;" onclick="aiOptToggleAll(true)"><i class="fa-solid fa-check"></i> Accept All</button>
+                        </div>
+                    </div>
+
+                    <div class="ats-revisions-list" id="ai-opt-suggestions-container">
+                        <!-- suggestions will load here -->
+                    </div>
+
+                    <button class="btn btn-success" style="margin-top: 20px; width: 100%; justify-content: center; font-weight: 700;" onclick="applyAIOptimizerChanges()"><i class="fa-solid fa-circle-check"></i> Apply Selected Changes</button>
                 </div>
             </div>
         </div>
