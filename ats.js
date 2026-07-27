@@ -721,7 +721,7 @@ Expected Output Format:
             return parsed;
         } catch (err) {
             console.error("Gemini optimization failed:", err);
-            throw new Error(`Gemini API Error: ${err.message || 'Verification failed. Check your API key settings or network connection.'}`);
+            throw err;
         }
     } else {
         throw new Error("AI optimization requires an API key. Configure OpenAI, Gemini, or Claude in Settings.");
@@ -730,25 +730,67 @@ Expected Output Format:
 
 window.callGeminiOptimizerAPI = async function(key, prompt) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            contents: [{
-                parts: [{
-                    text: prompt
-                }]
+    const requestBody = {
+        contents: [{
+            parts: [{
+                text: prompt
             }]
-        })
-    });
+        }]
+    };
+    
+    // Log the complete request payload (excluding key)
+    console.log("Gemini API Request Payload:", JSON.stringify(requestBody, null, 2));
+    
+    let response;
+    try {
+        response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+    } catch (netErr) {
+        console.error("Gemini API Network Error:", netErr);
+        throw new Error("Network error. Please check your internet connection and try again.");
+    }
     
     if (!response.ok) {
-        throw new Error(`API Error: ${response.statusText}`);
+        let errorData = null;
+        try {
+            errorData = await response.json();
+        } catch (jsonErr) {
+            // response was not JSON
+        }
+        
+        // Log the complete error response payload for debugging
+        console.error(`Gemini API Error Response [HTTP ${response.status}]:`, errorData || response.statusText);
+        
+        const httpStatus = response.status;
+        let errorMessage = response.statusText || "API Error";
+        let apiStatus = "";
+        
+        if (errorData && errorData.error) {
+            errorMessage = errorData.error.message || errorMessage;
+            apiStatus = errorData.error.status || "";
+        }
+        
+        const errObj = new Error(errorMessage);
+        errObj.httpStatus = httpStatus;
+        errObj.apiStatus = apiStatus;
+        errObj.errorData = errorData;
+        throw errObj;
     }
     
     const data = await response.json();
+    
+    // Log response payload for debugging
+    console.log("Gemini API Response Payload:", JSON.stringify(data, null, 2));
+    
+    if (!data.candidates || data.candidates.length === 0 || !data.candidates[0].content || !data.candidates[0].content.parts || data.candidates[0].content.parts.length === 0) {
+        throw new Error("Invalid response payload structure returned by Gemini API.");
+    }
+    
     return data.candidates[0].content.parts[0].text.trim();
 };
 
@@ -977,6 +1019,82 @@ window.closeAIOptimizeModal = function() {
     if (modal) modal.classList.remove("open");
 };
 
+window.classifyGeminiError = function(err) {
+    if (!err) {
+        return {
+            type: "Unknown Error",
+            detail: "An unspecified error occurred.",
+            instruction: "Please check your settings and try again."
+        };
+    }
+    
+    if (err.message && (err.message.toLowerCase().includes("network error") || err.message.toLowerCase().includes("failed to fetch"))) {
+        return {
+            type: "Network Error",
+            detail: "A network error occurred. Please check your internet connection and try again.",
+            instruction: "Ensure your DNS is resolving properly and you are not blocked by a firewall."
+        };
+    }
+    
+    const status = err.httpStatus || 0;
+    const apiStatus = err.apiStatus || "";
+    const msg = err.message || "";
+    
+    if (status === 400 && (msg.includes("API key not valid") || msg.includes("key is invalid") || (apiStatus === "INVALID_ARGUMENT" && msg.includes("key")))) {
+        return {
+            type: "Invalid API Key",
+            detail: "The configured Gemini API key is invalid.",
+            instruction: "Configure OpenAI, Gemini, or Claude in Settings with a valid API key."
+        };
+    }
+    
+    if (status === 401 || status === 403 || apiStatus === "PERMISSION_DENIED" || msg.includes("auth") || msg.includes("permission") || msg.includes("API key")) {
+        return {
+            type: "Authentication Error",
+            detail: "The configured Gemini API key is invalid.",
+            instruction: "Ensure the API key is correct and has permission to call generativelanguage.googleapis.com."
+        };
+    }
+    
+    if (status === 429 && (msg.includes("quota") || msg.includes("exhausted") || apiStatus === "RESOURCE_EXHAUSTED" || msg.includes("limit"))) {
+        return {
+            type: "Quota Exceeded",
+            detail: "Your Gemini API quota has been exceeded. Please wait for the quota reset or enable billing.",
+            instruction: "The free tier rate limit has been reached. Please wait or use a paid Gemini API key."
+        };
+    }
+    
+    if (status === 429) {
+        return {
+            type: "Rate Limit Exceeded",
+            detail: "Too many requests. Please wait and try again shortly.",
+            instruction: "Wait 60 seconds before triggering another content optimization."
+        };
+    }
+    
+    if (status === 404 && (msg.includes("model") || msg.includes("not found"))) {
+        return {
+            type: "Unsupported Model",
+            detail: `Unsupported Gemini model requested: ${msg}`,
+            instruction: "Select a supported model version or update the API endpoint URI."
+        };
+    }
+    
+    if (status === 400) {
+        return {
+            type: "Invalid Request Payload",
+            detail: `Request payload rejected: ${msg}`,
+            instruction: "Check formatting parameters or simplify input payload."
+        };
+    }
+    
+    return {
+        type: "API Error",
+        detail: msg || "An API error occurred.",
+        instruction: `HTTP Status Code: ${status || 'Unknown'}. Status: ${apiStatus || 'N/A'}.`
+    };
+};
+
 window.fetchAIOptimizationDetails = function() {
     const container = document.getElementById("ai-opt-suggestions-container");
     if (!container) return;
@@ -996,14 +1114,20 @@ window.fetchAIOptimizationDetails = function() {
         
         window.renderAIOptimizerSuggestions(state, optimizedData);
     }).catch(err => {
+        const errorDetail = window.classifyGeminiError(err);
+        
         container.innerHTML = `
             <div class="ats-suggestion-item danger" style="padding: 20px; display: flex; gap: 12px; border-radius: 8px;">
                 <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.5rem; margin-top: 2px;"></i>
                 <div>
-                    <h4 style="margin: 0 0 6px 0; color: white;">Optimization Failed</h4>
-                    <p style="margin: 0; font-size: 0.8rem; line-height: 1.4; color: #fecaca;">
-                        ${err.message || 'An unexpected API error occurred. Check your connection or API key settings.'}
+                    <h4 style="margin: 0 0 6px 0; color: white;">Optimization Failed (${errorDetail.type})</h4>
+                    <p style="margin: 0; font-size: 0.82rem; line-height: 1.4; color: #fecaca; font-weight: 500;">
+                        ${errorDetail.detail}
                     </p>
+                    <p style="margin: 6px 0 0 0; font-size: 0.75rem; color: var(--text-secondary);">
+                        ${errorDetail.instruction}
+                    </p>
+                    ${err.httpStatus ? `<p style="margin: 6px 0 0 0; font-size: 0.72rem; color: var(--text-secondary); font-family: monospace;">HTTP Status Code: ${err.httpStatus} ${err.apiStatus ? `[${err.apiStatus}]` : ''}</p>` : ''}
                 </div>
             </div>
         `;
