@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=6.0">
+    <link rel="stylesheet" href="style.css?v=7.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -330,22 +330,131 @@
     <div class="ats-modal" id="ats-modal">
         <div class="ats-modal-card">
             <div class="ats-modal-header">
-                <h3 style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-circle-nodes" style="color: var(--success);"></i> ATS Compatibility Audit
-                </h3>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-circle-nodes" style="color: var(--success); font-size: 1.4rem;"></i>
+                    <div>
+                        <h3 style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">ATS Optimization & AI Planner</h3>
+                        <span style="font-size: 0.72rem; color: var(--text-secondary);">Audit, match and auto-optimize your resume with Gemini AI</span>
+                    </div>
+                </div>
                 <button class="ats-modal-close" onclick="closeATSModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
+            
+            <div class="ats-modal-tabs">
+                <button class="ats-tab-btn active" id="tab-ats-dashboard" onclick="switchATSTab('dashboard')">
+                    <i class="fa-solid fa-chart-bar"></i> ATS Dashboard
+                </button>
+                <button class="ats-tab-btn" id="tab-ats-jd-match" onclick="switchATSTab('jd-match')">
+                    <i class="fa-solid fa-bullseye"></i> JD Matcher
+                </button>
+                <button class="ats-tab-btn" id="tab-ats-optimizer" onclick="switchATSTab('optimizer')">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Optimizer
+                </button>
+            </div>
+
             <div class="ats-modal-body">
-                <div class="ats-score-display">
-                    <div class="ats-gauge" id="ats-modal-gauge" style="--score: 0;">
-                        <span class="ats-gauge-num" id="ats-modal-score">0%</span>
+                <!-- Panel 1: Dashboard -->
+                <div class="ats-tab-panel active" id="panel-ats-dashboard">
+                    <div class="ats-dashboard-grid">
+                        <div class="ats-dashboard-left">
+                            <div class="ats-score-display">
+                                <div class="ats-gauge" id="ats-modal-gauge" style="--score: 0;">
+                                    <span class="ats-gauge-num" id="ats-modal-score">0%</span>
+                                </div>
+                                <span style="font-weight: 600; margin-top: 10px; font-size: 1.1rem;" id="ats-modal-status">Poor Compatibility</span>
+                            </div>
+                            
+                            <div class="country-rules-container">
+                                <label for="ats-country-select" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 6px;">Target Country Rules</label>
+                                <select id="ats-country-select" onchange="changeCountryRules(this.value)" class="ats-country-select">
+                                    <option value="US">United States / Canada</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="EU">Europe (Europass)</option>
+                                    <option value="AU">Australia</option>
+                                    <option value="IN">India</option>
+                                    <option value="GCC">GCC / Middle East</option>
+                                </select>
+                                <div class="country-rule-alert" id="country-rule-alert">
+                                    <strong>US / Canada expectations:</strong> No profile photos or birth dates allowed due to anti-discrimination laws. Single-page layout preferred.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ats-dashboard-right">
+                            <div class="ats-modal-subtitle">Audit Checklist Breakdown</div>
+                            <div class="ats-checklist" id="ats-modal-checklist">
+                                <!-- Category bars and audits -->
+                            </div>
+                            <div class="ats-modal-subtitle" style="margin-top: 20px;">Priority System Suggestions</div>
+                            <div class="ats-suggestion-list" id="ats-modal-suggestions">
+                                <!-- Suggestions list -->
+                            </div>
+                        </div>
                     </div>
-                    <span style="font-weight: 600; margin-top: 5px;" id="ats-modal-status">Poor Compatibility</span>
                 </div>
 
-                <div class="ats-modal-subtitle">System Analysis Details</div>
-                <div class="ats-suggestion-list" id="ats-modal-suggestions">
-                    <!-- Suggested checks -->
+                <!-- Panel 2: JD Matcher -->
+                <div class="ats-tab-panel" id="panel-ats-jd-match">
+                    <div class="ats-jd-layout">
+                        <div class="ats-jd-input-area">
+                            <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;">Target Job Description</label>
+                            <textarea id="ats-jd-text" placeholder="Paste the job description keywords here to compare details, or load details..." oninput="onJDTextInput()"></textarea>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <input type="file" id="jd-file-input" style="display: none;" onchange="handleJDFileUpload(event)">
+                                <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 8px 14px;" onclick="document.getElementById('jd-file-input').click()"><i class="fa-solid fa-file-arrow-up"></i> Upload JD File</button>
+                                <button class="btn btn-primary" style="font-size: 0.8rem; padding: 8px 14px;" onclick="calculateJDMatch()"><i class="fa-solid fa-rotate"></i> Analyze Match</button>
+                            </div>
+                        </div>
+
+                        <div class="ats-jd-results">
+                            <div class="ats-match-gauge-container">
+                                <div class="ats-match-score" id="ats-jd-match-score">0%</div>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">Resume keyword alignment</span>
+                            </div>
+                            <div class="ats-keywords-lists">
+                                <div class="keyword-sublist">
+                                    <div class="keyword-sublist-header" style="color: var(--success);"><i class="fa-solid fa-circle-check"></i> Matched Keywords</div>
+                                    <div class="keyword-chips" id="ats-matched-keywords">
+                                        <span class="no-keywords">No matched keywords identified yet.</span>
+                                    </div>
+                                </div>
+                                <div class="keyword-sublist" style="margin-top: 15px;">
+                                    <div class="keyword-sublist-header" style="color: var(--danger);"><i class="fa-solid fa-circle-xmark"></i> Missing Target Keywords (Click to add)</div>
+                                    <div class="keyword-chips" id="ats-missing-keywords">
+                                        <span class="no-keywords">Paste a job description to extract keywords.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 3: AI Optimizer -->
+                <div class="ats-tab-panel" id="panel-ats-optimizer">
+                    <div class="ats-optimizer-layout">
+                        <div class="ats-opt-header">
+                            <div class="opt-desc">
+                                <h4 style="margin: 0 0 4px 0; color: white;"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Resume Auto-Optimization</h4>
+                                <p style="font-size: 0.72rem; color: var(--text-secondary); margin: 0;">Improve wording, fix grammar, inject key phrases, and boost ATS score without inventing experience.</p>
+                            </div>
+                            <button class="btn btn-primary" id="ats-optimize-btn" onclick="runFullAIOptimization()"><i class="fa-solid fa-robot"></i> Optimize Entire Resume</button>
+                        </div>
+                        
+                        <div class="ats-opt-loading" id="ats-opt-loading" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px;">Gemini AI is analyzing and rewriting your resume details...</span>
+                        </div>
+
+                        <div class="ats-opt-results" id="ats-opt-results" style="display: none;">
+                            <div class="ats-opt-results-header">
+                                <span style="font-size: 0.85rem; font-weight: 700; color: white;">AI Suggested Revisions</span>
+                                <button class="btn btn-success" style="font-size: 0.8rem; padding: 6px 12px;" onclick="applyAllAIOptimizations()"><i class="fa-solid fa-circle-check"></i> Apply Selected Changes</button>
+                            </div>
+                            <div class="ats-revisions-list" id="ats-revisions-list">
+                                <!-- Side-by-side revisions loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

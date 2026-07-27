@@ -1722,41 +1722,24 @@ function updateATSScore() {
     const tbBadge = document.getElementById("toolbar-ats-badge");
     const tbStatus = document.getElementById("toolbar-ats-status");
     
-    tbBadge.innerText = report.score;
-    tbStatus.innerText = report.status;
-    
-    // Set colors based on scoring range
-    tbBadge.className = "ats-badge";
-    if (report.score < 60) {
-        tbBadge.classList.add("low");
-    } else if (report.score < 80) {
-        tbBadge.classList.add("medium");
-    }
-
-    // Modal elements
-    document.getElementById("ats-modal-score").innerText = `${report.score}%`;
-    document.getElementById("ats-modal-status").innerText = report.status;
-    
-    const gauge = document.getElementById("ats-modal-gauge");
-    gauge.style.setProperty('--score', report.score);
-    
-    const list = document.getElementById("ats-modal-suggestions");
-    list.innerHTML = "";
-    
-    report.suggestions.forEach(s => {
-        let icon = "fa-circle-check";
-        if (s.type === "warning") icon = "fa-circle-exclamation";
-        if (s.type === "danger") icon = "fa-circle-xmark";
+    if (tbBadge && tbStatus) {
+        tbBadge.innerText = report.score;
+        tbStatus.innerText = report.status;
         
-        const item = document.createElement("div");
-        item.className = `ats-suggestion-item ${s.type}`;
-        item.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${s.text}</span>`;
-        list.appendChild(item);
-    });
+        tbBadge.className = "ats-badge";
+        if (report.score < 60) {
+            tbBadge.classList.add("low");
+        } else if (report.score < 80) {
+            tbBadge.classList.add("medium");
+        }
+    }
 }
 
 function openATSModal() {
     updateATSScore();
+    if (window.initATSDashboard) {
+        window.initATSDashboard();
+    }
     document.getElementById("ats-modal").classList.add("open");
 }
 

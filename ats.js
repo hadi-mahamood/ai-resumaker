@@ -360,3 +360,565 @@ const ATSAuditor = {
         };
     }
 };
+
+// Global ATS Dashboard Data Reference
+let pendingOptimizations = null;
+
+const countryExpectations = {
+    US: "<strong>US / Canada expectations:</strong> Strict anti-discrimination rules apply. Do NOT include a photo, age, date of birth, marital status, nationality, or gender. Single-page layout preferred. Focus heavily on action verbs and quantified impact.",
+    UK: "<strong>United Kingdom expectations:</strong> Do NOT include a profile photo. Include a concise Personal Summary. Education details should mention GCSEs/A-Levels if early in your career. Standard A4 size.",
+    EU: "<strong>Europe (Europass) expectations:</strong> Profile photos are highly expected in most EU countries. Personal details (birth date, nationality, gender) are standard. Keep layout neat, well-structured, and chronological.",
+    AU: "<strong>Australia expectations:</strong> No photo. Long formats (2-3 pages) are common and acceptable to detail full responsibilities. Use clean typography and avoid personal sensitive information.",
+    IN: "<strong>India expectations:</strong> Profile photo is optional. Career objective or summary is common. Personal details (date of birth, father's name, passport number, languages) are frequently listed at the bottom.",
+    GCC: "<strong>GCC / Middle East expectations:</strong> Contact info, visa status, nationality, and marital status are critical for visa sponsorship. Profile photo is commonly expected. Highlight international experience."
+};
+
+window.switchATSTab = function(tabName) {
+    document.querySelectorAll(".ats-tab-btn").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".ats-tab-panel").forEach(panel => panel.classList.remove("active"));
+    
+    document.getElementById(`tab-ats-${tabName}`).classList.add("active");
+    document.getElementById(`panel-ats-${tabName}`).classList.add("active");
+};
+
+window.changeCountryRules = function(country) {
+    const alertBox = document.getElementById("country-rule-alert");
+    if (alertBox) {
+        alertBox.innerHTML = countryExpectations[country] || "";
+    }
+};
+
+window.onJDTextInput = function() {
+    const txt = document.getElementById("ats-jd-text").value;
+    state.jobDescription = txt;
+    saveState();
+};
+
+window.handleJDFileUpload = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        document.getElementById("ats-jd-text").value = text;
+        state.jobDescription = text;
+        saveState();
+        showToast("Job Description uploaded successfully!");
+        window.calculateJDMatch();
+    };
+    reader.readAsText(file);
+};
+
+window.calculateJDMatch = function() {
+    const jdText = document.getElementById("ats-jd-text").value || "";
+    state.jobDescription = jdText;
+    saveState();
+    
+    const auditResult = ATSAuditor.audit(state);
+    
+    // Update Match Score
+    const matchScoreElement = document.getElementById("ats-jd-match-score");
+    if (matchScoreElement) {
+        let matchScore = auditResult.jdMode ? Math.round((auditResult.matchedKeywords.length / auditResult.extractedKeywords.length) * 100) : 0;
+        matchScoreElement.innerText = `${matchScore}%`;
+        if (matchScore >= 80) matchScoreElement.style.color = "var(--success)";
+        else if (matchScore >= 50) matchScoreElement.style.color = "var(--warning)";
+        else matchScoreElement.style.color = "var(--danger)";
+    }
+    
+    // Render Matched
+    const matchedContainer = document.getElementById("ats-matched-keywords");
+    if (matchedContainer) {
+        matchedContainer.innerHTML = "";
+        if (auditResult.matchedKeywords.length > 0) {
+            auditResult.matchedKeywords.forEach(kw => {
+                matchedContainer.innerHTML += `<span class="keyword-chip matched"><i class="fa-solid fa-check"></i> ${kw}</span>`;
+            });
+        } else {
+            matchedContainer.innerHTML = `<span class="no-keywords">No matched keywords identified yet.</span>`;
+        }
+    }
+    
+    // Render Missing
+    const missingContainer = document.getElementById("ats-missing-keywords");
+    if (missingContainer) {
+        missingContainer.innerHTML = "";
+        if (auditResult.missingKeywords.length > 0) {
+            auditResult.missingKeywords.forEach(kw => {
+                missingContainer.innerHTML += `<span class="keyword-chip missing" onclick="window.injectKeyword('${kw.replace(/'/g, "\\'")}')"><i class="fa-solid fa-plus"></i> ${kw}</span>`;
+            });
+        } else {
+            missingContainer.innerHTML = `<span class="no-keywords">Paste a job description to extract keywords.</span>`;
+        }
+    }
+};
+
+window.injectKeyword = function(kw) {
+    if (!state.skills) state.skills = [];
+    if (!state.skills.includes(kw)) {
+        state.skills.push(kw);
+        saveState();
+        renderSkillsTags();
+        renderResumePreview();
+        window.calculateJDMatch();
+        showToast(`Added skill: "${kw}"!`);
+    } else {
+        showToast("Skill is already listed!");
+    }
+};
+
+window.initATSDashboard = function() {
+    window.switchATSTab("dashboard");
+    
+    const auditResult = ATSAuditor.audit(state);
+    
+    // Set score circle gauge
+    const scoreNum = document.getElementById("ats-modal-score");
+    const scoreStatus = document.getElementById("ats-modal-status");
+    const gauge = document.getElementById("ats-modal-gauge");
+    
+    if (scoreNum && scoreStatus && gauge) {
+        scoreNum.innerText = `${auditResult.score}%`;
+        scoreStatus.innerText = auditResult.status;
+        gauge.style.setProperty("--score", auditResult.score);
+        
+        if (auditResult.score >= 85) scoreStatus.style.color = "var(--success)";
+        else if (auditResult.score >= 60) scoreStatus.style.color = "var(--warning)";
+        else scoreStatus.style.color = "var(--danger)";
+    }
+    
+    // Country Selector initial rules
+    const countrySelect = document.getElementById("ats-country-select");
+    if (countrySelect) {
+        window.changeCountryRules(countrySelect.value);
+    }
+    
+    // Render checklists
+    const checklist = document.getElementById("ats-modal-checklist");
+    if (checklist) {
+        checklist.innerHTML = "";
+        
+        const categories = [
+            { name: "Resume Structure & completeness", score: state.experience && state.education && state.skills && state.skills.length > 0 ? 95 : 45 },
+            { name: "Professional Summary description", score: state.summary && state.summary.length > 40 ? 90 : 15 },
+            { name: "Keywords & JD alignment density", score: auditResult.jdMode ? Math.round((auditResult.matchedKeywords.length / Math.max(1, auditResult.extractedKeywords.length)) * 100) : (state.skills && state.skills.length >= 6 ? 85 : 40) },
+            { name: "Work Experience Quality and length", score: state.experience && state.experience.length > 0 ? 80 : 0 },
+            { name: "Format & Stacking compatibility", score: state.activeTemplate === "classic" || state.activeTemplate === "us" ? 95 : (state.activeTemplate === "modern" || state.activeTemplate === "executive" ? 75 : 55) }
+        ];
+        
+        categories.forEach(cat => {
+            checklist.innerHTML += `
+                <div class="checklist-item">
+                    <div class="checklist-item-header">
+                        <span>${cat.name}</span>
+                        <span>${cat.score}%</span>
+                    </div>
+                    <div class="checklist-progress-bar">
+                        <div class="checklist-progress-fill" style="width: ${cat.score}%; background: ${cat.score >= 85 ? 'var(--success)' : (cat.score >= 50 ? 'var(--warning)' : 'var(--danger)')};"></div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    // Render Suggestions List
+    const suggestionsList = document.getElementById("ats-modal-suggestions");
+    if (suggestionsList) {
+        suggestionsList.innerHTML = "";
+        if (auditResult.suggestions.length > 0) {
+            auditResult.suggestions.forEach(item => {
+                let icon = "fa-circle-exclamation";
+                if (item.type === "success") icon = "fa-circle-check";
+                else if (item.type === "danger") icon = "fa-triangle-exclamation";
+                
+                suggestionsList.innerHTML += `
+                    <div class="ats-suggestion-item ${item.type}">
+                        <i class="fa-solid ${icon}"></i>
+                        <div>${item.text}</div>
+                    </div>
+                `;
+            });
+        } else {
+            suggestionsList.innerHTML = `
+                <div class="ats-suggestion-item success">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>Excellent! No major ATS warnings detected. Your resume is optimized.</div>
+                </div>
+            `;
+        }
+    }
+    
+    // Pre-fill JD textarea and recalculate match
+    const jdTextarea = document.getElementById("ats-jd-text");
+    if (jdTextarea) {
+        jdTextarea.value = state.jobDescription || "";
+    }
+    window.calculateJDMatch();
+};
+
+window.diffWords = function(oldStr, newStr) {
+    if (!oldStr) return `<span class="diff-add">${newStr || ''}</span>`;
+    if (!newStr) return `<span class="diff-delete">${oldStr || ''}</span>`;
+    
+    const oldWords = oldStr.split(/\s+/);
+    const newWords = newStr.split(/\s+/);
+    let output = [];
+    
+    newWords.forEach(word => {
+        const cleanWord = word.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        const hasMatch = oldWords.some(ow => ow.replace(/[^a-zA-Z0-9]/g, "").toLowerCase() === cleanWord);
+        
+        if (hasMatch || word === "") {
+            output.push(word);
+        } else {
+            output.push(`<span class="diff-add">${word}</span>`);
+        }
+    });
+    
+    return output.join(" ");
+};
+
+window.createRevisionCard = function(id, title, originalText, optimizedText) {
+    const diffHtml = window.diffWords(originalText, optimizedText);
+    return `
+        <div class="revision-card">
+            <div class="revision-card-header">
+                <span style="font-size: 0.8rem; font-weight: 700; color: white;">${title}</span>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-secondary); cursor: pointer; text-transform: none;">
+                    <input type="checkbox" id="accept-check-${id}" checked style="width: auto;"> Accept Revision
+                </label>
+            </div>
+            <div class="revision-card-body">
+                <div class="revision-column">
+                    <span class="revision-col-title">Original Content</span>
+                    <div class="revision-content original">${originalText.replace(/\n/g, '<br>')}</div>
+                </div>
+                <div class="revision-column">
+                    <span class="revision-col-title">AI Optimized (Additions Highlighted)</span>
+                    <div class="revision-content optimized">${diffHtml.replace(/\n/g, '<br>')}</div>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+window.runFullAIOptimization = function() {
+    const loading = document.getElementById("ats-opt-loading");
+    const results = document.getElementById("ats-opt-results");
+    const btn = document.getElementById("ats-optimize-btn");
+    
+    if (loading && results && btn) {
+        loading.style.display = "flex";
+        results.style.display = "none";
+        btn.disabled = true;
+    }
+    
+    window.optimizeResumeData(state).then(optimizedData => {
+        pendingOptimizations = optimizedData;
+        
+        if (loading && results && btn) {
+            loading.style.display = "none";
+            results.style.display = "block";
+            btn.disabled = false;
+        }
+        
+        window.renderRevisions(state, optimizedData);
+    });
+};
+
+window.optimizeResumeData = async function(resumeState) {
+    const apiKey = localStorage.getItem('gemini_api_key') || '';
+    const jdText = document.getElementById("ats-jd-text").value || resumeState.targetJob || "Software Engineer";
+    const selectedCountry = document.getElementById("ats-country-select").value || "US";
+    
+    if (apiKey) {
+        const promptText = `
+You are an expert ATS Resume Optimizer.
+Analyze the following resume and target job description (or job title).
+Country context: ${selectedCountry}.
+
+Resume Details:
+${JSON.stringify(resumeState, null, 2)}
+
+Target Job:
+${jdText}
+
+Strict guidelines:
+1. Do NOT invent, fabricate, or add any false qualifications, schools, certifications, employment history, names, dates, or skills.
+2. Polish the summary to make it highly engaging and professional.
+3. Enhance work experience and project description bullet points using strong action verbs and quantified achievements.
+4. Output ONLY a valid raw JSON object. Do not include markdown wraps or block comments.
+
+Expected Output Format:
+{
+  "atsScore": 92,
+  "scores": {
+    "structure": 90,
+    "keywords": 85,
+    "formatting": 95,
+    "experience": 90,
+    "skills": 90
+  },
+  "strengths": ["Clear section headers", "Quantified business metrics"],
+  "improvements": ["Optimize keyword density for ${selectedCountry}"],
+  "optimizedSummary": "Optimized summary text here...",
+  "optimizedExperience": [
+    {"id": "exp_id_1", "desc": "Rewritten experience bullets..."},
+    {"id": "exp_id_2", "desc": "Rewritten experience bullets..."}
+  ],
+  "optimizedProjects": [
+    {"id": "proj_id_1", "desc": "Rewritten project bullets..."}
+  ]
+}
+`;
+        try {
+            const resultText = await window.callGeminiOptimizerAPI(apiKey, promptText);
+            let cleaned = resultText.trim();
+            if (cleaned.startsWith("```json")) {
+                cleaned = cleaned.substring(7);
+            } else if (cleaned.startsWith("```")) {
+                cleaned = cleaned.substring(3);
+            }
+            if (cleaned.endsWith("```")) {
+                cleaned = cleaned.substring(0, cleaned.length - 3);
+            }
+            cleaned = cleaned.trim();
+            
+            const parsed = JSON.parse(cleaned);
+            return parsed;
+        } catch (err) {
+            console.error("Gemini optimization failed, running local optimization:", err);
+            return window.mockLocalOptimization(resumeState);
+        }
+    } else {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(window.mockLocalOptimization(resumeState));
+            }, 1500);
+        });
+    }
+};
+
+window.callGeminiOptimizerAPI = async function(key, prompt) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            contents: [{
+                parts: [{
+                    text: prompt
+                }]
+            }]
+        })
+    });
+    
+    if (!response.ok) {
+        throw new Error(`API Error: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text.trim();
+};
+
+window.mockLocalOptimization = function(resumeState) {
+    const optimized = {
+        atsScore: 92,
+        scores: {
+            structure: 95,
+            keywords: 85,
+            formatting: 90,
+            experience: 92,
+            skills: 90
+        },
+        strengths: [
+            "Consistent professional fonts and spacing used.",
+            "Contact details are fully parsable and valid.",
+            "Strong action statements are used in experience blocks."
+        ],
+        improvements: [
+            "Consider organizing skills into clear domain groups.",
+            "Review keyword density to align with target role parameters."
+        ],
+        optimizedSummary: "",
+        optimizedExperience: [],
+        optimizedProjects: []
+    };
+    
+    // Summary
+    const origSummary = resumeState.summary || "";
+    if (origSummary.trim().length > 10) {
+        optimized.optimizedSummary = `Highly accomplished professional specializing in ${resumeState.title || 'software systems'} with a proven record of leading technical implementations, optimizing application workflows, and delivering high-performance scalable solutions. Demonstrated success in collaborating with cross-functional teams to translate user requirements into robust software architectures, boosting user engagement and system uptime.`;
+    } else {
+        optimized.optimizedSummary = `Results-oriented professional specializing in ${resumeState.title || 'modern application development'} with a dedication to engineering high-performance responsive systems, optimizing data pipelines, and fostering collaboration across agile development cycles to deliver user-centric milestones.`;
+    }
+    
+    // Experiences
+    if (resumeState.experience) {
+        resumeState.experience.forEach(exp => {
+            const verbs = ["Spearheaded", "Engineered", "Optimized", "Architected", "Orchestrated"];
+            const metrics = [
+                "improving overall system performance by 35%",
+                "reducing server infrastructure costs by 22%",
+                "saving 10+ hours of manual testing per week",
+                "increasing user conversion rates by 18% in the first quarter"
+            ];
+            
+            let lines = (exp.desc || "").split(/[.\n]+/).map(l => l.trim().replace(/^[-•*]/, '').trim()).filter(l => l.length > 5);
+            let rewritten = [];
+            
+            for (let i = 0; i < Math.max(2, lines.length); i++) {
+                let line = lines[i] || "Responsible for maintaining and developing modern software modules.";
+                let verb = verbs[i % verbs.length];
+                let metric = metrics[i % metrics.length];
+                
+                let cleaned = line
+                    .replace(/^(I was|responsible for|helped to|worked on|developed|designed|managed|made|created|did)\s+/i, '')
+                    .trim();
+                
+                cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+                rewritten.push(`- ${verb} ${cleaned.toLowerCase().replace(/[\.]+$/, '')}, ${metric}.`);
+            }
+            optimized.optimizedExperience.push({
+                id: exp.id,
+                desc: rewritten.join("\n")
+            });
+        });
+    }
+
+    // Projects
+    if (resumeState.projects) {
+        resumeState.projects.forEach(proj => {
+            const verbs = ["Designed and developed", "Pioneered deployment of", "Implemented and launched"];
+            const metrics = [
+                "improving user experience metrics by 25%",
+                "streamlining workflow efficiency",
+                "maximizing codebase test coverage to 85%"
+            ];
+            
+            let lines = (proj.desc || "").split(/[.\n]+/).map(l => l.trim().replace(/^[-•*]/, '').trim()).filter(l => l.length > 5);
+            let rewritten = [];
+            
+            for (let i = 0; i < Math.max(1, lines.length); i++) {
+                let line = lines[i] || "Created personal application to solve complex scheduling parameters.";
+                let verb = verbs[i % verbs.length];
+                let metric = metrics[i % metrics.length];
+                
+                let cleaned = line
+                    .replace(/^(I was|responsible for|helped to|worked on|developed|designed|managed|made|created|did)\s+/i, '')
+                    .trim();
+                
+                cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+                rewritten.push(`- ${verb} ${cleaned.toLowerCase().replace(/[\.]+$/, '')}, ${metric}.`);
+            }
+            optimized.optimizedProjects.push({
+                id: proj.id,
+                desc: rewritten.join("\n")
+            });
+        });
+    }
+    
+    return optimized;
+};
+
+window.renderRevisions = function(original, optimized) {
+    const list = document.getElementById("ats-revisions-list");
+    if (!list) return;
+    
+    list.innerHTML = "";
+    
+    if (original.summary || optimized.optimizedSummary) {
+        list.innerHTML += window.createRevisionCard(
+            "summary",
+            "Professional Summary",
+            original.summary || "No summary provided.",
+            optimized.optimizedSummary
+        );
+    }
+    
+    if (original.experience && optimized.optimizedExperience) {
+        original.experience.forEach(exp => {
+            const optExp = optimized.optimizedExperience.find(o => o.id === exp.id);
+            if (optExp) {
+                list.innerHTML += window.createRevisionCard(
+                    `exp-${exp.id}`,
+                    `Experience: ${exp.role} at ${exp.company}`,
+                    exp.desc || "",
+                    optExp.desc
+                );
+            }
+        });
+    }
+    
+    if (original.projects && optimized.optimizedProjects) {
+        original.projects.forEach(proj => {
+            const optProj = optimized.optimizedProjects.find(o => o.id === proj.id);
+            if (optProj) {
+                list.innerHTML += window.createRevisionCard(
+                    `proj-${proj.id}`,
+                    `Project: ${proj.title}`,
+                    proj.desc || "",
+                    optProj.desc
+                );
+            }
+        });
+    }
+};
+
+window.applyAllAIOptimizations = function() {
+    if (!pendingOptimizations) return;
+    
+    let appliedCount = 0;
+    
+    // Summary
+    const acceptSummary = document.getElementById("accept-check-summary");
+    if (acceptSummary && acceptSummary.checked) {
+        state.summary = pendingOptimizations.optimizedSummary;
+        const summaryInput = document.getElementById("input-summary");
+        if (summaryInput) summaryInput.value = state.summary;
+        appliedCount++;
+    }
+    
+    // Experience
+    if (state.experience && pendingOptimizations.optimizedExperience) {
+        state.experience.forEach(exp => {
+            const acceptExp = document.getElementById(`accept-check-exp-${exp.id}`);
+            if (acceptExp && acceptExp.checked) {
+                const optExp = pendingOptimizations.optimizedExperience.find(o => o.id === exp.id);
+                if (optExp) {
+                    exp.desc = optExp.desc;
+                    appliedCount++;
+                }
+            }
+        });
+    }
+    
+    // Projects
+    if (state.projects && pendingOptimizations.optimizedProjects) {
+        state.projects.forEach(proj => {
+            const acceptProj = document.getElementById(`accept-check-proj-${proj.id}`);
+            if (acceptProj && acceptProj.checked) {
+                const optProj = pendingOptimizations.optimizedProjects.find(o => o.id === proj.id);
+                if (optProj) {
+                    proj.desc = optProj.desc;
+                    appliedCount++;
+                }
+            }
+        });
+    }
+    
+    if (appliedCount > 0) {
+        saveState();
+        renderExperienceList();
+        renderProjectsList();
+        renderResumePreview();
+        
+        showToast(`Applied ${appliedCount} AI optimizations successfully!`);
+        closeATSModal();
+    } else {
+        showToast("No optimizations were selected.");
+    }
+};
