@@ -437,21 +437,21 @@ window.calculateJDMatch = function() {
             auditResult.matchedKeywords.forEach(kw => {
                 matchedContainer.innerHTML += `<span class="keyword-chip matched"><i class="fa-solid fa-check"></i> ${kw}</span>`;
             });
-        } else {
-            matchedContainer.innerHTML = `<span class="no-keywords">No matched keywords identified yet.</span>`;
-        }
     }
     
-    // Render Missing
-    const missingContainer = document.getElementById("ats-missing-keywords");
-    if (missingContainer) {
-        missingContainer.innerHTML = "";
-        if (auditResult.missingKeywords.length > 0) {
+    // Render sidebar matched & missing keywords
+    const sidebarKeywordsContainer = document.getElementById("sidebar-job-keywords");
+    if (sidebarKeywordsContainer) {
+        sidebarKeywordsContainer.innerHTML = "";
+        if (auditResult.jdMode && auditResult.extractedKeywords.length > 0) {
+            auditResult.matchedKeywords.forEach(kw => {
+                sidebarKeywordsContainer.innerHTML += `<span class="keyword-chip matched" style="font-size: 0.65rem; padding: 2px 6px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-check"></i> ${kw}</span>`;
+            });
             auditResult.missingKeywords.forEach(kw => {
-                missingContainer.innerHTML += `<span class="keyword-chip missing" onclick="window.injectKeyword('${kw.replace(/'/g, "\\'")}')"><i class="fa-solid fa-plus"></i> ${kw}</span>`;
+                sidebarKeywordsContainer.innerHTML += `<span class="keyword-chip missing" onclick="window.injectKeyword('${kw.replace(/'/g, "\\'")}')" style="font-size: 0.65rem; padding: 2px 6px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Click to add skill to resume"><i class="fa-solid fa-plus"></i> ${kw}</span>`;
             });
         } else {
-            missingContainer.innerHTML = `<span class="no-keywords">Paste a job description to extract keywords.</span>`;
+            sidebarKeywordsContainer.innerHTML = `<span style="font-size: 0.7rem; color: var(--text-secondary); font-style: italic;">Paste a job description to trigger parser alignment.</span>`;
         }
     }
 };
@@ -468,6 +468,46 @@ window.injectKeyword = function(kw) {
     } else {
         showToast("Skill is already listed!");
     }
+};
+
+window.onJDTextInput = function() {
+    const txt = document.getElementById("ats-jd-text").value;
+    state.jobDescription = txt;
+    
+    const sidebarJdText = document.getElementById("target-job-desc");
+    if (sidebarJdText) sidebarJdText.value = txt;
+    
+    window.updateJobTarget("jobDescription", txt);
+};
+
+window.updateJobTarget = function(key, val) {
+    state[key] = val;
+    
+    if (key === "jobDescription") {
+        const modalJdText = document.getElementById("ats-jd-text");
+        if (modalJdText) modalJdText.value = val;
+        
+        const sidebarJdText = document.getElementById("target-job-desc");
+        if (sidebarJdText && sidebarJdText.value !== val) sidebarJdText.value = val;
+        
+        if (window.calculateJDMatch) {
+            window.calculateJDMatch();
+        }
+    } else if (key === "targetCompany") {
+        const sidebarCompanyInput = document.getElementById("target-company");
+        if (sidebarCompanyInput && sidebarCompanyInput.value !== val) sidebarCompanyInput.value = val;
+    }
+    
+    if (window.profiles && window.activeProfileId) {
+        const activeIdx = window.profiles.findIndex(p => p.id === window.activeProfileId);
+        if (activeIdx !== -1) {
+            window.profiles[activeIdx].resumeData = JSON.parse(JSON.stringify(state));
+            window.profiles[activeIdx].updatedAt = Date.now();
+            localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
+        }
+    }
+    
+    saveState();
 };
 
 window.initATSDashboard = function() {

@@ -137,6 +137,12 @@ document.addEventListener("DOMContentLoaded", () => {
 // Sync state data to form inputs
 function setFormFields() {
     document.getElementById("target-job").value = state.targetJob || "";
+    if (document.getElementById("target-company")) {
+        document.getElementById("target-company").value = state.targetCompany || "";
+    }
+    if (document.getElementById("target-job-desc")) {
+        document.getElementById("target-job-desc").value = state.jobDescription || "";
+    }
     document.getElementById("input-name").value = state.name || "";
     document.getElementById("input-title").value = state.title || "";
     document.getElementById("input-email").value = state.email || "";
@@ -148,6 +154,14 @@ function setFormFields() {
     if (document.getElementById("input-visa")) document.getElementById("input-visa").value = state.visaStatus || "";
     if (document.getElementById("input-marital")) document.getElementById("input-marital").value = state.maritalStatus || "";
     if (document.getElementById("input-languages")) document.getElementById("input-languages").value = state.languages || "";
+    
+    // Auto-calculate keywords match for current profile
+    if (window.calculateJDMatch) {
+        // Sync textareas first
+        const modalJdText = document.getElementById("ats-jd-text");
+        if (modalJdText) modalJdText.value = state.jobDescription || "";
+        window.calculateJDMatch();
+    }
 }
 
 // Bind standard text input keyup events to auto-save and update preview

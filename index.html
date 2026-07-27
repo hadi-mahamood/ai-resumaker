@@ -69,12 +69,12 @@
                     </div>
                 </div>
 
-                <!-- Target Job Section -->
+                <!-- Job Target Workspace Section -->
                 <div class="accordion-item active" id="sec-target">
                     <div class="accordion-header" onclick="toggleAccordion('sec-target')">
                         <div class="accordion-title">
                             <i class="fa-solid fa-bullseye"></i>
-                            <span>Target Role</span>
+                            <span>Job Target Workspace</span>
                         </div>
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span class="sidebar-badge" id="badge-target">0%</span>
@@ -82,10 +82,26 @@
                         </div>
                     </div>
                     <div class="accordion-content">
-                        <div class="accordion-inner">
-                            <div class="form-group">
+                        <div class="accordion-inner" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="form-group" style="margin-bottom: 0;">
                                 <label for="target-job">Target Job Title</label>
                                 <input type="text" id="target-job" placeholder="e.g., Senior Software Engineer" value="Software Developer">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="target-company">Target Company</label>
+                                <input type="text" id="target-company" placeholder="e.g., Google" oninput="window.updateJobTarget('targetCompany', this.value)">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="target-job-desc">Job Description (Shared Context)</label>
+                                <textarea id="target-job-desc" placeholder="Paste the target job description here..." oninput="window.updateJobTarget('jobDescription', this.value)" style="width: 100%; height: 120px; font-size: 0.8rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: white; border-radius: 4px; padding: 6px 10px; resize: vertical; outline: none;"></textarea>
+                            </div>
+                            
+                            <!-- Compact Keywords Comparison Panel -->
+                            <div style="margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+                                <div style="font-size: 0.68rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px;">Keywords Match Alignment</div>
+                                <div id="sidebar-job-keywords" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                    <span style="font-size: 0.7rem; color: var(--text-secondary); font-style: italic;">Paste a job description to trigger parser alignment.</span>
+                                </div>
                             </div>
                         </div>
                     </div>
