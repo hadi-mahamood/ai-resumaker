@@ -413,6 +413,12 @@ body {
     gap: 12px;
 }
 
+@media (max-width: 480px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
 label {
     font-size: 0.8rem;
     font-weight: 500;
@@ -422,6 +428,7 @@ label {
 }
 
 input, select, textarea {
+    width: 100%;
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid var(--border-color);
     border-radius: 8px;
