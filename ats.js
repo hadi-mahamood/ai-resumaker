@@ -634,23 +634,21 @@ window.optimizeResumeData = async function(resumeState) {
     const jdText = document.getElementById("ats-jd-text").value || resumeState.targetJob || "Software Engineer";
     const selectedCountry = document.getElementById("ats-country-select").value || "US";
     
-    // Check Cache
+    // Create state hash key to determine if resume data has changed
     const currentStateString = JSON.stringify({
         resume: resumeState,
         jd: jdText,
         country: selectedCountry
     });
     
+    // Check cache
     if (optimizationCache && lastCachedStateString === currentStateString) {
         console.log("Serving ATS optimization results from cache.");
         return optimizationCache;
     }
     
-    if (!apiKey) {
-        throw new Error("AI optimization requires an API key. Configure OpenAI, Gemini, or Claude in Settings.");
-    }
-    
-    const promptText = `
+    if (apiKey) {
+        const promptText = `
 You are an expert ATS Resume Optimizer.
 Analyze the following resume and target job description (or job title).
 Country context: ${selectedCountry}.
@@ -668,7 +666,7 @@ Strict guidelines:
 4. Detect missing high-priority keywords from the job description.
 5. Provide actionable formatting improvements.
 6. Check grammar and provide a list of verified spelling/grammar corrections.
-7. Output ONLY a valid raw JSON object. Do not include markdown wraps or block comments.
+7. Output ONLY a valid JSON object. Do not include markdown wraps or block comments.
 
 Expected Output Format:
 {
@@ -701,29 +699,32 @@ Expected Output Format:
   ]
 }
 `;
-    try {
-        const resultText = await window.callGeminiOptimizerAPI(apiKey, promptText);
-        let cleaned = resultText.trim();
-        if (cleaned.startsWith("```json")) {
-            cleaned = cleaned.substring(7);
-        } else if (cleaned.startsWith("```")) {
-            cleaned = cleaned.substring(3);
+        try {
+            const resultText = await window.callGeminiOptimizerAPI(apiKey, promptText);
+            let cleaned = resultText.trim();
+            if (cleaned.startsWith("```json")) {
+                cleaned = cleaned.substring(7);
+            } else if (cleaned.startsWith("```")) {
+                cleaned = cleaned.substring(3);
+            }
+            if (cleaned.endsWith("```")) {
+                cleaned = cleaned.substring(0, cleaned.length - 3);
+            }
+            cleaned = cleaned.trim();
+            
+            const parsed = JSON.parse(cleaned);
+            
+            // Cache the result
+            optimizationCache = parsed;
+            lastCachedStateString = currentStateString;
+            
+            return parsed;
+        } catch (err) {
+            console.error("Gemini optimization failed:", err);
+            throw new Error(`Gemini API Error: ${err.message || 'Verification failed. Check your API key settings or network connection.'}`);
         }
-        if (cleaned.endsWith("```")) {
-            cleaned = cleaned.substring(0, cleaned.length - 3);
-        }
-        cleaned = cleaned.trim();
-        
-        const parsed = JSON.parse(cleaned);
-        
-        // Cache the parsed result
-        optimizationCache = parsed;
-        lastCachedStateString = currentStateString;
-        
-        return parsed;
-    } catch (err) {
-        console.error("Gemini optimization failed:", err);
-        throw new Error(`Gemini API Error: Invalid API key or connection timeout. Please verify your API key in Settings.`);
+    } else {
+        throw new Error("AI optimization requires an API key. Configure OpenAI, Gemini, or Claude in Settings.");
     }
 };
 
@@ -981,9 +982,9 @@ window.fetchAIOptimizationDetails = function() {
     if (!container) return;
     
     container.innerHTML = `
-        <div class="ats-opt-loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0;">
-            <div class="loading-spinner" style="border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-bottom: 12px;"></div>
-            <span style="font-size: 0.8rem; color: var(--text-secondary); text-align: center;">Gemini AI is analyzing your complete resume and job criteria...</span>
+        <div class="ats-opt-loading" style="padding: 40px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
+            <div class="loading-spinner"></div>
+            <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px;">Gemini AI is analyzing and refactoring your resume details...</span>
         </div>
     `;
     
@@ -1001,11 +1002,10 @@ window.fetchAIOptimizationDetails = function() {
                 <div>
                     <h4 style="margin: 0 0 6px 0; color: white;">Optimization Failed</h4>
                     <p style="margin: 0; font-size: 0.8rem; line-height: 1.4; color: #fecaca;">
-                        ${err.message}
+                        ${err.message || 'An unexpected API error occurred. Check your connection or API key settings.'}
                     </p>
                 </div>
             </div>
-            <button class="btn btn-secondary" style="margin-top: 20px; width: 100%; justify-content: center;" onclick="window.fetchAIOptimizationDetails()"><i class="fa-solid fa-rotate-right"></i> Retry Optimization</button>
         `;
     });
 };
@@ -1044,6 +1044,9 @@ window.renderAIOptimizerSuggestions = function(original, optimized) {
     // 2. ATS Formatting Warnings & Suggestions
     const activeTemplate = original.activeTemplate || "modern";
     if (activeTemplate !== "classic" && activeTemplate !== "us") {
+        const formattingRecs = optimized.formattingSuggestions || [
+            "Switch to Classic or US Standard single-column layout for 100% compatibility."
+        ];
         let formatHtml = `<div class="revision-card">
             <div class="revision-card-header">
                 <span style="font-size: 0.8rem; font-weight: 700; color: white;"><i class="fa-solid fa-file-invoice"></i> ATS Formatting Suggestion</span>
@@ -1055,7 +1058,10 @@ window.renderAIOptimizerSuggestions = function(original, optimized) {
                 <div style="font-size: 0.8rem; line-height: 1.5; color: var(--text-secondary);">
                     The active layout template (<strong>${activeTemplate.toUpperCase()}</strong>) uses color decorations or columns which some older parser systems might misalign.
                     <br><br>
-                    <span style="color: var(--success); font-weight: 600;">Recommendation:</span> Switch to <strong>Classic</strong> or <strong>US Standard</strong> single-column layout for 100% compatibility.
+                    <span style="color: var(--success); font-weight: 600;">Recommendations:</span>
+                    <ul style="padding-left: 20px; margin: 4px 0 0 0;">
+                        ${formattingRecs.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
                 </div>
             </div>
         </div>`;
@@ -1128,7 +1134,7 @@ window.renderAIOptimizerSuggestions = function(original, optimized) {
     }
 
     // 7. Grammar & Spelling Suggestions
-    let grammarSuggestions = [
+    let grammarSuggestions = optimized.grammarFixes || [
         "Ensured consistent tense usage in all experience bullet statements (action verbs in past tense).",
         "Checked punctuation formatting consistency (periods at the end of bullet points)."
     ];
