@@ -2748,8 +2748,296 @@ textarea {
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 0.76rem;
-    margin-right: 4px;
     margin-bottom: 4px;
     display: inline-block;
+}
+
+/* ==========================================
+   ATS IMPROVEMENT SUGGESTIONS PANEL STYLES
+   ========================================== */
+.ats-suggestions-card {
+    background: rgba(17, 24, 39, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    width: 100%;
+    max-width: 820px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.ats-suggestions-header {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    user-select: none;
+}
+
+.ats-suggestions-header:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.ats-suggestions-header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: white;
+    font-size: 0.95rem;
+}
+
+.ats-suggestions-badge {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    background: rgba(139, 92, 246, 0.15);
+    color: #c084fc;
+    border-radius: 20px;
+    font-weight: 700;
+    border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.ats-suggestions-header .toggle-icon {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    transition: transform 0.3s;
+}
+
+.ats-suggestions-card.collapsed .ats-suggestions-body {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ats-suggestions-card.collapsed .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.ats-suggestions-body {
+    padding: 20px;
+    max-height: 2000px;
+    opacity: 1;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tracker Row */
+.ats-suggestions-tracker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.tracker-item {
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.tracker-score-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.tracker-score-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1;
+}
+
+.tracker-score-value.potential {
+    color: var(--success);
+}
+
+.tracker-potential-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    flex: 1;
+    padding: 0 10px;
+}
+
+.tracker-potential-chip {
+    font-size: 0.68rem;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    transition: all 0.25s;
+}
+
+.tracker-potential-chip.completed {
+    border-color: rgba(16, 185, 129, 0.25);
+    background: rgba(16, 185, 129, 0.08);
+    color: #34d399;
+}
+
+.tracker-progress-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.tracker-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--success) 100%);
+    width: 0%;
+    border-radius: 10px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Suggestion Card inside Panel */
+.ats-suggestion-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.ats-suggestion-card:hover {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.ats-suggestion-card.completed {
+    border-color: rgba(16, 185, 129, 0.2);
+    background: rgba(16, 185, 129, 0.03);
+    opacity: 0.75;
+}
+
+.ats-suggestion-card.completed:hover {
+    opacity: 1;
+}
+
+.ats-suggestion-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.ats-suggestion-priority {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ats-suggestion-priority.high { color: #f87171; }
+.ats-suggestion-priority.medium { color: #fbbf24; }
+.ats-suggestion-priority.low { color: #60a5fa; }
+
+.ats-suggestion-points {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--success);
+    background: rgba(16, 185, 129, 0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.ats-suggestion-category {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px 0;
+}
+
+.ats-suggestion-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    margin: 0 0 14px 0;
+}
+
+.ats-suggestion-action-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Completed Overlay/Check */
+.ats-suggestion-check-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #34d399;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Diff Block directly inside card */
+.card-diff-container {
+    margin-top: 14px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    padding-top: 14px;
+}
+
+.card-diff-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+@media (max-width: 600px) {
+    .card-diff-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card-diff-column {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 6px;
+    padding: 10px 12px;
+}
+
+.card-diff-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.card-diff-content {
+    font-size: 0.78rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+    word-break: break-word;
 }
 

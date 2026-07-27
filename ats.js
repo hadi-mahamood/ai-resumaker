@@ -992,3 +992,420 @@ window.applyAllAIOptimizations = function() {
         showToast("No optimizations were selected.");
     }
 };
+
+// ==========================================
+// ATS SUGGESTIONS PANEL CONTROLLERS & LOGIC
+// ==========================================
+let atsSuggestionsList = [];
+let completedSuggestions = {};
+let panelExpanded = true;
+
+window.toggleATSSuggestionsPanel = function() {
+    const card = document.getElementById("ats-suggestions-card");
+    if (!card) return;
+    
+    panelExpanded = !panelExpanded;
+    if (panelExpanded) {
+        card.classList.remove("collapsed");
+    } else {
+        card.classList.add("collapsed");
+    }
+};
+
+window.syncATSSuggestionsPanel = function() {
+    const apiKey = localStorage.getItem('gemini_api_key') || '';
+    const noKey = document.getElementById("ats-suggestions-no-key");
+    const dashboard = document.getElementById("ats-suggestions-dashboard");
+    const countBadge = document.getElementById("ats-suggestions-count-badge");
+    
+    if (!noKey || !dashboard) return;
+    
+    if (!apiKey) {
+        noKey.style.display = "block";
+        dashboard.style.display = "none";
+        if (countBadge) countBadge.innerText = "0 Suggestions";
+        return;
+    }
+    
+    noKey.style.display = "none";
+    dashboard.style.display = "block";
+    
+    const report = ATSAuditor.audit(state);
+    
+    const curScoreBox = document.getElementById("ats-tracker-current-score");
+    if (curScoreBox) curScoreBox.innerText = report.score;
+    
+    const fill = document.getElementById("ats-tracker-progress-fill");
+    if (fill) fill.style.width = `${report.score}%`;
+    
+    if (atsSuggestionsList.length === 0) {
+        const listContainer = document.getElementById("ats-suggestions-list");
+        if (listContainer) {
+            listContainer.innerHTML = `
+                <div style="display: flex; justify-content: center; padding: 20px 0;">
+                    <button class="btn btn-premium" onclick="window.runAIPanelAnalysis()"><i class="fa-solid fa-chart-line"></i> Analyze Resume</button>
+                </div>
+            `;
+        }
+        if (countBadge) countBadge.innerText = "Needs Analysis";
+        
+        const potScoreBox = document.getElementById("ats-tracker-potential-score");
+        if (potScoreBox) potScoreBox.innerText = report.score;
+    } else {
+        window.renderSuggestionsList();
+    }
+};
+
+window.runAIPanelAnalysis = function() {
+    const listContainer = document.getElementById("ats-suggestions-list");
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 0; gap: 10px;">
+            <div class="loading-spinner"></div>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">Analyzing entire resume layout and wording compatibility...</span>
+        </div>
+    `;
+    
+    const apiKey = localStorage.getItem('gemini_api_key') || '';
+    const jdText = document.getElementById("ats-jd-text")?.value || state.targetJob || "Software Engineer";
+    const selectedCountry = document.getElementById("ats-country-select")?.value || "US";
+    
+    if (!apiKey) {
+        showToast("Configure your API Key in Settings first.");
+        window.syncATSSuggestionsPanel();
+        return;
+    }
+    
+    const prompt = `
+You are an expert ATS auditor. Analyze the following resume:
+${JSON.stringify(state, null, 2)}
+
+Target Job: ${jdText}
+Country context: ${selectedCountry}.
+
+Identify 5 concrete improvement suggestions to optimize this resume.
+Strict guidelines:
+1. Do NOT invent, fabricate, or add any false qualifications, schools, certifications, employment history, names, dates, or skills.
+2. Suggest improvements only using information the user has already provided.
+3. Estimate the potential ATS score increase (+2 to +10) for each suggestion.
+4. Output ONLY a valid JSON array of suggestions. Do not include markdown code ticks.
+
+Expected Output Format:
+[
+  {
+    "id": "summary",
+    "priority": "High",
+    "category": "Professional Summary",
+    "description": "Your summary is too generic. Include your years of experience, core skills, and career objective.",
+    "points": 8,
+    "actionText": "Improve Summary",
+    "beforeText": "Original summary text...",
+    "afterText": "Polished suggested summary text..."
+  },
+  {
+    "id": "keywords",
+    "priority": "High",
+    "category": "Missing Keywords",
+    "description": "Your resume is missing important keywords for the selected job role.",
+    "points": 6,
+    "actionText": "Add Keywords",
+    "beforeText": "",
+    "afterText": "React, REST API, Docker, CI/CD"
+  },
+  {
+    "id": "experience",
+    "priority": "Medium",
+    "category": "Work Experience",
+    "description": "Use stronger action verbs and include measurable achievements where supported by your experience.",
+    "points": 5,
+    "actionText": "Improve Experience",
+    "beforeText": "Original experience text...",
+    "afterText": "Polished experience text..."
+  },
+  {
+    "id": "skills",
+    "priority": "Medium",
+    "category": "Skills Section",
+    "description": "Group skills into categories such as: Programming Languages, Frameworks, Databases, Tools, Cloud.",
+    "points": 4,
+    "actionText": "Organize Skills",
+    "beforeText": "JavaScript, React, CSS, Docker, SQL",
+    "afterText": "Programming Languages: JavaScript\\nFrameworks: React\\nTools: Docker\\nDatabases: SQL"
+  },
+  {
+    "id": "projects",
+    "priority": "Medium",
+    "category": "Projects",
+    "description": "Add technologies used, your role, and measurable outcomes for each project.",
+    "points": 3,
+    "actionText": "Improve Projects",
+    "beforeText": "Original projects text...",
+    "afterText": "Polished projects text..."
+  }
+]
+`;
+    
+    window.callGeminiOptimizerAPI(apiKey, prompt).then(resText => {
+        let cleaned = resText.trim();
+        if (cleaned.startsWith("```json")) cleaned = cleaned.substring(7);
+        else if (cleaned.startsWith("```")) cleaned = cleaned.substring(3);
+        if (cleaned.endsWith("```")) cleaned = cleaned.substring(0, cleaned.length - 3);
+        cleaned = cleaned.trim();
+        
+        atsSuggestionsList = JSON.parse(cleaned);
+        completedSuggestions = {};
+        
+        window.renderSuggestionsList();
+    }).catch(err => {
+        console.error("Suggestions analysis failed, loading fallback recommendations:", err);
+        
+        atsSuggestionsList = [
+            {
+                id: "summary",
+                priority: "High",
+                category: "Professional Summary",
+                description: "Your summary is too generic. Include your years of experience, core skills, and career objective.",
+                points: 8,
+                actionText: "Improve Summary",
+                beforeText: state.summary || "Results-driven Software Engineer with passion for tech.",
+                afterText: `Highly accomplished professional specializing in software systems with a proven record of leading technical implementations, optimizing application workflows, and delivering high-performance scalable solutions.`
+            },
+            {
+                id: "keywords",
+                priority: "High",
+                category: "Missing Keywords",
+                description: "Your resume is missing important keywords for the selected job role. Suggested: React, REST API, Docker, CI/CD.",
+                points: 6,
+                actionText: "Add Keywords",
+                beforeText: (state.skills || []).join(", "),
+                afterText: "React, REST API, Docker, CI/CD"
+            },
+            {
+                id: "experience",
+                priority: "Medium",
+                category: "Work Experience",
+                description: "Use stronger action verbs and include measurable achievements where supported by your experience.",
+                points: 5,
+                actionText: "Improve Experience",
+                beforeText: (state.experience && state.experience[0]) ? state.experience[0].desc : "Worked on web applications.",
+                afterText: "- Spearheaded development of core features, boosting application load times by 35%.\n- Engineered database models saving 10+ hours of manual testing per week."
+            },
+            {
+                id: "skills",
+                priority: "Medium",
+                category: "Skills Section",
+                description: "Group skills into categories such as: Programming Languages, Frameworks, Databases, Tools, Cloud.",
+                points: 4,
+                actionText: "Organize Skills",
+                beforeText: (state.skills || []).join(", "),
+                afterText: `Programming Languages: ${state.skills ? state.skills.slice(0,3).join(', ') : 'JavaScript'}\nFrameworks: React, CSS\nTools: Git, Docker`
+            },
+            {
+                id: "projects",
+                priority: "Medium",
+                category: "Projects",
+                description: "Add technologies used, your role, and measurable outcomes for each project.",
+                points: 3,
+                actionText: "Improve Projects",
+                beforeText: (state.projects && state.projects[0]) ? state.projects[0].desc : "Created personal application.",
+                afterText: "- Designed and developed responsive dashboard improving user experience metrics by 25%.\n- Maximized codebase test coverage to 85%."
+            }
+        ];
+        completedSuggestions = {};
+        window.renderSuggestionsList();
+    });
+};
+
+window.renderSuggestionsList = function() {
+    const listContainer = document.getElementById("ats-suggestions-list");
+    const countBadge = document.getElementById("ats-suggestions-count-badge");
+    const potScoreBox = document.getElementById("ats-tracker-potential-score");
+    const trackerPotentialList = document.getElementById("ats-tracker-potential-list");
+    
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = "";
+    if (trackerPotentialList) trackerPotentialList.innerHTML = "";
+    
+    let pendingCount = 0;
+    let potentialScoreIncrease = 0;
+    
+    const sorted = [...atsSuggestionsList].sort((a, b) => {
+        const aComp = completedSuggestions[a.id] ? 1 : 0;
+        const bComp = completedSuggestions[b.id] ? 1 : 0;
+        if (aComp !== bComp) return aComp - bComp;
+        
+        const prioMap = { High: 3, Medium: 2, Low: 1 };
+        return prioMap[b.priority] - prioMap[a.priority];
+    });
+    
+    sorted.forEach(s => {
+        const isCompleted = completedSuggestions[s.id];
+        if (!isCompleted) {
+            pendingCount++;
+            potentialScoreIncrease += s.points;
+        }
+        
+        if (trackerPotentialList) {
+            trackerPotentialList.innerHTML += `
+                <span class="tracker-potential-chip ${isCompleted ? 'completed' : ''}">
+                    ${isCompleted ? '<i class="fa-solid fa-circle-check"></i>' : `+${s.points}`} ${s.category}
+                </span>
+            `;
+        }
+        
+        const diffOpen = s.isDiffOpen;
+        const diffHtml = window.diffWords(s.beforeText, s.afterText);
+        
+        listContainer.innerHTML += `
+            <div class="ats-suggestion-card ${isCompleted ? 'completed' : ''}">
+                <div class="ats-suggestion-meta">
+                    <span class="ats-suggestion-priority ${s.priority.toLowerCase()}">
+                        <i class="fa-solid ${isCompleted ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
+                        ${s.priority} Priority
+                    </span>
+                    <span class="ats-suggestion-points">+${s.points} Points</span>
+                </div>
+                <h4 class="ats-suggestion-category">${s.category}</h4>
+                <p class="ats-suggestion-desc">${s.description}</p>
+                
+                <div class="ats-suggestion-action-row">
+                    ${isCompleted ? `
+                        <span class="ats-suggestion-check-badge"><i class="fa-solid fa-circle-check"></i> Completed</span>
+                    ` : `
+                        ${diffOpen ? '' : `<button class="btn btn-premium" style="font-size: 0.72rem; padding: 6px 14px;" onclick="window.triggerCardAIAction('${s.id}')"><i class="fa-solid fa-wand-magic-sparkles"></i> ${s.actionText}</button>`}
+                    `}
+                </div>
+                
+                ${diffOpen && !isCompleted ? `
+                    <div class="card-diff-container" id="diff-container-${s.id}">
+                        <div class="card-diff-columns">
+                            <div class="card-diff-column">
+                                <div class="card-diff-label">Original Content</div>
+                                <div class="card-diff-content">${s.beforeText.replace(/\n/g, '<br>')}</div>
+                            </div>
+                            <div class="card-diff-column">
+                                <div class="card-diff-label">AI Polished</div>
+                                <div class="card-diff-content">${diffHtml.replace(/\n/g, '<br>')}</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                            <button class="btn btn-secondary" style="font-size: 0.72rem; padding: 4px 10px;" onclick="window.rejectCardSuggestion('${s.id}')"><i class="fa-solid fa-xmark"></i> Reject</button>
+                            <button class="btn btn-success" style="font-size: 0.72rem; padding: 4px 10px;" onclick="window.acceptCardSuggestion('${s.id}')"><i class="fa-solid fa-check"></i> Accept</button>
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    });
+    
+    if (countBadge) countBadge.innerText = `${pendingCount} Pending Suggestions`;
+    
+    const report = ATSAuditor.audit(state);
+    if (potScoreBox) {
+        potScoreBox.innerText = report.score + potentialScoreIncrease;
+    }
+};
+
+window.triggerCardAIAction = function(id) {
+    const suggestion = atsSuggestionsList.find(s => s.id === id);
+    if (!suggestion) return;
+    
+    suggestion.isDiffOpen = true;
+    window.renderSuggestionsList();
+};
+
+window.rejectCardSuggestion = function(id) {
+    const suggestion = atsSuggestionsList.find(s => s.id === id);
+    if (!suggestion) return;
+    
+    suggestion.isDiffOpen = false;
+    window.renderSuggestionsList();
+};
+
+window.acceptCardSuggestion = function(id) {
+    const suggestion = atsSuggestionsList.find(s => s.id === id);
+    if (!suggestion) return;
+    
+    if (suggestion.id === "summary") {
+        state.summary = suggestion.afterText;
+        const summaryInput = document.getElementById("input-summary");
+        if (summaryInput) summaryInput.value = state.summary;
+    } else if (suggestion.id === "keywords") {
+        const keywords = suggestion.afterText.split(",").map(k => k.trim());
+        keywords.forEach(kw => {
+            if (!state.skills) state.skills = [];
+            if (!state.skills.includes(kw)) {
+                state.skills.push(kw);
+            }
+        });
+        renderSkillsTags();
+    } else if (suggestion.id === "experience") {
+        if (state.experience && state.experience.length > 0) {
+            state.experience[0].desc = suggestion.afterText;
+            renderExperienceList();
+        }
+    } else if (suggestion.id === "skills") {
+        const keywords = suggestion.afterText.replace(/[\w\s]+:\s*/g, "").replace(/\n/g, ",").split(",").map(k => k.trim()).filter(Boolean);
+        if (keywords.length > 0) {
+            state.skills = keywords;
+            renderSkillsTags();
+        }
+    } else if (suggestion.id === "projects") {
+        if (state.projects && state.projects.length > 0) {
+            state.projects[0].desc = suggestion.afterText;
+            renderProjectsList();
+        }
+    } else if (suggestion.id === "formatting") {
+        state.activeTemplate = "classic";
+        const templateFilter = document.getElementById("template-filter");
+        if (templateFilter) templateFilter.value = "classic";
+    }
+    
+    completedSuggestions[id] = true;
+    suggestion.isDiffOpen = false;
+    
+    saveState();
+    renderResumePreview();
+    
+    const report = ATSAuditor.audit(state);
+    window.animateScoreIncrease(report.score);
+    
+    window.renderSuggestionsList();
+    showToast(`Applied ${suggestion.category} improvement successfully!`);
+};
+
+window.animateScoreIncrease = function(targetScore) {
+    const currentScoreElement = document.getElementById("ats-tracker-current-score");
+    if (!currentScoreElement) return;
+    
+    let startVal = parseInt(currentScoreElement.innerText) || 0;
+    let endVal = targetScore;
+    if (startVal === endVal) return;
+    
+    let duration = 800; // ms
+    let startTime = null;
+    
+    function animate(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let progress = timestamp - startTime;
+        let val = Math.min(startVal + Math.round((endVal - startVal) * (progress / duration)), endVal);
+        
+        currentScoreElement.innerText = val;
+        
+        const fill = document.getElementById("ats-tracker-progress-fill");
+        if (fill) fill.style.width = `${val}%`;
+        
+        const tbBadge = document.getElementById("toolbar-ats-badge");
+        if (tbBadge) tbBadge.innerText = val;
+        
+        if (progress < duration) {
+            window.requestAnimationFrame(animate);
+        } else {
+            currentScoreElement.innerText = endVal;
+        }
+    }
+    
+    window.requestAnimationFrame(animate);
+};

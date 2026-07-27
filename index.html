@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=8.0">
+    <link rel="stylesheet" href="style.css?v=9.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -303,6 +303,64 @@
 
             <!-- Scrollable Workspace for A4 Sheet -->
             <div class="preview-workspace">
+                <!-- Collapsible ATS Suggestions Panel -->
+                <div class="ats-suggestions-card" id="ats-suggestions-card">
+                    <div class="ats-suggestions-header" onclick="window.toggleATSSuggestionsPanel()">
+                        <div class="ats-suggestions-header-title">
+                            <i class="fa-solid fa-wand-magic-sparkles" style="color: #a78bfa;"></i>
+                            <span>ATS Improvement Suggestions</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span class="ats-suggestions-badge" id="ats-suggestions-count-badge">0 Suggestions</span>
+                            <i class="fa-solid fa-chevron-down toggle-icon" id="ats-suggestions-toggle-icon"></i>
+                        </div>
+                    </div>
+                    <div class="ats-suggestions-body" id="ats-suggestions-body">
+                        <!-- If no API Key: -->
+                        <div class="ai-opt-no-key-alert" id="ats-suggestions-no-key" style="display: none;">
+                            <div class="ats-suggestion-item danger" style="padding: 16px; display: flex; gap: 12px; border-radius: 8px; margin-bottom: 0;">
+                                <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.5rem; margin-top: 2px;"></i>
+                                <div>
+                                    <h4 style="margin: 0 0 6px 0; color: white;">API Key Required</h4>
+                                    <p style="margin: 0; font-size: 0.8rem; line-height: 1.4; color: #fecaca;">
+                                        AI optimization requires an API key. Configure OpenAI, Gemini, or Claude in Settings.
+                                    </p>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="margin-top: 16px; width: 100%; justify-content: center;" onclick="window.toggleSettingsPanel();"><i class="fa-solid fa-gear"></i> Open API Settings</button>
+                        </div>
+
+                        <!-- If API Key is present: -->
+                        <div id="ats-suggestions-dashboard" style="display: none;">
+                            <!-- Progress tracker row -->
+                            <div class="ats-suggestions-tracker">
+                                <div class="tracker-item">
+                                    <div class="tracker-score-label">Current ATS Score</div>
+                                    <div class="tracker-score-value" id="ats-tracker-current-score">0</div>
+                                </div>
+                                <div class="tracker-potential-list" id="ats-tracker-potential-list">
+                                    <!-- Potential list chips -->
+                                </div>
+                                <div class="tracker-item">
+                                    <div class="tracker-score-label">Potential Score</div>
+                                    <div class="tracker-score-value potential" id="ats-tracker-potential-score">0</div>
+                                </div>
+                            </div>
+                            
+                            <div class="tracker-progress-bar">
+                                <div class="tracker-progress-fill" id="ats-tracker-progress-fill" style="width: 0%;"></div>
+                            </div>
+
+                            <!-- Suggestions list -->
+                            <div class="ats-suggestions-list" id="ats-suggestions-list">
+                                <div style="display: flex; justify-content: center; padding: 20px 0;">
+                                    <button class="btn btn-premium" onclick="window.runAIPanelAnalysis()"><i class="fa-solid fa-chart-line"></i> Analyze Resume</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="resume-sheet-scaler" id="resume-sheet-scaler">
                     <div class="resume-sheet t-modern" id="resume-sheet">
                         <!-- Live Resume structure filled by javascript -->

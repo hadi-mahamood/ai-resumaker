@@ -1733,6 +1733,9 @@ function updateATSScore() {
             tbBadge.classList.add("medium");
         }
     }
+    if (window.syncATSSuggestionsPanel) {
+        window.syncATSSuggestionsPanel();
+    }
 }
 
 function openATSModal() {
