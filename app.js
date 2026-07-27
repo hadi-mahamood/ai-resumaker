@@ -1801,11 +1801,21 @@ function updateATSScore() {
         tbBadge.innerText = report.score;
         tbStatus.innerText = report.status;
         
-        tbBadge.className = "ats-badge";
+        tbBadge.className = "ats-score-num";
         if (report.score < 60) {
             tbBadge.classList.add("low");
         } else if (report.score < 80) {
             tbBadge.classList.add("medium");
+        }
+        
+        const pill = tbBadge.closest(".ats-score-pill");
+        if (pill) {
+            pill.className = "ats-score-pill";
+            if (report.score < 60) {
+                pill.classList.add("low");
+            } else if (report.score < 80) {
+                pill.classList.add("medium");
+            }
         }
     }
     if (window.syncATSSuggestionsPanel) {

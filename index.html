@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=9.0">
+    <link rel="stylesheet" href="style.css?v=10.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -293,53 +293,60 @@
         <main class="preview-container">
             <div class="toolbar">
                 <button class="menu-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar Menu">
-                    <i class="fa-solid fa-bars"></i> <span>Menu</span>
+                    <i class="fa-solid fa-bars"></i>
                 </button>
-                <div class="template-selector">
-                    <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary);"><i class="fa-solid fa-filter" style="margin-right: 4px;"></i> Layout Filter</span>
-                    <select id="template-filter" onchange="switchTemplate(this.value)" class="template-select-dropdown">
-                        <optgroup label="General / Functional">
-                            <option value="modern" selected>Modern (Global Tech)</option>
-                            <option value="classic">Classic (Traditional Business)</option>
-                            <option value="executive">Executive (Two-Column Corporate)</option>
-                        </optgroup>
-                        <optgroup label="Regional / International Standards">
-                            <option value="gcc">GCC (Middle East / Gulf Region)</option>
-                            <option value="india">India (Academic Metrics & Declaration)</option>
-                            <option value="europe">Europe (Europass / CEFR Languages)</option>
-                            <option value="us">US / Canada (Strict Chronological B&W)</option>
-                            <option value="uk">UK / Commonwealth (Career Profile)</option>
-                            <option value="asia">Asia / Pacific (Sidebar Certifications)</option>
-                            <option value="latam">Latin America (Formal Profile Details)</option>
-                        </optgroup>
-                    </select>
+                
+                <!-- Left group: Editing / Filter Controls -->
+                <div class="toolbar-group left-group">
+                    <div class="template-selector">
+                        <span class="toolbar-label"><i class="fa-solid fa-filter"></i> Layout</span>
+                        <select id="template-filter" onchange="switchTemplate(this.value)" class="template-select-dropdown">
+                            <optgroup label="General / Functional">
+                                <option value="modern" selected>Modern (Global Tech)</option>
+                                <option value="classic">Classic (Traditional Business)</option>
+                                <option value="executive">Executive (Two-Column Corporate)</option>
+                            </optgroup>
+                            <optgroup label="Regional / International Standards">
+                                <option value="gcc">GCC (Middle East / Gulf Region)</option>
+                                <option value="india">India (Academic Metrics & Declaration)</option>
+                                <option value="europe">Europe (Europass / CEFR Languages)</option>
+                                <option value="us">US / Canada (Strict Chronological B&W)</option>
+                                <option value="uk">UK / Commonwealth (Career Profile)</option>
+                                <option value="asia">Asia / Pacific (Sidebar Certifications)</option>
+                                <option value="latam">Latin America (Formal Profile Details)</option>
+                            </optgroup>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="actions">
+                <!-- Middle group: Resume Analysis / Tools -->
+                <div class="toolbar-group middle-group">
                     <!-- ATS Score Indicator -->
-                    <div class="ats-container" onclick="openATSModal()">
-                        <div class="ats-badge" id="toolbar-ats-badge">0</div>
-                        <div class="ats-text">
-                            <div class="ats-label">ATS Score</div>
-                            <div class="ats-score-detail" id="toolbar-ats-status">Calculating...</div>
-                        </div>
+                    <div class="ats-score-pill" onclick="openATSModal()" title="View full ATS Score Details">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span class="ats-score-num" id="toolbar-ats-badge">0</span>
+                        <span class="ats-score-text" id="toolbar-ats-status">Calculating...</span>
                     </div>
 
                     <!-- ATS Parser View Toggle -->
-                    <button class="btn btn-secondary" id="ats-sim-toggle-btn" onclick="window.toggleATSSimulator()" title="Simulate ATS Parser View">
-                        <i class="fa-solid fa-microchip"></i> ATS Parser View
+                    <button class="btn btn-pill" id="ats-sim-toggle-btn" onclick="window.toggleATSSimulator()" title="Simulate ATS Parser View">
+                        <i class="fa-solid fa-microchip"></i> <span>ATS Parser</span>
                     </button>
 
-                    <button class="btn btn-secondary" onclick="openAICoverLetter()">
-                        <i class="fa-solid fa-envelope-open-text"></i> Cover Letter
+                    <button class="btn btn-pill" onclick="openAICoverLetter()" title="AI Cover Letter Generator">
+                        <i class="fa-solid fa-envelope-open-text"></i> <span>Cover Letter</span>
                     </button>
 
                     <!-- Practice Interview Button -->
-                    <button class="btn btn-secondary" onclick="window.openInterviewPracticeModal()" title="AI Practice Interview">
-                        <i class="fa-solid fa-comments"></i> Practice Interview
+                    <button class="btn btn-pill" onclick="window.openInterviewPracticeModal()" title="AI Practice Interview">
+                        <i class="fa-solid fa-comments"></i> <span>Practice Interview</span>
                     </button>
-                    <button class="btn btn-primary" onclick="exportPDF()">
-                        <i class="fa-solid fa-file-pdf"></i> Download PDF
+                </div>
+
+                <!-- Right group: Export / Download Actions -->
+                <div class="toolbar-group right-group">
+                    <button class="btn btn-primary btn-pill" onclick="exportPDF()" title="Download PDF Copy">
+                        <i class="fa-solid fa-file-pdf"></i> <span>Download PDF</span>
                     </button>
                 </div>
             </div>
