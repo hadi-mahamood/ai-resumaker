@@ -2128,9 +2128,11 @@ function resizeResumePreview() {
         sheet.style.transformOrigin = "top center";
         const scaledHeight = sheet.offsetHeight * scale;
         scaler.style.height = `${scaledHeight}px`;
+        scaler.style.width = `${workspaceWidth}px`;
     } else {
         sheet.style.transform = "none";
         scaler.style.height = "auto";
+        scaler.style.width = "794px";
     }
 }
 
