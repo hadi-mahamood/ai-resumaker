@@ -1409,3 +1409,788 @@ window.animateScoreIncrease = function(targetScore) {
     
     window.requestAnimationFrame(animate);
 };
+
+// ==========================================
+// MULTI-PROFILE RESUME MANAGER CONTROLLER
+// ==========================================
+window.activeProfileId = "default";
+window.profiles = [];
+
+window.initProfiles = function() {
+    const savedProfiles = localStorage.getItem('resumake_profiles');
+    const savedActiveId = localStorage.getItem('resumake_active_profile_id');
+    const savedState = localStorage.getItem('resumake_state');
+    
+    if (savedProfiles) {
+        try {
+            window.profiles = JSON.parse(savedProfiles);
+            window.activeProfileId = savedActiveId || window.profiles[0].id;
+        } catch (e) {
+            console.error("Failed to parse profiles", e);
+        }
+    }
+    
+    if (window.profiles.length === 0) {
+        let migrationData = null;
+        if (savedState) {
+            try {
+                migrationData = JSON.parse(savedState);
+            } catch (e) {}
+        }
+        
+        const defaultProfile = {
+            id: "default",
+            name: "Default Profile",
+            resumeData: migrationData || JSON.parse(JSON.stringify(state)),
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        };
+        window.profiles = [defaultProfile];
+        window.activeProfileId = "default";
+        localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
+        localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
+    }
+    
+    const active = window.profiles.find(p => p.id === window.activeProfileId) || window.profiles[0];
+    if (active) {
+        state = JSON.parse(JSON.stringify(active.resumeData));
+        window.activeProfileId = active.id;
+        localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
+    }
+    
+    window.renderProfileDropdown();
+};
+
+window.renderProfileDropdown = function() {
+    const dropdown = document.getElementById("profile-select-dropdown");
+    if (!dropdown) return;
+    
+    dropdown.innerHTML = "";
+    window.profiles.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.innerText = p.name;
+        if (p.id === window.activeProfileId) {
+            opt.selected = true;
+        }
+        dropdown.appendChild(opt);
+    });
+};
+
+window.switchProfile = function(profileId) {
+    const activeIdx = window.profiles.findIndex(p => p.id === window.activeProfileId);
+    if (activeIdx !== -1) {
+        window.profiles[activeIdx].resumeData = JSON.parse(JSON.stringify(state));
+        window.profiles[activeIdx].updatedAt = Date.now();
+    }
+    
+    const target = window.profiles.find(p => p.id === profileId);
+    if (target) {
+        window.activeProfileId = target.id;
+        state = JSON.parse(JSON.stringify(target.resumeData));
+        localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
+        localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
+        localStorage.setItem('resumake_state', JSON.stringify(state));
+        
+        setFormFields();
+        updateSidebarBadges();
+        renderExperienceList();
+        renderEducationList();
+        renderProjectsList();
+        renderSkillsTags();
+        renderResumePreview();
+        updateATSScore();
+        showToast(`Switched to profile: "${target.name}"`);
+    }
+};
+
+window.createNewProfile = function() {
+    const name = prompt("Enter a name for the new resume profile:");
+    if (!name || name.trim() === "") return;
+    
+    const newId = "profile-" + Date.now();
+    const newProfile = {
+        id: newId,
+        name: name.trim(),
+        resumeData: {
+            targetJob: "Software Developer",
+            personal: { name: "", title: "", email: "", phone: "", address: "", website: "", linkedin: "", github: "" },
+            summary: "",
+            experience: [],
+            education: [],
+            skills: [],
+            projects: [],
+            languages: [],
+            custom: [],
+            activeTemplate: "modern"
+        },
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    };
+    
+    const activeIdx = window.profiles.findIndex(p => p.id === window.activeProfileId);
+    if (activeIdx !== -1) {
+        window.profiles[activeIdx].resumeData = JSON.parse(JSON.stringify(state));
+        window.profiles[activeIdx].updatedAt = Date.now();
+    }
+    
+    window.profiles.push(newProfile);
+    window.activeProfileId = newId;
+    state = newProfile.resumeData;
+    
+    localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
+    localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
+    localStorage.setItem('resumake_state', JSON.stringify(state));
+    
+    setFormFields();
+    updateSidebarBadges();
+    renderExperienceList();
+    renderEducationList();
+    renderProjectsList();
+    renderSkillsTags();
+    renderResumePreview();
+    updateATSScore();
+    window.renderProfileDropdown();
+    showToast(`Created new profile: "${name}"`);
+};
+
+window.duplicateCurrentProfile = function() {
+    const active = window.profiles.find(p => p.id === window.activeProfileId);
+    if (!active) return;
+    
+    const newId = "profile-" + Date.now();
+    const newProfile = {
+        id: newId,
+        name: active.name + " (Copy)",
+        resumeData: JSON.parse(JSON.stringify(state)),
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    };
+    
+    window.profiles.push(newProfile);
+    window.activeProfileId = newId;
+    state = newProfile.resumeData;
+    
+    localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
+    localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
+    localStorage.setItem('resumake_state', JSON.stringify(state));
+    
+    setFormFields();
+    updateSidebarBadges();
+    renderExperienceList();
+    renderEducationList();
+    renderProjectsList();
+    renderSkillsTags();
+    renderResumePreview();
+    updateATSScore();
+    window.renderProfileDropdown();
+    showToast(`Duplicated profile: "${newProfile.name}"`);
+};
+
+window.renameCurrentProfile = function() {
+    const active = window.profiles.find(p => p.id === window.activeProfileId);
+    if (!active) return;
+    
+    const name = prompt("Enter a new name for this profile:", active.name);
+    if (!name || name.trim() === "") return;
+    
+    active.name = name.trim();
+    active.updatedAt = Date.now();
+    
+    localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
+    window.renderProfileDropdown();
+    showToast(`Profile renamed to: "${active.name}"`);
+};
+
+window.deleteCurrentProfile = function() {
+    if (window.profiles.length <= 1) {
+        showToast("Cannot delete the only remaining profile.");
+        return;
+    }
+    
+    const active = window.profiles.find(p => p.id === window.activeProfileId);
+    if (!active) return;
+    
+    const confirmDelete = confirm(`Are you sure you want to delete the profile "${active.name}"? This action cannot be undone.`);
+    if (!confirmDelete) return;
+    
+    window.profiles = window.profiles.filter(p => p.id !== window.activeProfileId);
+    window.activeProfileId = window.profiles[0].id;
+    state = JSON.parse(JSON.stringify(window.profiles[0].resumeData));
+    
+    localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
+    localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
+    localStorage.setItem('resumake_state', JSON.stringify(state));
+    
+    setFormFields();
+    updateSidebarBadges();
+    renderExperienceList();
+    renderEducationList();
+    renderProjectsList();
+    renderSkillsTags();
+    renderResumePreview();
+    updateATSScore();
+    window.renderProfileDropdown();
+    showToast("Profile deleted successfully.");
+};
+
+// ==========================================
+// RAW ATS PARSER SIMULATOR CONTROLLER
+// ==========================================
+let atsSimulatorActive = false;
+
+window.toggleATSSimulator = function() {
+    const toggleBtn = document.getElementById("ats-sim-toggle-btn");
+    const scaler = document.getElementById("resume-sheet-scaler");
+    const display = document.getElementById("ats-simulator-display");
+    
+    if (!toggleBtn || !scaler || !display) return;
+    
+    atsSimulatorActive = !atsSimulatorActive;
+    if (atsSimulatorActive) {
+        toggleBtn.classList.add("active");
+        toggleBtn.style.background = "var(--primary-color)";
+        toggleBtn.style.color = "white";
+        
+        scaler.style.display = "none";
+        display.style.display = "block";
+        
+        window.runATSSimulation();
+    } else {
+        toggleBtn.classList.remove("active");
+        toggleBtn.style.background = "";
+        toggleBtn.style.color = "";
+        
+        scaler.style.display = "flex";
+        display.style.display = "none";
+    }
+};
+
+window.runATSSimulation = function() {
+    const display = document.getElementById("ats-simulator-display");
+    if (!display) return;
+    
+    const name = state.personal?.name || "";
+    const email = state.personal?.email || "";
+    const phone = state.personal?.phone || "";
+    const address = state.personal?.address || "";
+    const linkedin = state.personal?.linkedin || "";
+    const github = state.personal?.github || "";
+    
+    let output = "";
+    
+    output += `========================================================\n`;
+    output += `                 ATS PARSER SIMULATOR VIEW              \n`;
+    output += `========================================================\n\n`;
+    
+    output += `[CANDIDATE INFORMATION]\n`;
+    output += `Candidate Name:  ${name ? name : '[MISSING] (Critical Action Required)'}\n`;
+    output += `Email Address:   ${email ? email : '[MISSING] (Critical Action Required)'}\n`;
+    output += `Phone Number:    ${phone ? phone : '[MISSING] (Critical Action Required)'}\n`;
+    output += `Address/Location:${address ? address : '[MISSING] (Medium Action Recommended)'}\n`;
+    output += `LinkedIn Profile:${linkedin ? linkedin : '[NOT FOUND]'}\n`;
+    output += `GitHub Account:  ${github ? github : '[NOT FOUND]'}\n\n`;
+    
+    output += `[PROFESSIONAL SUMMARY]\n`;
+    output += `${state.summary ? state.summary : '[MISSING Summary Section]'}\n\n`;
+    
+    output += `[WORK HISTORY timeline]\n`;
+    if (state.experience && state.experience.length > 0) {
+        state.experience.forEach((exp, idx) => {
+            output += `Timeline Record #${idx+1}:\n`;
+            output += `  Role/Title: ${exp.role || '[MISSING]'}\n`;
+            output += `  Company:    ${exp.company || '[MISSING]'}\n`;
+            output += `  Date:       ${exp.date || '[MISSING]'}\n`;
+            output += `  Details:\n${exp.desc || '[No achievements bulleted]'}\n\n`;
+        });
+    } else {
+        output += `[WARNING] Work history could not be parsed.\n\n`;
+    }
+    
+    output += `[EDUCATION HISTORY timeline]\n`;
+    if (state.education && state.education.length > 0) {
+        state.education.forEach((edu, idx) => {
+            output += `Timeline Record #${idx+1}:\n`;
+            output += `  Degree:     ${edu.degree || '[MISSING]'}\n`;
+            output += `  Institution:${edu.school || '[MISSING]'}\n`;
+            output += `  Date:       ${edu.date || '[MISSING]'}\n\n`;
+        });
+    } else {
+        output += `[WARNING] Education records could not be parsed.\n\n`;
+    }
+    
+    output += `[SKILLS KEYWORDS INDEX]\n`;
+    const skills = state.skills || [];
+    if (skills.length > 0) {
+        output += `Keywords Detected: ${skills.join(', ')}\n`;
+    } else {
+        output += `[WARNING] No indexable skills keywords detected.\n`;
+    }
+    
+    display.innerText = output;
+};
+
+// ==========================================
+// STAR METHOD BULLET ASSISTANT CONTROLLER
+// ==========================================
+window.toggleStarHelper = function(expId) {
+    const helper = document.getElementById(`star-helper-${expId}`);
+    if (helper) {
+        const isHidden = helper.style.display === "none";
+        helper.style.display = isHidden ? "flex" : "none";
+    }
+};
+
+window.generateStarBullet = function(expId) {
+    const situation = document.getElementById(`star-s-${expId}`)?.value || "";
+    const task = document.getElementById(`star-t-${expId}`)?.value || "";
+    const action = document.getElementById(`star-a-${expId}`)?.value || "";
+    const result = document.getElementById(`star-r-${expId}`)?.value || "";
+    
+    if (!situation && !task && !action && !result) {
+        showToast("Please enter at least one field to synthesize.");
+        return;
+    }
+    
+    const outputContainer = document.getElementById(`star-output-container-${expId}`);
+    const outputBox = document.getElementById(`star-output-${expId}`);
+    
+    if (outputContainer && outputBox) {
+        outputContainer.style.display = "block";
+        outputBox.innerText = "Generating STAR-structured bullet points...";
+    }
+    
+    const apiKey = localStorage.getItem('gemini_api_key') || '';
+    if (apiKey) {
+        const prompt = `
+You are an expert resume writer. Synthesize the following STAR variables into a single high-impact bullet point for a resume.
+Do NOT use first-person pronouns (I, me, my, we).
+Use strong action verbs.
+Highlight measurable metrics if provided.
+
+STAR Details:
+- Situation: ${situation}
+- Task: ${task}
+- Action: ${action}
+- Result: ${result}
+
+Output ONLY the single generated bullet text. No explanations or quotes.
+`;
+        window.callGeminiOptimizerAPI(apiKey, prompt).then(text => {
+            let bullet = text.trim().replace(/^[-•*]\s*/, "");
+            outputBox.innerText = bullet;
+        }).catch(err => {
+            console.error("Gemini STAR generation failed, falling back to local builder:", err);
+            outputBox.innerText = window.localFallbackSTARBullet(situation, task, action, result);
+        });
+    } else {
+        setTimeout(() => {
+            outputBox.innerText = window.localFallbackSTARBullet(situation, task, action, result);
+        }, 800);
+    }
+};
+
+window.localFallbackSTARBullet = function(situation, task, action, result) {
+    const s = situation ? situation.trim().charAt(0).toLowerCase() + situation.slice(1) : "";
+    const t = task ? task.trim().charAt(0).toLowerCase() + task.slice(1) : "";
+    const a = action ? action.trim().charAt(0).toUpperCase() + action.slice(1) : "";
+    const r = result ? result.trim().charAt(0).toLowerCase() + result.slice(1) : "";
+    
+    let bullet = "";
+    if (a) {
+        bullet += `${a}`;
+    } else {
+        bullet += `Executed critical responsibilities`;
+    }
+    
+    if (t) {
+        bullet += ` targeting ${t}`;
+    }
+    if (s) {
+        bullet += ` to address ${s}`;
+    }
+    if (r) {
+        bullet += `, resulting in ${r}`;
+    }
+    
+    return "- " + bullet.trim().replace(/\.$/, "") + ".";
+};
+
+window.rejectStarBullet = function(expId) {
+    const container = document.getElementById(`star-output-container-${expId}`);
+    if (container) container.style.display = "none";
+};
+
+window.insertStarBullet = function(expId) {
+    const text = document.getElementById(`star-output-${expId}`)?.innerText;
+    if (!text) return;
+    
+    const exp = state.experience.find(e => e.id === expId);
+    if (exp) {
+        let currentDesc = exp.desc || "";
+        if (currentDesc && !currentDesc.endsWith("\n")) {
+            currentDesc += "\n";
+        }
+        currentDesc += text;
+        exp.desc = currentDesc;
+        
+        renderExperienceList();
+        saveState();
+        renderResumePreview();
+        showToast("STAR bullet appended to experience details!");
+    }
+};
+
+// ==========================================
+// THEME-MATCHED COVER LETTER LAYOUT PREVIEW
+// ==========================================
+window.previewCoverLetterTheme = function() {
+    const clText = document.getElementById("ai-cl-result-text")?.value;
+    if (!clText || clText.startsWith("Drafting")) {
+        showToast("Please generate a Cover Letter first.");
+        return;
+    }
+    
+    const modal = document.getElementById("cover-letter-preview-modal");
+    if (!modal) return;
+    
+    modal.classList.add("open");
+    
+    const subtitle = document.getElementById("cover-letter-theme-subtitle");
+    if (subtitle) {
+        subtitle.innerText = `Inheriting "${state.activeTemplate.toUpperCase()}" Layout Theme`;
+    }
+    
+    const sheet = document.getElementById("cover-letter-preview-sheet");
+    if (!sheet) return;
+    
+    sheet.className = `resume-sheet t-${state.activeTemplate}`;
+    
+    const name = state.personal?.name || "Candidate Name";
+    const title = state.personal?.title || state.targetJob || "Software Engineer";
+    const email = state.personal?.email || "email@example.com";
+    const phone = state.personal?.phone || "(123) 456-7890";
+    const address = state.personal?.address || "City, Country";
+    const linkedin = state.personal?.linkedin || "";
+    const github = state.personal?.github || "";
+    
+    let headerHtml = "";
+    
+    if (state.activeTemplate === "modern" || state.activeTemplate === "executive") {
+        headerHtml = `
+            <div class="resume-header">
+                <h1 class="name-preview">${name}</h1>
+                <div class="title-preview">${title}</div>
+                <div class="contact-preview">
+                    <span><i class="fa-solid fa-envelope"></i> ${email}</span>
+                    <span><i class="fa-solid fa-phone"></i> ${phone}</span>
+                    <span><i class="fa-solid fa-location-dot"></i> ${address}</span>
+                    ${linkedin ? `<span><i class="fa-brands fa-linkedin"></i> ${linkedin}</span>` : ''}
+                </div>
+            </div>
+        `;
+    } else if (state.activeTemplate === "us" || state.activeTemplate === "classic") {
+        headerHtml = `
+            <div class="resume-header" style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px;">
+                <h1 style="font-size: 20px; font-weight: bold; text-transform: uppercase; margin-bottom: 4px;">${name}</h1>
+                <div style="font-size: 11px; margin-bottom: 4px; font-weight: 600;">${title}</div>
+                <div style="font-size: 10px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                    <span>${email}</span> | <span>${phone}</span> | <span>${address}</span>
+                    ${linkedin ? `| <span>${linkedin}</span>` : ''}
+                </div>
+            </div>
+        `;
+    } else {
+        headerHtml = `
+            <div class="resume-header" style="border-bottom: 1.5px solid var(--border-color); padding-bottom: 10px; margin-bottom: 16px;">
+                <h1 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 2px;">${name}</h1>
+                <div style="font-size: 0.9rem; color: var(--primary-color); font-weight: 600; margin-bottom: 6px;">${title}</div>
+                <div style="display: flex; gap: 12px; font-size: 0.75rem; color: #475569; flex-wrap: wrap;">
+                    <span>${email}</span>
+                    <span>${phone}</span>
+                    <span>${address}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    const paragraphs = clText.split("\n\n").map(p => p.trim()).filter(Boolean);
+    const bodyHtml = paragraphs.map(p => `<p style="font-size: 0.82rem; line-height: 1.5; margin-bottom: 12px; color: #334155; text-align: left;">${p}</p>`).join('');
+    
+    sheet.innerHTML = `
+        ${headerHtml}
+        <div class="cover-letter-content-body" style="padding: 20px 0; text-align: left;">
+            <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 16px;">
+                Date: ${new Date().toLocaleDateString()}
+            </div>
+            ${bodyHtml}
+        </div>
+    `;
+};
+
+window.closeCoverLetterPreviewModal = function() {
+    const modal = document.getElementById("cover-letter-preview-modal");
+    if (modal) modal.classList.remove("open");
+};
+
+window.printCoverLetter = function() {
+    window.print();
+};
+
+// ==========================================
+// AI PRACTICE INTERVIEW CONTROLLER
+// ==========================================
+let practiceQuestionsList = [];
+let evaluatedAnswersList = {};
+
+window.openInterviewPracticeModal = function() {
+    const modal = document.getElementById("ats-interview-practice-modal");
+    if (!modal) return;
+    
+    modal.classList.add("open");
+    
+    const startPane = document.getElementById("interview-start-pane");
+    const dashboard = document.getElementById("interview-dashboard");
+    
+    if (practiceQuestionsList.length > 0) {
+        startPane.style.display = "none";
+        dashboard.style.display = "flex";
+        window.renderInterviewDashboard();
+    } else {
+        startPane.style.display = "flex";
+        dashboard.style.display = "none";
+    }
+};
+
+window.closeInterviewPracticeModal = function() {
+    const modal = document.getElementById("ats-interview-practice-modal");
+    if (modal) modal.classList.remove("open");
+};
+
+window.generateInterviewQuestions = function() {
+    const startPane = document.getElementById("interview-start-pane");
+    const dashboard = document.getElementById("interview-dashboard");
+    const questionsContainer = document.getElementById("interview-questions-list");
+    
+    if (!startPane || !dashboard || !questionsContainer) return;
+    
+    startPane.style.display = "none";
+    dashboard.style.display = "flex";
+    
+    questionsContainer.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; gap: 10px;">
+            <div class="loading-spinner"></div>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">Analyzing target profile to formulate interview scenarios...</span>
+        </div>
+    `;
+    
+    const apiKey = localStorage.getItem('gemini_api_key') || '';
+    const jdText = document.getElementById("ats-jd-text")?.value || state.targetJob || "Software Engineer";
+    
+    if (apiKey) {
+        const prompt = `
+You are an expert interviewer. Generate 3 tailored practice interview questions based on the candidate's resume and target job.
+Include:
+- 1 Technical question matching their skills.
+- 1 Behavioral question matching their experience.
+- 1 Resume-specific question asking details about their work history.
+
+Resume Details:
+${JSON.stringify(state, null, 2)}
+
+Target Job: ${jdText}
+
+Strictly output ONLY a valid JSON array of questions. Do not include markdown code ticks.
+Expected Output Format:
+[
+  {
+    "id": "q1",
+    "type": "Technical",
+    "question": "Custom question here..."
+  },
+  {
+    "id": "q2",
+    "type": "Behavioral",
+    "question": "Custom question here..."
+  },
+  {
+    "id": "q3",
+    "type": "Resume-Specific",
+    "question": "Custom question here..."
+  }
+]
+`;
+        window.callGeminiOptimizerAPI(apiKey, prompt).then(text => {
+            let cleaned = text.trim();
+            if (cleaned.startsWith("```json")) cleaned = cleaned.substring(7);
+            else if (cleaned.startsWith("```")) cleaned = cleaned.substring(3);
+            if (cleaned.endsWith("```")) cleaned = cleaned.substring(0, cleaned.length - 3);
+            cleaned = cleaned.trim();
+            
+            practiceQuestionsList = JSON.parse(cleaned);
+            evaluatedAnswersList = {};
+            window.renderInterviewDashboard();
+        }).catch(err => {
+            console.error("AI Interview questions failed, using fallback list:", err);
+            window.loadFallbackInterviewQuestions(jdText);
+        });
+    } else {
+        setTimeout(() => {
+            window.loadFallbackInterviewQuestions(jdText);
+        }, 1200);
+    }
+};
+
+window.loadFallbackInterviewQuestions = function(jdText) {
+    practiceQuestionsList = [
+        {
+            id: "q1",
+            type: "Technical",
+            question: `Can you explain your experience using standard architectural models for ${jdText || 'software system design'}?`
+        },
+        {
+            id: "q2",
+            type: "Behavioral",
+            question: "Describe a situation where you encountered a major technical bottleneck. How did you diagnose the root cause and resolve it?"
+        },
+        {
+            id: "q3",
+            type: "Resume-Specific",
+            question: `Explain how you leveraged your skill keywords: ${(state.skills || []).slice(0, 4).join(', ') || 'coding'} to optimize accomplishments in your recent role.`
+        }
+    ];
+    evaluatedAnswersList = {};
+    window.renderInterviewDashboard();
+};
+
+window.renderInterviewDashboard = function() {
+    const container = document.getElementById("interview-questions-list");
+    if (!container) return;
+    
+    container.innerHTML = "";
+    practiceQuestionsList.forEach(q => {
+        const feedback = evaluatedAnswersList[q.id];
+        
+        container.innerHTML += `
+            <div class="ats-suggestion-card" style="background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.03); margin-bottom: 16px;">
+                <div class="ats-suggestion-meta">
+                    <span class="ats-suggestion-priority low"><i class="fa-solid fa-circle-question"></i> ${q.type} Question</span>
+                </div>
+                <h4 style="margin: 0 0 10px 0; color: white; font-size: 0.85rem; line-height: 1.4; text-align: left;">${q.question}</h4>
+                
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <textarea id="interview-ans-${q.id}" placeholder="Type your answer here..." style="width: 100%; font-size: 0.8rem; background: rgba(0,0,0,0.25); height: 80px; resize: vertical; padding: 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); color: white; outline: none;"></textarea>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                    <button class="btn btn-primary" style="font-size: 0.72rem; padding: 4px 10px;" id="eval-btn-${q.id}" onclick="window.evaluateInterviewAnswer('${q.id}')">
+                        <i class="fa-solid fa-award"></i> Evaluate Answer
+                    </button>
+                </div>
+                
+                <div id="eval-feedback-${q.id}" style="display: ${feedback ? 'block' : 'none'}; margin-top: 14px; padding-top: 14px; border-top: 1px dashed rgba(255,255,255,0.08); text-align: left;">
+                    ${feedback ? window.getFeedbackMarkup(feedback) : ''}
+                </div>
+            </div>
+        `;
+        
+        const textarea = document.getElementById(`interview-ans-${q.id}`);
+        if (textarea && q.userAnswer) {
+            textarea.value = q.userAnswer;
+        }
+    });
+};
+
+window.getFeedbackMarkup = function(fb) {
+    return `
+        <div style="font-size: 0.8rem; line-height: 1.5; color: var(--text-secondary);">
+            <div style="margin-bottom: 8px;"><strong style="color: var(--success);"><i class="fa-solid fa-circle-check"></i> Strengths:</strong><br>${fb.strengths}</div>
+            <div style="margin-bottom: 8px;"><strong style="color: var(--warning);"><i class="fa-solid fa-triangle-exclamation"></i> Areas for Improvement:</strong><br>${fb.improvements}</div>
+            <div><strong style="color: #a78bfa;"><i class="fa-solid fa-lightbulb"></i> Recommended Answer Outline:</strong><br>${fb.sampleAnswer}</div>
+        </div>
+    `;
+};
+
+window.evaluateInterviewAnswer = function(qId) {
+    const q = practiceQuestionsList.find(item => item.id === qId);
+    if (!q) return;
+    
+    const answer = document.getElementById(`interview-ans-${qId}`)?.value || "";
+    q.userAnswer = answer;
+    
+    if (answer.trim() === "") {
+        showToast("Please type an answer to evaluate.");
+        return;
+    }
+    
+    const feedbackBox = document.getElementById(`eval-feedback-${qId}`);
+    const evalBtn = document.getElementById(`eval-btn-${qId}`);
+    
+    if (feedbackBox && evalBtn) {
+        feedbackBox.style.display = "block";
+        feedbackBox.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-secondary);">
+                <div class="loading-spinner" style="width: 14px; height: 14px; border-width: 2px;"></div>
+                <span>Evaluating your response against industry expectations...</span>
+            </div>
+        `;
+        evalBtn.disabled = true;
+    }
+    
+    const apiKey = localStorage.getItem('gemini_api_key') || '';
+    if (apiKey) {
+        const prompt = `
+You are an expert tech interviewer. Evaluate the candidate's answer for the following question.
+Question: ${q.question}
+Candidate's Answer: ${answer}
+
+Provide feedback detailing:
+- Strengths of their response.
+- Missing details they should have included.
+- A strong sample answer or outline.
+
+Strictly output ONLY a valid JSON object matching this schema:
+{
+  "strengths": "Feedback on strengths...",
+  "improvements": "Feedback on improvements...",
+  "sampleAnswer": "Recommended outline or strong sample answer..."
+}
+`;
+        window.callGeminiOptimizerAPI(apiKey, prompt).then(text => {
+            let cleaned = text.trim();
+            if (cleaned.startsWith("```json")) cleaned = cleaned.substring(7);
+            else if (cleaned.startsWith("```")) cleaned = cleaned.substring(3);
+            if (cleaned.endsWith("```")) cleaned = cleaned.substring(0, cleaned.length - 3);
+            cleaned = cleaned.trim();
+            
+            const feedback = JSON.parse(cleaned);
+            evaluatedAnswersList[qId] = feedback;
+            
+            if (feedbackBox && evalBtn) {
+                feedbackBox.innerHTML = window.getFeedbackMarkup(feedback);
+                evalBtn.disabled = false;
+            }
+        }).catch(err => {
+            console.error("AI Evaluation failed, using local rule-based builder:", err);
+            window.loadFallbackEvaluation(qId, answer, feedbackBox, evalBtn);
+        });
+    } else {
+        setTimeout(() => {
+            window.loadFallbackEvaluation(qId, answer, feedbackBox, evalBtn);
+        }, 1000);
+    }
+};
+
+window.loadFallbackEvaluation = function(qId, answer, feedbackBox, evalBtn) {
+    const feedback = {
+        strengths: "Your answer provides clear background context and shows active involvement in solving technical tasks.",
+        improvements: "Quantify the outcome of your actions using measurable metrics (e.g. performance speed-ups or hours saved).",
+        sampleAnswer: "Start with a high-level Situation description. Next, detail the Action you spearheaded, and conclude with the Result metric."
+    };
+    
+    evaluatedAnswersList[qId] = feedback;
+    if (feedbackBox && evalBtn) {
+        feedbackBox.innerHTML = window.getFeedbackMarkup(feedback);
+        evalBtn.disabled = false;
+    }
+};

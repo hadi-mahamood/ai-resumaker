@@ -87,13 +87,18 @@ function collapseAllAccordions() {
 
 // Initialize Application
 document.addEventListener("DOMContentLoaded", () => {
-    // Load from local storage if exists
-    const savedState = localStorage.getItem('resumake_state');
-    if (savedState) {
-        try {
-            state = JSON.parse(savedState);
-        } catch (e) {
-            console.error("Failed to parse saved state, using default values.");
+    // Initialize Profiles Manager
+    if (window.initProfiles) {
+        window.initProfiles();
+    } else {
+        // Load from local storage if exists
+        const savedState = localStorage.getItem('resumake_state');
+        if (savedState) {
+            try {
+                state = JSON.parse(savedState);
+            } catch (e) {
+                console.error("Failed to parse saved state, using default values.");
+            }
         }
     }
 
@@ -206,6 +211,16 @@ function autoSave() {
 
     saveTimeout = setTimeout(() => {
         localStorage.setItem('resumake_state', JSON.stringify(state));
+        
+        if (window.profiles && window.activeProfileId) {
+            const activeIdx = window.profiles.findIndex(p => p.id === window.activeProfileId);
+            if (activeIdx !== -1) {
+                window.profiles[activeIdx].resumeData = JSON.parse(JSON.stringify(state));
+                window.profiles[activeIdx].updatedAt = Date.now();
+                localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
+            }
+        }
+
         updateATSScore();
         updateSidebarBadges();
         if (saveDot) {
@@ -289,6 +304,52 @@ function renderExperienceList() {
                     </button>
                 </div>
                 <textarea oninput="updateExperience('${exp.id}', 'desc', this.value)" placeholder="Include bullet points for achievements...">${exp.desc}</textarea>
+            </div>
+
+            <!-- STAR Method Helper Toggle -->
+            <div style="margin-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 10px;">
+                <button class="util-link-btn" onclick="window.toggleStarHelper('${exp.id}')" style="font-size: 0.75rem; font-weight: 600; color: #a5b4fc; background: none; border: none; cursor: pointer; padding: 0;">
+                    <i class="fa-solid fa-star"></i> STAR Bullet Assistant
+                </button>
+                
+                <div id="star-helper-${exp.id}" style="display: none; margin-top: 10px; background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 12px; gap: 8px; flex-direction: column;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 4px; display: block;">Situation</label>
+                            <input type="text" id="star-s-${exp.id}" placeholder="e.g. Server crash during traffic spikes" style="width:100%; padding: 6px 10px; font-size: 0.75rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: white; border-radius: 4px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 4px; display: block;">Task</label>
+                            <input type="text" id="star-t-${exp.id}" placeholder="e.g. Needed to optimize querying performance" style="width:100%; padding: 6px 10px; font-size: 0.75rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: white; border-radius: 4px;">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 4px; display: block;">Action</label>
+                            <input type="text" id="star-a-${exp.id}" placeholder="e.g. Optimized database index mapping" style="width:100%; padding: 6px 10px; font-size: 0.75rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: white; border-radius: 4px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 4px; display: block;">Result</label>
+                            <input type="text" id="star-r-${exp.id}" placeholder="e.g. Latency decreased by 40%" style="width:100%; padding: 6px 10px; font-size: 0.75rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: white; border-radius: 4px;">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+                        <button class="btn btn-secondary" style="font-size: 0.7rem; padding: 4px 10px;" onclick="window.generateStarBullet('${exp.id}')">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Bullet
+                        </button>
+                    </div>
+                    
+                    <!-- Bullet Output Preview -->
+                    <div id="star-output-container-${exp.id}" style="display: none; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.06);">
+                        <div style="font-size: 0.7rem; font-weight: 700; color: var(--success); margin-bottom: 4px;">Generated Bullet:</div>
+                        <div id="star-output-${exp.id}" style="font-size: 0.75rem; line-height: 1.4; color: white; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 8px; white-space: pre-wrap;"></div>
+                        <div style="display: flex; justify-content: flex-end; gap: 6px;">
+                            <button class="btn btn-secondary" style="font-size: 0.7rem; padding: 4px 8px;" onclick="window.rejectStarBullet('${exp.id}')">Discard</button>
+                            <button class="btn btn-success" style="font-size: 0.7rem; padding: 4px 8px;" onclick="window.insertStarBullet('${exp.id}')">Insert Bullet</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
         container.appendChild(card);
@@ -1905,7 +1966,10 @@ function openAICoverLetter() {
         <div id="ai-cl-result-card" class="ai-card" style="display:none; flex: 1; min-height: 350px;">
             <div class="ai-card-title" style="justify-content:space-between; width:100%;">
                 <span><i class="fa-solid fa-file-text"></i> Tailored Document</span>
-                <button class="ai-btn ai-btn-outline" style="padding:2px 8px; font-size:0.75rem;" onclick="copyCoverLetter()"><i class="fa-solid fa-copy"></i> Copy</button>
+                <div style="display:flex; gap:6px;">
+                    <button class="ai-btn ai-btn-outline" style="padding:2px 8px; font-size:0.75rem;" onclick="copyCoverLetter()"><i class="fa-solid fa-copy"></i> Copy</button>
+                    <button class="ai-btn ai-btn-accent" style="padding:2px 8px; font-size:0.75rem; background:var(--primary-gradient);" onclick="window.previewCoverLetterTheme()"><i class="fa-solid fa-eye"></i> Preview Styled</button>
+                </div>
             </div>
             <textarea id="ai-cl-result-text" style="flex:1; background:rgba(0,0,0,0.3); color:var(--text-primary); font-family:var(--font-mono); font-size:0.78rem; line-height:1.4; border:1px solid rgba(255,255,255,0.05); resize:none; overflow-y:auto; padding:10px; border-radius:6px;"></textarea>
             <button class="ai-btn ai-btn-accent" style="width:100%" onclick="closeAIPanel()">Close Panel</button>

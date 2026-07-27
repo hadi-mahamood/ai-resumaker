@@ -42,6 +42,23 @@
             </div>
 
             <div class="sidebar-content">
+                <!-- Resume Profile Manager -->
+                <div class="profile-manager-container" style="padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.01); display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.68rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-folder-open"></i> Resume Profiles</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="util-link-btn" onclick="window.duplicateCurrentProfile()" title="Duplicate Profile" style="font-size: 0.72rem; padding: 2px;"><i class="fa-solid fa-copy"></i></button>
+                            <button class="util-link-btn" onclick="window.renameCurrentProfile()" title="Rename Profile" style="font-size: 0.72rem; padding: 2px;"><i class="fa-solid fa-pen"></i></button>
+                            <button class="util-link-btn" onclick="window.deleteCurrentProfile()" title="Delete Profile" style="color: var(--danger); font-size: 0.72rem; padding: 2px;"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <select id="profile-select-dropdown" onchange="window.switchProfile(this.value)" style="flex: 1; padding: 6px 10px; font-size: 0.8rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: white; border-radius: 4px; outline: none; cursor: pointer;">
+                            <!-- Loaded dynamically -->
+                        </select>
+                        <button class="btn btn-primary" onclick="window.createNewProfile()" style="padding: 6px 10px; font-size: 0.8rem; height: 30px; border-radius: 4px;" title="Create New Profile"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </div>
                 
                 <div class="sidebar-utils">
                     <span class="utils-title"><i class="fa-solid fa-list-check"></i> Form Sections</span>
@@ -292,8 +309,18 @@
                         </div>
                     </div>
 
+                    <!-- ATS Parser View Toggle -->
+                    <button class="btn btn-secondary" id="ats-sim-toggle-btn" onclick="window.toggleATSSimulator()" title="Simulate ATS Parser View">
+                        <i class="fa-solid fa-microchip"></i> ATS Parser View
+                    </button>
+
                     <button class="btn btn-secondary" onclick="openAICoverLetter()">
                         <i class="fa-solid fa-envelope-open-text"></i> Cover Letter
+                    </button>
+
+                    <!-- Practice Interview Button -->
+                    <button class="btn btn-secondary" onclick="window.openInterviewPracticeModal()" title="AI Practice Interview">
+                        <i class="fa-solid fa-comments"></i> Practice Interview
                     </button>
                     <button class="btn btn-primary" onclick="exportPDF()">
                         <i class="fa-solid fa-file-pdf"></i> Download PDF
@@ -359,6 +386,11 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- ATS Parser Simulator Display -->
+                <div class="ats-simulator-display" id="ats-simulator-display" style="display: none; width: 100%; max-width: 820px; margin: 0 auto 24px auto; background: #0f172a; border: 1.5px dashed #3b82f6; border-radius: 8px; padding: 24px; color: #cbd5e1; font-family: monospace; font-size: 0.82rem; line-height: 1.5; white-space: pre-wrap; overflow-y: auto; max-height: calc(100vh - 180px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);">
+                    <!-- Dynamic parsed text will load here -->
                 </div>
 
                 <div class="resume-sheet-scaler" id="resume-sheet-scaler">
@@ -512,6 +544,64 @@
                                 <!-- Side-by-side revisions loaded dynamically -->
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cover Letter Preview Modal -->
+    <div class="ats-modal" id="cover-letter-preview-modal">
+        <div class="ats-modal-card" style="max-width: 900px; height: 90vh;">
+            <div class="ats-modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope-open-text" style="color: #a78bfa; font-size: 1.3rem;"></i>
+                    <div>
+                        <h3 style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">Styled Cover Letter Preview</h3>
+                        <span style="font-size: 0.72rem; color: var(--text-secondary);" id="cover-letter-theme-subtitle">Inheriting Layout Styling</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="btn btn-primary" onclick="window.printCoverLetter()" style="padding: 6px 12px; font-size: 0.8rem;"><i class="fa-solid fa-print"></i> Export Letter</button>
+                    <button class="ats-modal-close" onclick="window.closeCoverLetterPreviewModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="ats-modal-body" style="background: rgba(0,0,0,0.1); padding: 20px; overflow-y: auto; display: flex; justify-content: center; align-items: flex-start;">
+                <div class="cover-letter-sheet-scaler" style="width: 100%; display: flex; justify-content: center;">
+                    <div class="resume-sheet" id="cover-letter-preview-sheet" style="box-shadow: 0 5px 15px rgba(0,0,0,0.3); transform-origin: top center;">
+                        <!-- Compiled cover letter inherits template styles -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Practice Interview Modal -->
+    <div class="ats-modal" id="ats-interview-practice-modal">
+        <div class="ats-modal-card" style="max-width: 800px; height: 85vh;">
+            <div class="ats-modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-comments" style="color: #a78bfa; font-size: 1.3rem;"></i>
+                    <div>
+                        <h3 style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">AI Interview Practice</h3>
+                        <span style="font-size: 0.72rem; color: var(--text-secondary);">Tailored questions based on your resume and target role</span>
+                    </div>
+                </div>
+                <button class="ats-modal-close" onclick="window.closeInterviewPracticeModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="ats-modal-body" style="padding: 20px; overflow-y: auto; display: flex; flex-direction: column;">
+                <div id="interview-start-pane" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; gap: 16px; padding: 40px 0;">
+                    <i class="fa-solid fa-microphone-lines" style="font-size: 3rem; color: #8b5cf6;"></i>
+                    <h3 style="margin: 0; color: white; font-weight: 600;">Tailored Interview Practice</h3>
+                    <p style="margin: 0; max-width: 480px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                        AI will review your active profile and job description details to formulate custom technical, behavioral, and resume-specific questions.
+                    </p>
+                    <button class="btn btn-premium" onclick="window.generateInterviewQuestions()"><i class="fa-solid fa-play"></i> Generate Practice Questions</button>
+                </div>
+                
+                <div id="interview-dashboard" style="display: none; flex-direction: column; gap: 20px; flex: 1;">
+                    <div id="interview-questions-list" style="display: flex; flex-direction: column; gap: 16px;">
+                        <!-- Questions and answer blocks load here -->
                     </div>
                 </div>
             </div>
