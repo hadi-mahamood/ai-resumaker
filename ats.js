@@ -446,6 +446,7 @@ window.calculateJDMatch = function() {
             auditResult.matchedKeywords.forEach(kw => {
                 matchedContainer.innerHTML += `<span class="keyword-chip matched"><i class="fa-solid fa-check"></i> ${kw}</span>`;
             });
+        }
     }
     
     // Render sidebar matched & missing keywords
