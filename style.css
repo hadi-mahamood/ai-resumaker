@@ -3307,6 +3307,16 @@ textarea {
         height: calc(100vh - 56px) !important;
     }
     
+    body.mobile-view-edit .sidebar-content {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    body.mobile-view-preview .preview-workspace {
+        height: 100% !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    
     body {
         padding-bottom: 56px !important;
         height: 100vh !important;
