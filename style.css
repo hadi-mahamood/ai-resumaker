@@ -2168,13 +2168,31 @@ textarea {
     }
     
     .app-container {
-        display: block;
-        height: auto;
-        overflow: visible;
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
     }
     
-    .sidebar, .toolbar, .ai-panel, .ats-modal, .toast, .ats-suggestions-card, .ats-simulator-display {
+    .sidebar, 
+    body.mobile-view-edit .sidebar, 
+    body.mobile-view-preview .sidebar,
+    .toolbar,
+    .mobile-tab-bar,
+    .ai-panel, 
+    .ats-modal, 
+    .toast, 
+    .ats-suggestions-card, 
+    .ats-simulator-display {
         display: none !important;
+    }
+    
+    .preview-container,
+    body.mobile-view-edit .preview-container,
+    body.mobile-view-preview .preview-container {
+        display: flex !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
     }
     
     .preview-workspace {
