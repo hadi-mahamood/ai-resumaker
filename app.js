@@ -2224,11 +2224,11 @@ function resizeResumePreview() {
     if (workspaceWidth < sheetWidth) {
         const scale = workspaceWidth / sheetWidth;
         sheet.style.transform = `scale(${scale})`;
-        sheet.style.transformOrigin = "top left";
+        sheet.style.transformOrigin = "top center";
         const scaledHeight = sheet.offsetHeight * scale;
         scaler.style.height = `${scaledHeight}px`;
-        scaler.style.width = `${workspaceWidth}px`;
-        scaler.style.justifyContent = "flex-start";
+        scaler.style.width = "100%";
+        scaler.style.justifyContent = "center";
     } else {
         sheet.style.transform = "none";
         sheet.style.transformOrigin = "top center";
