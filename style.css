@@ -2186,6 +2186,13 @@ textarea {
         overflow: visible !important;
     }
     
+    .resume-sheet-scaler, .cover-letter-sheet-scaler {
+        height: auto !important;
+        width: auto !important;
+        display: block !important;
+        transform: none !important;
+    }
+    
     .resume-sheet {
         width: 210mm !important;
         height: auto !important;
