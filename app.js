@@ -2125,14 +2125,17 @@ function resizeResumePreview() {
     if (workspaceWidth < sheetWidth) {
         const scale = workspaceWidth / sheetWidth;
         sheet.style.transform = `scale(${scale})`;
-        sheet.style.transformOrigin = "top center";
+        sheet.style.transformOrigin = "top left";
         const scaledHeight = sheet.offsetHeight * scale;
         scaler.style.height = `${scaledHeight}px`;
         scaler.style.width = `${workspaceWidth}px`;
+        scaler.style.justifyContent = "flex-start";
     } else {
         sheet.style.transform = "none";
+        sheet.style.transformOrigin = "top center";
         scaler.style.height = "auto";
         scaler.style.width = "794px";
+        scaler.style.justifyContent = "center";
     }
 }
 
