@@ -2151,3 +2151,35 @@ function toggleSidebar() {
         }
     }
 }
+
+window.switchMobileTab = function(tab) {
+    const editBtn = document.getElementById("mobile-tab-edit");
+    const previewBtn = document.getElementById("mobile-tab-preview");
+    if (!editBtn || !previewBtn) return;
+    
+    if (tab === "edit") {
+        document.body.classList.add("mobile-view-edit");
+        document.body.classList.remove("mobile-view-preview");
+        editBtn.classList.add("active");
+        previewBtn.classList.remove("active");
+    } else {
+        document.body.classList.remove("mobile-view-edit");
+        document.body.classList.add("mobile-view-preview");
+        editBtn.classList.remove("active");
+        previewBtn.classList.add("active");
+        
+        // Trigger scale update after rendering tab view
+        setTimeout(() => {
+            if (window.resizeResumePreview) {
+                window.resizeResumePreview();
+            }
+        }, 80);
+    }
+};
+
+// Start mobile users in edit tab mode automatically
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.innerWidth <= 768) {
+        window.switchMobileTab("edit");
+    }
+});
