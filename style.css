@@ -2187,12 +2187,12 @@ textarea {
     }
     
     .resume-sheet {
-        width: 100% !important;
+        width: 210mm !important;
         height: auto !important;
-        min-height: auto !important;
+        min-height: 297mm !important;
         box-shadow: none !important;
         padding: 20mm !important;
-        margin: 0 !important;
+        margin: 0 auto !important;
         transform: none !important;
         page-break-after: avoid;
         box-sizing: border-box !important;
