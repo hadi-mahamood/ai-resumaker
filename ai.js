@@ -79,6 +79,84 @@ const AIService = {
         return "generic";
     },
 
+    // Helper to generate offline experience rewrites without recursion
+    getOfflineRewriteMock(text) {
+        if (!text || text.trim().length < 10) {
+            return "- Spearheaded development of core product features, improving system performance and usability.\n- Collaborated with cross-functional teams to design and deploy scalable architectures.\n- Optimized data pipelines and code structures, reducing average load times by 25%.";
+        }
+
+        let lines = text.split(/[.\n]+/).map(l => l.trim()).filter(l => l.length > 5);
+        let rewrittenLines = [];
+        let usedVerbs = new Set();
+        let usedMetrics = new Set();
+
+        for (let i = 0; i < Math.min(3, Math.max(3, lines.length)); i++) {
+            let line = lines[i] || "Responsible for maintaining and developing software applications.";
+            let verb = this.knowledgeBase.verbs.find(v => !usedVerbs.has(v)) || this.knowledgeBase.verbs[Math.floor(Math.random() * this.knowledgeBase.verbs.length)];
+            usedVerbs.add(verb);
+            
+            let metric = this.knowledgeBase.metrics.find(m => !usedMetrics.has(m)) || this.knowledgeBase.metrics[Math.floor(Math.random() * this.knowledgeBase.metrics.length)];
+            usedMetrics.add(metric);
+
+            let cleanLine = line
+                .replace(/^(I was|responsible for|helped to|worked on|developed|designed|managed|made|created|did)\s+/i, '')
+                .replace(/^\-/, '')
+                .trim();
+            
+            cleanLine = cleanLine.charAt(0).toUpperCase() + cleanLine.slice(1);
+
+            let bullet = `- ${verb} ${cleanLine.toLowerCase().replace(/[\.]+$/, '')}, ${metric}.`;
+            rewrittenLines.push(bullet);
+        }
+        return rewrittenLines.join('\n');
+    },
+
+    // Helper to generate offline skill suggestions without recursion
+    getOfflineSkillsMock(jobTitle, existingSkills = []) {
+        let category = this.detectCategory(jobTitle);
+        let pool = this.knowledgeBase.skills[category] || this.knowledgeBase.skills["generic"];
+        
+        let existingLower = existingSkills.map(s => s.toLowerCase());
+        let suggestions = pool.filter(s => !existingLower.includes(s.toLowerCase()));
+        
+        if (suggestions.length < 10) {
+            let genericPool = this.knowledgeBase.skills["generic"];
+            for (let g of genericPool) {
+                if (!existingLower.includes(g.toLowerCase()) && !suggestions.includes(g)) {
+                    suggestions.push(g);
+                }
+            }
+        }
+        return suggestions.slice(0, 10).join(', ');
+    },
+
+    // Helper to generate offline cover letters without recursion
+    getOfflineCoverLetterMock(resumeData) {
+        let name = resumeData.name || "John Doe";
+        let role = resumeData.targetJob || "Software Developer";
+        let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 3).join(', ') : "Software Engineering";
+        
+        let dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        let greeting = `Dear Hiring Manager,`;
+        
+        let openingTpl = this.knowledgeBase.coverLetters.opening[Math.floor(Math.random() * this.knowledgeBase.coverLetters.opening.length)];
+        let opening = openingTpl.replace('[Role]', role).replace('[Skill]', skills);
+        
+        let bodyTpl = this.knowledgeBase.coverLetters.body[Math.floor(Math.random() * this.knowledgeBase.coverLetters.body.length)];
+        let body = bodyTpl.replace('[Role]', role).replace(/\[Skill\]/g, skills);
+        
+        let experienceDetail = "";
+        if (resumeData.experience && resumeData.experience.length > 0) {
+            let latestExp = resumeData.experience[0];
+            experienceDetail = `In my recent role as ${latestExp.role} at ${latestExp.company}, I focused on implementing features, collaborating with engineering teams, and optimizing technical solutions to meet business milestones.`;
+        } else {
+            experienceDetail = "I have developed strong competencies in modern software development methodologies and enjoy working on complex technical challenges.";
+        }
+        
+        let closing = this.knowledgeBase.coverLetters.closing[Math.floor(Math.random() * this.knowledgeBase.coverLetters.closing.length)];
+        return `${dateStr}\n\n${greeting}\n\n${opening}\n\n${body}\n\n${experienceDetail}\n\n${closing}\n\nSincerely,\n\n${name}`;
+    },
+
     /**
      * AI Work Experience Rewriter
      */
@@ -95,37 +173,7 @@ const AIService = {
         // Offline / Mock engine
         return new Promise((resolve) => {
             setTimeout(() => {
-                if (!text || text.trim().length < 10) {
-                    resolve("- Spearheaded development of core product features, improving system performance and usability.\n- Collaborated with cross-functional teams to design and deploy scalable architectures.\n- Optimized data pipelines and code structures, reducing average load times by 25%.");
-                    return;
-                }
-
-                let lines = text.split(/[.\n]+/).map(l => l.trim()).filter(l => l.length > 5);
-                let rewrittenLines = [];
-                let usedVerbs = new Set();
-                let usedMetrics = new Set();
-
-                for (let i = 0; i < Math.max(3, lines.length); i++) {
-                    let line = lines[i] || "Responsible for maintaining and developing software applications.";
-                    let verb = this.knowledgeBase.verbs.find(v => !usedVerbs.has(v)) || this.knowledgeBase.verbs[Math.floor(Math.random() * this.knowledgeBase.verbs.length)];
-                    usedVerbs.add(verb);
-                    
-                    let metric = this.knowledgeBase.metrics.find(m => !usedMetrics.has(m)) || this.knowledgeBase.metrics[Math.floor(Math.random() * this.knowledgeBase.metrics.length)];
-                    usedMetrics.add(metric);
-
-                    let cleanLine = line
-                        .replace(/^(I was|responsible for|helped to|worked on|developed|designed|managed|made|created|did)\s+/i, '')
-                        .replace(/^\-/, '')
-                        .trim();
-                    
-                    cleanLine = cleanLine.charAt(0).toUpperCase() + cleanLine.slice(1);
-                    if (!cleanLine.endsWith('.')) cleanLine += '';
-
-                    let bullet = `- ${verb} ${cleanLine.toLowerCase().replace(/[\.]+$/, '')}, ${metric}.`;
-                    rewrittenLines.push(bullet);
-                }
-
-                resolve(rewrittenLines.join('\n'));
+                resolve(this.getOfflineRewriteMock(text));
             }, 1000);
         });
     },
@@ -146,22 +194,7 @@ const AIService = {
         // Offline / Mock engine
         return new Promise((resolve) => {
             setTimeout(() => {
-                let category = this.detectCategory(jobTitle);
-                let pool = this.knowledgeBase.skills[category] || this.knowledgeBase.skills["generic"];
-                
-                let existingLower = existingSkills.map(s => s.toLowerCase());
-                let suggestions = pool.filter(s => !existingLower.includes(s.toLowerCase()));
-                
-                if (suggestions.length < 10) {
-                    let genericPool = this.knowledgeBase.skills["generic"];
-                    for (let g of genericPool) {
-                        if (!existingLower.includes(g.toLowerCase()) && !suggestions.includes(g)) {
-                            suggestions.push(g);
-                        }
-                    }
-                }
-                
-                resolve(suggestions.slice(0, 10).join(', '));
+                resolve(this.getOfflineSkillsMock(jobTitle, existingSkills));
             }, 800);
         });
     },
@@ -186,27 +219,7 @@ const AIService = {
         // Offline / Mock engine
         return new Promise((resolve) => {
             setTimeout(() => {
-                let dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-                let greeting = `Dear Hiring Manager,`;
-                
-                let openingTpl = this.knowledgeBase.coverLetters.opening[Math.floor(Math.random() * this.knowledgeBase.coverLetters.opening.length)];
-                let opening = openingTpl.replace('[Role]', role).replace('[Skill]', skills);
-                
-                let bodyTpl = this.knowledgeBase.coverLetters.body[Math.floor(Math.random() * this.knowledgeBase.coverLetters.body.length)];
-                let body = bodyTpl.replace('[Role]', role).replace(/\[Skill\]/g, skills);
-                
-                let experienceDetail = "";
-                if (resumeData.experience && resumeData.experience.length > 0) {
-                    let latestExp = resumeData.experience[0];
-                    experienceDetail = `In my recent role as ${latestExp.role} at ${latestExp.company}, I focused on implementing features, collaborating with engineering teams, and optimizing technical solutions to meet business milestones.`;
-                } else {
-                    experienceDetail = "I have developed strong competencies in modern software development methodologies and enjoy working on complex technical challenges.";
-                }
-                
-                let closing = this.knowledgeBase.coverLetters.closing[Math.floor(Math.random() * this.knowledgeBase.coverLetters.closing.length)];
-                let letter = `${dateStr}\n\n${greeting}\n\n${opening}\n\n${body}\n\n${experienceDetail}\n\n${closing}\n\nSincerely,\n\n${name}`;
-                
-                resolve(letter);
+                resolve(this.getOfflineCoverLetterMock(resumeData));
             }, 1200);
         });
     },
@@ -332,10 +345,16 @@ const AIService = {
      * Basic prompt parser for offline fallback
      */
     async offlineFallback(prompt) {
-        if (prompt.includes("Rewrite")) {
-            return await this.rewriteExperience("Sample developer description", "Software Developer");
-        } else if (prompt.includes("recommend")) {
-            return await this.suggestSkills([], "Software Developer");
+        const p = (prompt || "").toLowerCase();
+        if (p.includes("rewrite")) {
+            return this.getOfflineRewriteMock("Sample developer description");
+        } else if (p.includes("recommend") || p.includes("suggest") || p.includes("skill")) {
+            return this.getOfflineSkillsMock("Software Developer");
+        } else if (p.includes("cover letter")) {
+            if (typeof state !== "undefined") {
+                return this.getOfflineCoverLetterMock(state);
+            }
+            return "Dear Hiring Manager,\n\nI am writing to apply for the position...";
         } else {
             return "Sincerely,\nJohn Doe";
         }
