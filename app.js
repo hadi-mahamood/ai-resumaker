@@ -1981,8 +1981,11 @@ async function runAIEperienceRewrite(expId) {
     resultBox.className = "ai-result-box loading";
     resultBox.innerHTML = '<div class="ai-spinner"></div>';
 
-    // Call AIService
-    const optimized = await AIService.rewriteExperience(textInput, state.targetJob);
+    // Call AIService with streaming chunk callback
+    const optimized = await AIService.rewriteExperience(textInput, state.targetJob, (chunkText) => {
+        resultBox.className = "ai-result-box";
+        resultBox.innerText = chunkText;
+    });
     
     resultBox.className = "ai-result-box";
     resultBox.innerText = optimized;
@@ -2097,7 +2100,9 @@ async function runAICoverLetter() {
     resultCard.style.display = "flex";
     textTarget.value = "Drafting cover letter... Please wait.";
     
-    const letter = await AIService.generateCoverLetter(state);
+    const letter = await AIService.generateCoverLetter(state, (chunkText) => {
+        textTarget.value = chunkText;
+    });
     textTarget.value = letter;
 }
 

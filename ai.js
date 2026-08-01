@@ -249,31 +249,62 @@ const AIService = {
             }
             
             const data = await response.json();
-            return data.candidates[0].content.parts[0].text.trim();
+            const text = data.candidates[0].content.parts[0].text.trim();
+            return await this.simulateStreaming(text, onChunk);
         } catch (error) {
             console.error("Gemini API call failed: ", error);
-            return "Gemini API Error. Falling back to local offline AI results:\n\n" + await this.offlineFallback(promptText);
+            const fallback = "Gemini API Error. Falling back to local offline AI results:\n\n" + await this.offlineFallback(promptText);
+            return await this.simulateStreaming(fallback, onChunk);
         }
     },
 
     /**
-     * WebGPU Local LLM Client Call
+     * Helper to simulate a snappy typing stream effect for non-WebGPU calls
      */
-    async callWebGPULLM(promptText) {
+    async simulateStreaming(text, onChunk) {
+        if (!onChunk) return text;
+        const words = text.split(" ");
+        let current = "";
+        for (let i = 0; i < words.length; i++) {
+            current += (i === 0 ? "" : " ") + words[i];
+            onChunk(current);
+            await new Promise(r => setTimeout(r, 10)); // snappy 10ms per word
+        }
+        return text;
+    },
+
+    /**
+     * WebGPU Local LLM Client Call with true real-time token streaming
+     */
+    async callWebGPULLM(promptText, onChunk) {
         try {
             if (!this.webllmEngine) {
                 await this.initWebGPUEngine();
             }
             
             showToast("Generating with local WebGPU model...");
-            const reply = await this.webllmEngine.chat.completions.create({
-                messages: [{ role: "user", content: promptText }]
-            });
-            return reply.choices[0].message.content.trim();
+            if (onChunk) {
+                const completion = await this.webllmEngine.chat.completions.create({
+                    messages: [{ role: "user", content: promptText }],
+                    stream: true
+                });
+                let accumulatedText = "";
+                for await (const chunk of completion) {
+                    accumulatedText += chunk.choices[0].delta.content || "";
+                    onChunk(accumulatedText);
+                }
+                return accumulatedText.trim();
+            } else {
+                const reply = await this.webllmEngine.chat.completions.create({
+                    messages: [{ role: "user", content: promptText }]
+                });
+                return reply.choices[0].message.content.trim();
+            }
         } catch (error) {
             console.error("WebGPU call failed: ", error);
             showToast("Local WebGPU error. Check WebGPU browser support.");
-            return "WebGPU Error. Falling back to offline fallback:\n\n" + await this.offlineFallback(promptText);
+            const fallback = "WebGPU Error. Falling back to offline fallback:\n\n" + await this.offlineFallback(promptText);
+            return await this.simulateStreaming(fallback, onChunk);
         }
     },
 
@@ -342,22 +373,25 @@ const AIService = {
     },
 
     /**
-     * Basic prompt parser for offline fallback
+     * Basic prompt parser for offline fallback with simulation support
      */
-    async offlineFallback(prompt) {
+    async offlineFallback(prompt, onChunk) {
         const p = (prompt || "").toLowerCase();
+        let res = "";
         if (p.includes("rewrite")) {
-            return this.getOfflineRewriteMock("Sample developer description");
+            res = this.getOfflineRewriteMock("Sample developer description");
         } else if (p.includes("recommend") || p.includes("suggest") || p.includes("skill")) {
-            return this.getOfflineSkillsMock("Software Developer");
+            res = this.getOfflineSkillsMock("Software Developer");
         } else if (p.includes("cover letter")) {
             if (typeof state !== "undefined") {
-                return this.getOfflineCoverLetterMock(state);
+                res = this.getOfflineCoverLetterMock(state);
+            } else {
+                res = "Dear Hiring Manager,\n\nI am writing to apply for the position...";
             }
-            return "Dear Hiring Manager,\n\nI am writing to apply for the position...";
         } else {
-            return "Sincerely,\nJohn Doe";
+            res = "Sincerely,\nJohn Doe";
         }
+        return await this.simulateStreaming(res, onChunk);
     }
 };
 
