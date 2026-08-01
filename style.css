@@ -2158,19 +2158,21 @@ textarea {
         margin: 0;
     }
     
-    body {
+    html, body {
         background: white !important;
         background-image: none !important;
         color: black !important;
         margin: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
     
-    .app-container {
-        display: block;
-        height: auto;
-        overflow: visible;
+    .app-container, .preview-container {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
     }
     
     .sidebar, .toolbar, .ai-panel, .ats-modal, .toast, .ats-suggestions-card, .ats-simulator-display, .mobile-tab-bar {
