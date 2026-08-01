@@ -14,7 +14,7 @@ const AIService = {
     // Optional API configuration if user wants to supply their own key
     apiKey: localStorage.getItem('gemini_api_key') || '',
     activeProvider: localStorage.getItem('ai_provider') || 'gemini',
-    webgpuModel: localStorage.getItem('webgpu_model') || 'Phi-3-mini-4k-instruct-q4f32_1-MLC',
+    webgpuModel: localStorage.getItem('webgpu_model') || 'Llama-3.2-1B-Instruct-q4f16_1-MLC',
     webllmEngine: null,
     webllmLoading: false,
     
