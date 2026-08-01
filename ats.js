@@ -351,6 +351,67 @@ const ATSAuditor = {
             suggestions.push({ type: "danger", text: `Active layout (${activeTemplate.toUpperCase()}) has low ATS compatibility. Avoid multi-columns, visual dials, or tables for automated submittals.` });
         }
 
+        // 7. Country-Specific Rules (Adjusts score based on local conventions)
+        const targetCountry = resumeData.targetCountry || "US";
+        if (targetCountry === "US" || targetCountry === "UK" || targetCountry === "AU") {
+            // US/UK/AU resumes should not contain age/DOB, nationality, marital status, or gender due to strict discrimination laws.
+            let hasSensitive = false;
+            if (resumeData.dob && resumeData.dob.trim().length > 0) {
+                score -= 6;
+                suggestions.push({ type: "danger", text: `US/UK/AU Rule: Remove Date of Birth (${resumeData.dob}) to avoid age discrimination rejection.` });
+                hasSensitive = true;
+            }
+            if (resumeData.nationality && resumeData.nationality.trim().length > 0) {
+                score -= 6;
+                suggestions.push({ type: "danger", text: `US/UK/AU Rule: Remove Nationality (${resumeData.nationality}) to satisfy anti-bias hiring filters.` });
+                hasSensitive = true;
+            }
+            if (resumeData.maritalStatus && resumeData.maritalStatus.trim().length > 0) {
+                score -= 6;
+                suggestions.push({ type: "danger", text: `US/UK/AU Rule: Remove Marital Status / Gender (${resumeData.maritalStatus}) to maintain standard compliance.` });
+                hasSensitive = true;
+            }
+            if (!hasSensitive) {
+                suggestions.push({ type: "success", text: `US/UK/AU Compliance: No sensitive details (DOB, Nationality, Marital Status) identified.` });
+            }
+        } else if (targetCountry === "GCC") {
+            // GCC resumes require nationality, visa status, and marital status.
+            let missingGCC = [];
+            if (!resumeData.nationality || resumeData.nationality.trim().length === 0) {
+                score -= 6;
+                missingGCC.push("Nationality");
+            }
+            if (!resumeData.visaStatus || resumeData.visaStatus.trim().length === 0) {
+                score -= 6;
+                missingGCC.push("Visa Status");
+            }
+            if (!resumeData.maritalStatus || resumeData.maritalStatus.trim().length === 0) {
+                score -= 6;
+                missingGCC.push("Marital Status");
+            }
+            if (missingGCC.length > 0) {
+                suggestions.push({ type: "danger", text: `GCC Rule: Missing sponsorship fields: ${missingGCC.join(', ')}.` });
+            } else {
+                suggestions.push({ type: "success", text: "GCC Alignment: Key sponsorship metadata (Nationality, Visa, Marital Status) is fully specified." });
+            }
+        } else if (targetCountry === "EU" || targetCountry === "IN") {
+            // European and Indian resumes expect DOB and languages.
+            let missingEUIN = [];
+            if (!resumeData.dob || resumeData.dob.trim().length === 0) {
+                score -= 5;
+                missingEUIN.push("Date of Birth");
+            }
+            if (!resumeData.languages || resumeData.languages.trim().length === 0) {
+                score -= 5;
+                missingEUIN.push("Languages Known");
+            }
+            if (missingEUIN.length > 0) {
+                suggestions.push({ type: "warning", text: `${targetCountry} Expectation: Missing standard details: ${missingEUIN.join(', ')}.` });
+            } else {
+                suggestions.push({ type: "success", text: `${targetCountry} Alignment: Standard metadata (DOB, Languages) is complete.` });
+            }
+        }
+
         // Cap score at 100 and floor at 0
         score = Math.max(0, Math.min(100, score));
 
@@ -396,6 +457,13 @@ window.changeCountryRules = function(country) {
     const alertBox = document.getElementById("country-rule-alert");
     if (alertBox) {
         alertBox.innerHTML = countryExpectations[country] || "";
+    }
+    state.targetCountry = country;
+    if (window.saveState) window.saveState();
+    else if (typeof autoSave === "function") autoSave();
+    
+    if (window.updateATSScore) {
+        window.updateATSScore();
     }
 };
 
@@ -543,7 +611,13 @@ window.initATSDashboard = function() {
     // Country Selector initial rules
     const countrySelect = document.getElementById("ats-country-select");
     if (countrySelect) {
-        window.changeCountryRules(countrySelect.value);
+        if (state.targetCountry) {
+            countrySelect.value = state.targetCountry;
+        }
+        const alertBox = document.getElementById("country-rule-alert");
+        if (alertBox) {
+            alertBox.innerHTML = countryExpectations[countrySelect.value] || "";
+        }
     }
     
     // Render checklists

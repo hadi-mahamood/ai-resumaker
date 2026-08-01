@@ -9,6 +9,7 @@
 // Core App State
 var state = {
     targetJob: "Software Developer",
+    targetCountry: "US",
     name: "Alex Mercer",
     title: "Full Stack Software Engineer",
     email: "alex.mercer@dev.io",
@@ -1878,7 +1879,7 @@ function formatMultiline(str) {
    ATS WIDGET & MODAL LOGIC
    ========================================== */
 
-function updateATSScore() {
+window.updateATSScore = function() {
     const report = ATSAuditor.audit(state);
     
     // Update toolbar indicator
