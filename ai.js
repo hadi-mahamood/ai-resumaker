@@ -77,11 +77,15 @@ const AIService = {
 
     /**
      * AI Work Experience Rewriter
-     * Uses template metrics and strong action verbs to polish text
      */
     async rewriteExperience(text, jobTitle) {
+        const prompt = `Rewrite this job description for a "${jobTitle}" role using strong action verbs, quantify achievements where possible, and optimize it for ATS systems. Output ONLY the rewritten paragraphs as bullet points:\n\n${text}`;
+        
+        if (this.activeProvider === "webgpu") {
+            return await this.callWebGPULLM(prompt);
+        }
         if (this.apiKey) {
-            return await this.callGeminiAPI(`Rewrite this job description for a "${jobTitle}" role using strong action verbs, quantify achievements where possible, and optimize it for ATS systems. Output ONLY the rewritten paragraphs as bullet points:\n\n${text}`);
+            return await this.callGeminiAPI(prompt);
         }
         
         // Offline / Mock engine
@@ -92,40 +96,33 @@ const AIService = {
                     return;
                 }
 
-                // Clean the input text, split by sentences or bullets
                 let lines = text.split(/[.\n]+/).map(l => l.trim()).filter(l => l.length > 5);
                 let rewrittenLines = [];
-                
                 let usedVerbs = new Set();
                 let usedMetrics = new Set();
 
                 for (let i = 0; i < Math.max(3, lines.length); i++) {
                     let line = lines[i] || "Responsible for maintaining and developing software applications.";
-                    
-                    // Select a unique verb and metric
                     let verb = this.knowledgeBase.verbs.find(v => !usedVerbs.has(v)) || this.knowledgeBase.verbs[Math.floor(Math.random() * this.knowledgeBase.verbs.length)];
                     usedVerbs.add(verb);
                     
                     let metric = this.knowledgeBase.metrics.find(m => !usedMetrics.has(m)) || this.knowledgeBase.metrics[Math.floor(Math.random() * this.knowledgeBase.metrics.length)];
                     usedMetrics.add(metric);
 
-                    // Clean the original line of common weak verbs/starters
                     let cleanLine = line
                         .replace(/^(I was|responsible for|helped to|worked on|developed|designed|managed|made|created|did)\s+/i, '')
                         .replace(/^\-/, '')
                         .trim();
                     
-                    // Capitalize first letter of cleaned line
                     cleanLine = cleanLine.charAt(0).toUpperCase() + cleanLine.slice(1);
                     if (!cleanLine.endsWith('.')) cleanLine += '';
 
-                    // Construct rewritten sentence
                     let bullet = `- ${verb} ${cleanLine.toLowerCase().replace(/[\.]+$/, '')}, ${metric}.`;
                     rewrittenLines.push(bullet);
                 }
 
                 resolve(rewrittenLines.join('\n'));
-            }, 1000); // Simulated delay
+            }, 1000);
         });
     },
 
@@ -133,8 +130,13 @@ const AIService = {
      * AI Skill Suggester
      */
     async suggestSkills(existingSkills, jobTitle) {
+        const prompt = `Based on this target job "${jobTitle}" and existing skills [${existingSkills.join(', ')}], recommend exactly 10 relevant technical and soft skills as a comma-separated list. Output ONLY the comma-separated skills:`;
+        
+        if (this.activeProvider === "webgpu") {
+            return await this.callWebGPULLM(prompt);
+        }
         if (this.apiKey) {
-            return await this.callGeminiAPI(`Based on this target job "${jobTitle}" and existing skills [${existingSkills.join(', ')}], recommend exactly 10 relevant technical and soft skills as a comma-separated list. Output ONLY the comma-separated skills:`);
+            return await this.callGeminiAPI(prompt);
         }
 
         // Offline / Mock engine
@@ -143,11 +145,9 @@ const AIService = {
                 let category = this.detectCategory(jobTitle);
                 let pool = this.knowledgeBase.skills[category] || this.knowledgeBase.skills["generic"];
                 
-                // Filter out skills the user already has
                 let existingLower = existingSkills.map(s => s.toLowerCase());
                 let suggestions = pool.filter(s => !existingLower.includes(s.toLowerCase()));
                 
-                // If we don't have enough, add some generic ones
                 if (suggestions.length < 10) {
                     let genericPool = this.knowledgeBase.skills["generic"];
                     for (let g of genericPool) {
@@ -157,7 +157,6 @@ const AIService = {
                     }
                 }
                 
-                // Return exactly 10
                 resolve(suggestions.slice(0, 10).join(', '));
             }, 800);
         });
@@ -170,17 +169,20 @@ const AIService = {
         let name = resumeData.name || "John Doe";
         let role = resumeData.targetJob || "Software Developer";
         let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 3).join(', ') : "Software Engineering";
-        let company = "Hiring Manager";
         
+        const prompt = `Write a highly professional and compelling cover letter. Candidate Name: ${name}. Target Role: ${role}. Skills: ${resumeData.skills.join(', ')}. Experience Summary: ${JSON.stringify(resumeData.experience)}. Output ONLY the letter text with greetings and signature. No markdown comments or brackets:`;
+        
+        if (this.activeProvider === "webgpu") {
+            return await this.callWebGPULLM(prompt);
+        }
         if (this.apiKey) {
-            return await this.callGeminiAPI(`Write a highly professional and compelling cover letter. Candidate Name: ${name}. Target Role: ${role}. Skills: ${resumeData.skills.join(', ')}. Experience Summary: ${JSON.stringify(resumeData.experience)}. Output ONLY the letter text with greetings and signature. No markdown comments or brackets:`);
+            return await this.callGeminiAPI(prompt);
         }
 
         // Offline / Mock engine
         return new Promise((resolve) => {
             setTimeout(() => {
                 let dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-                
                 let greeting = `Dear Hiring Manager,`;
                 
                 let openingTpl = this.knowledgeBase.coverLetters.opening[Math.floor(Math.random() * this.knowledgeBase.coverLetters.opening.length)];
@@ -189,7 +191,6 @@ const AIService = {
                 let bodyTpl = this.knowledgeBase.coverLetters.body[Math.floor(Math.random() * this.knowledgeBase.coverLetters.body.length)];
                 let body = bodyTpl.replace('[Role]', role).replace(/\[Skill\]/g, skills);
                 
-                // Incorporate work experience details if available
                 let experienceDetail = "";
                 if (resumeData.experience && resumeData.experience.length > 0) {
                     let latestExp = resumeData.experience[0];
@@ -199,7 +200,6 @@ const AIService = {
                 }
                 
                 let closing = this.knowledgeBase.coverLetters.closing[Math.floor(Math.random() * this.knowledgeBase.coverLetters.closing.length)];
-                
                 let letter = `${dateStr}\n\n${greeting}\n\n${opening}\n\n${body}\n\n${experienceDetail}\n\n${closing}\n\nSincerely,\n\n${name}`;
                 
                 resolve(letter);
@@ -208,7 +208,7 @@ const AIService = {
     },
 
     /**
-     * Gemini API Client Call (Fallback if API Key provided)
+     * Gemini API Client Call
      */
     async callGeminiAPI(promptText) {
         try {
@@ -234,14 +234,83 @@ const AIService = {
             const data = await response.json();
             return data.candidates[0].content.parts[0].text.trim();
         } catch (error) {
-            console.error("Gemini API call failed, falling back to local intelligence: ", error);
-            // Flash notification of failure in dev tools, but fallback gracefully to mock
-            return "Gemini API Error. Please check your API key in development settings or connection. Falling back to local offline AI results:\n\n" + await this.offlineFallback(promptText);
+            console.error("Gemini API call failed: ", error);
+            return "Gemini API Error. Falling back to local offline AI results:\n\n" + await this.offlineFallback(promptText);
         }
     },
 
     /**
-     * Basic prompt parser for offline fallback in case user API key fails
+     * WebGPU Local LLM Client Call
+     */
+    async callWebGPULLM(promptText) {
+        try {
+            if (!this.webllmEngine) {
+                await this.initWebGPUEngine();
+            }
+            
+            showToast("Generating with local WebGPU model...");
+            const reply = await this.webllmEngine.chat.completions.create({
+                messages: [{ role: "user", content: promptText }]
+            });
+            return reply.choices[0].message.content.trim();
+        } catch (error) {
+            console.error("WebGPU call failed: ", error);
+            showToast("Local WebGPU error. Check WebGPU browser support.");
+            return "WebGPU Error. Falling back to offline fallback:\n\n" + await this.offlineFallback(promptText);
+        }
+    },
+
+    /**
+     * WebGPU MLCEngine Setup
+     */
+    async initWebGPUEngine() {
+        if (this.webllmLoading) return;
+        this.webllmLoading = true;
+        
+        const progressContainer = document.getElementById("webgpu-loading-progress");
+        const progressStatus = document.getElementById("webgpu-progress-status");
+        const progressPercent = document.getElementById("webgpu-progress-percent");
+        const progressBar = document.getElementById("webgpu-progress-bar");
+        
+        if (progressContainer) progressContainer.style.display = "block";
+        if (progressStatus) progressStatus.innerText = "Loading Web-LLM...";
+        
+        try {
+            const webllm = await import("https://esm.run/@mlc-ai/web-llm");
+            
+            if (progressStatus) progressStatus.innerText = "Downloading model weights...";
+            
+            this.webllmEngine = new webllm.MLCEngine();
+            this.webllmEngine.setInitProgressCallback((report) => {
+                if (progressStatus) {
+                    const statusText = report.text.split("]")[1] || report.text;
+                    progressStatus.innerText = statusText.trim();
+                }
+                const percent = Math.round(report.progress * 100);
+                if (progressPercent) progressPercent.innerText = `${percent}%`;
+                if (progressBar) progressBar.style.width = `${percent}%`;
+            });
+            
+            await this.webllmEngine.reload(this.webgpuModel);
+            
+            showToast("Local GPU Model ready!");
+            if (progressStatus) progressStatus.innerText = "Model Active & Ready";
+            
+            setTimeout(() => {
+                if (progressContainer) progressContainer.style.display = "none";
+            }, 2500);
+        } catch (e) {
+            console.error("Failed to load WebGPU model", e);
+            if (progressStatus) progressStatus.innerText = "Failed to load. Check console/WebGPU support.";
+            showToast("Failed to initialize WebGPU model.");
+            throw e;
+        } finally {
+            this.webllmLoading = false;
+        }
+    },
+
+    /**
+     * Basic prompt parser for offline fallback
      */
     async offlineFallback(prompt) {
         if (prompt.includes("Rewrite")) {
@@ -253,3 +322,46 @@ const AIService = {
         }
     }
 };
+
+// Global WebGPU UI Control Handlers
+window.switchAIProvider = function(provider) {
+    AIService.activeProvider = provider;
+    localStorage.setItem('ai_provider', provider);
+    
+    document.querySelectorAll(".provider-radio-label").forEach(lbl => {
+        lbl.classList.remove("active");
+    });
+    const activeLabel = document.getElementById(`prov-label-${provider}`);
+    if (activeLabel) activeLabel.classList.add("active");
+    
+    const geminiSection = document.getElementById("settings-section-gemini");
+    const webgpuSection = document.getElementById("settings-section-webgpu");
+    
+    if (provider === "gemini") {
+        if (geminiSection) geminiSection.style.display = "block";
+        if (webgpuSection) webgpuSection.style.display = "none";
+    } else {
+        if (geminiSection) geminiSection.style.display = "none";
+        if (webgpuSection) webgpuSection.style.display = "block";
+        
+        const modelSelect = document.getElementById("webgpu-model-select");
+        if (modelSelect) {
+            modelSelect.value = AIService.webgpuModel;
+            modelSelect.onchange = (e) => {
+                AIService.webgpuModel = e.target.value;
+                localStorage.setItem('webgpu_model', e.target.value);
+                AIService.webllmEngine = null;
+            };
+        }
+    }
+};
+
+window.preloadWebGPUModel = function() {
+    showToast("Initializing local model download...");
+    AIService.initWebGPUEngine();
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    const prov = localStorage.getItem('ai_provider') || 'gemini';
+    window.switchAIProvider(prov);
+});
