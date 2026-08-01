@@ -69,6 +69,12 @@
                         </select>
                         <button class="btn btn-premium" id="btn-load-webgpu" onclick="window.preloadWebGPUModel()" style="width: 100%; justify-content: center; font-size: 0.75rem;"><i class="fa-solid fa-download"></i> Preload Model Files</button>
                         
+                        <!-- Auto-preload toggle option -->
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px; margin-bottom: 8px;">
+                            <input type="checkbox" id="webgpu-auto-load-chk" onclick="window.toggleWebGPUAutoLoad(this.checked)" style="width: 13px; height: 13px; cursor: pointer; accent-color: var(--accent);">
+                            <label for="webgpu-auto-load-chk" style="font-size: 0.68rem; color: var(--text-secondary); cursor: pointer; user-select: none;">Auto-load model on page refresh</label>
+                        </div>
+                        
                         <div id="webgpu-loading-progress" style="display: none; margin-top: 10px;">
                             <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-secondary); margin-bottom: 4px;">
                                 <span id="webgpu-progress-status">Loading WebGPU...</span>

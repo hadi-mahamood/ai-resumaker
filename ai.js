@@ -386,8 +386,25 @@ window.checkWebGPUSupport = function() {
     }
 };
 
+window.toggleWebGPUAutoLoad = function(checked) {
+    localStorage.setItem('webgpu_auto_load', checked ? 'true' : 'false');
+};
+
 document.addEventListener("DOMContentLoaded", () => {
     const prov = localStorage.getItem('ai_provider') || 'gemini';
     window.switchAIProvider(prov);
     window.checkWebGPUSupport();
+    
+    // Sync Auto-load checkbox state
+    const autoLoad = localStorage.getItem('webgpu_auto_load') === 'true';
+    const autoLoadChk = document.getElementById("webgpu-auto-load-chk");
+    if (autoLoadChk) {
+        autoLoadChk.checked = autoLoad;
+    }
+    
+    // Auto-load model weights on startup if enabled
+    if (prov === 'webgpu' && autoLoad && ("gpu" in navigator)) {
+        console.log("WebGPU Auto-load is active: preloading model weights in the background.");
+        AIService.initWebGPUEngine();
+    }
 });
