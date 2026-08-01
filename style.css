@@ -2173,7 +2173,7 @@ textarea {
         overflow: visible;
     }
     
-    .sidebar, .toolbar, .ai-panel, .ats-modal, .toast, .ats-suggestions-card, .ats-simulator-display {
+    .sidebar, .toolbar, .ai-panel, .ats-modal, .toast, .ats-suggestions-card, .ats-simulator-display, .mobile-tab-bar {
         display: none !important;
     }
     
