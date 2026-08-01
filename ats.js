@@ -2170,6 +2170,12 @@ window.previewCoverLetterTheme = function() {
             ${bodyHtml}
         </div>
     `;
+    
+    setTimeout(() => {
+        if (window.resizeCoverLetterPreview) {
+            window.resizeCoverLetterPreview();
+        }
+    }, 50);
 };
 
 window.closeCoverLetterPreviewModal = function() {
@@ -2179,6 +2185,32 @@ window.closeCoverLetterPreviewModal = function() {
 
 window.printCoverLetter = function() {
     window.print();
+};
+
+window.resizeCoverLetterPreview = function() {
+    const modalBody = document.querySelector("#cover-letter-preview-modal .ats-modal-body");
+    const scaler = document.querySelector("#cover-letter-preview-modal .cover-letter-sheet-scaler");
+    const sheet = document.getElementById("cover-letter-preview-sheet");
+    if (!modalBody || !scaler || !sheet) return;
+
+    const availableWidth = modalBody.clientWidth - 40;
+    const sheetWidth = 794;
+
+    if (availableWidth < sheetWidth) {
+        const scale = availableWidth / sheetWidth;
+        sheet.style.transform = `scale(${scale})`;
+        sheet.style.transformOrigin = "top center";
+        const scaledHeight = sheet.offsetHeight * scale;
+        scaler.style.height = `${scaledHeight}px`;
+        scaler.style.width = "100%";
+        scaler.style.justifyContent = "center";
+    } else {
+        sheet.style.transform = "none";
+        sheet.style.transformOrigin = "top center";
+        scaler.style.height = "auto";
+        scaler.style.width = "794px";
+        scaler.style.justifyContent = "center";
+    }
 };
 
 // ==========================================

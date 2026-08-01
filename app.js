@@ -151,7 +151,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Dynamic A4 Sheet Preview Scaling
     resizeResumePreview();
-    window.addEventListener("resize", resizeResumePreview);
+    window.addEventListener("resize", () => {
+        resizeResumePreview();
+        if (window.resizeCoverLetterPreview) {
+            window.resizeCoverLetterPreview();
+        }
+    });
 });
 
 // Sync state data to form inputs
