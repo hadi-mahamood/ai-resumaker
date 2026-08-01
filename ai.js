@@ -361,7 +361,33 @@ window.preloadWebGPUModel = function() {
     AIService.initWebGPUEngine();
 };
 
+window.checkWebGPUSupport = function() {
+    const badge = document.getElementById("webgpu-support-badge");
+    if (!badge) return;
+    
+    if ("gpu" in navigator) {
+        badge.style.background = "rgba(16, 185, 129, 0.1)";
+        badge.style.border = "1px solid rgba(16, 185, 129, 0.25)";
+        badge.style.color = "#34d399";
+        badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> WebGPU hardware acceleration detected';
+    } else {
+        badge.style.background = "rgba(239, 68, 68, 0.1)";
+        badge.style.border = "1px solid rgba(239, 68, 68, 0.25)";
+        badge.style.color = "#f87171";
+        badge.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> WebGPU not supported in this browser';
+        
+        const btn = document.getElementById("btn-load-webgpu");
+        if (btn) {
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            btn.style.cursor = "not-allowed";
+            btn.title = "WebGPU is unsupported by this browser.";
+        }
+    }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
     const prov = localStorage.getItem('ai_provider') || 'gemini';
     window.switchAIProvider(prov);
+    window.checkWebGPUSupport();
 });
