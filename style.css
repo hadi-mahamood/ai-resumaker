@@ -675,7 +675,7 @@ textarea {
     gap: 8px;
     z-index: 5;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .toolbar-group {
