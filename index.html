@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=12.0">
+    <link rel="stylesheet" href="style.css?v=13.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -298,24 +298,48 @@
                 
                 <!-- Left group: Editing / Filter Controls -->
                 <div class="toolbar-group left-group">
-                    <div class="template-selector">
-                        <span class="toolbar-label"><i class="fa-solid fa-filter"></i> Layout</span>
-                        <select id="template-filter" onchange="switchTemplate(this.value)" class="template-select-dropdown">
-                            <optgroup label="General / Functional">
-                                <option value="modern" selected>Modern (Global Tech)</option>
-                                <option value="classic">Classic (Traditional Business)</option>
-                                <option value="executive">Executive (Two-Column Corporate)</option>
-                            </optgroup>
-                            <optgroup label="Regional / International Standards">
-                                <option value="gcc">GCC (Middle East / Gulf Region)</option>
-                                <option value="india">India (Academic Metrics & Declaration)</option>
-                                <option value="europe">Europe (Europass / CEFR Languages)</option>
-                                <option value="us">US / Canada (Strict Chronological B&W)</option>
-                                <option value="uk">UK / Commonwealth (Career Profile)</option>
-                                <option value="asia">Asia / Pacific (Sidebar Certifications)</option>
-                                <option value="latam">Latin America (Formal Profile Details)</option>
-                            </optgroup>
-                        </select>
+                    <div class="custom-dropdown-container" id="template-dropdown-container">
+                        <button class="custom-dropdown-trigger" id="template-dropdown-trigger" onclick="window.toggleTemplateDropdown(event)">
+                            <i class="fa-solid fa-filter"></i>
+                            <span id="current-template-label">Modern (Global Tech)</span>
+                            <i class="fa-solid fa-chevron-down" style="font-size: 0.55rem; margin-left: 2px;"></i>
+                        </button>
+                        
+                        <div class="custom-dropdown-menu" id="template-dropdown-menu">
+                            <div class="dropdown-category">General / Functional</div>
+                            <div class="dropdown-item active" data-value="modern" onclick="window.selectTemplateOption('modern', 'Modern (Global Tech)')">
+                                <i class="fa-solid fa-laptop-code"></i> Modern (Global Tech)
+                            </div>
+                            <div class="dropdown-item" data-value="classic" onclick="window.selectTemplateOption('classic', 'Classic (Traditional Business)')">
+                                <i class="fa-solid fa-briefcase"></i> Classic (Traditional Business)
+                            </div>
+                            <div class="dropdown-item" data-value="executive" onclick="window.selectTemplateOption('executive', 'Executive (Two-Column Corporate)')">
+                                <i class="fa-solid fa-user-tie"></i> Executive (Two-Column Corporate)
+                            </div>
+                            
+                            <div class="dropdown-category">Regional / International Standards</div>
+                            <div class="dropdown-item" data-value="gcc" onclick="window.selectTemplateOption('gcc', 'GCC (Middle East / Gulf)')">
+                                <i class="fa-solid fa-globe"></i> GCC (Middle East / Gulf)
+                            </div>
+                            <div class="dropdown-item" data-value="india" onclick="window.selectTemplateOption('india', 'India (Academic & Declaration)')">
+                                <i class="fa-solid fa-graduation-cap"></i> India (Academic & Declaration)
+                            </div>
+                            <div class="dropdown-item" data-value="europe" onclick="window.selectTemplateOption('europe', 'Europe (Europass / CEFR)')">
+                                <i class="fa-solid fa-euro-sign"></i> Europe (Europass / CEFR)
+                            </div>
+                            <div class="dropdown-item" data-value="us" onclick="window.selectTemplateOption('us', 'US / Canada (Chronological)')">
+                                <i class="fa-solid fa-flag-usa"></i> US / Canada (Chronological)
+                            </div>
+                            <div class="dropdown-item" data-value="uk" onclick="window.selectTemplateOption('uk', 'UK / Commonwealth')">
+                                <i class="fa-solid fa-crown"></i> UK / Commonwealth
+                            </div>
+                            <div class="dropdown-item" data-value="asia" onclick="window.selectTemplateOption('asia', 'Asia / Pacific (Certifications)')">
+                                <i class="fa-solid fa-certificate"></i> Asia / Pacific
+                            </div>
+                            <div class="dropdown-item" data-value="latam" onclick="window.selectTemplateOption('latam', 'Latin America (Formal Details)')">
+                                <i class="fa-solid fa-address-card"></i> Latin America
+                            </div>
+                        </div>
                     </div>
                 </div>
 

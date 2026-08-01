@@ -534,7 +534,25 @@ function deleteProject(id) {
 function switchTemplate(templateName) {
     state.activeTemplate = templateName;
     
-    // Sync filter dropdown if exists
+    // Sync custom dropdown active label
+    const label = document.getElementById("current-template-label");
+    if (label) {
+        const activeItem = document.querySelector(`.dropdown-item[data-value="${templateName}"]`);
+        if (activeItem) {
+            label.innerText = activeItem.textContent.trim();
+        }
+    }
+    
+    // Sync custom dropdown item active class
+    document.querySelectorAll(".dropdown-item").forEach(item => {
+        if (item.getAttribute("data-value") === templateName) {
+            item.classList.add("active");
+        } else {
+            item.classList.remove("active");
+        }
+    });
+
+    // Sync filter dropdown if exists (for legacy backup)
     const filter = document.getElementById("template-filter");
     if (filter) {
         filter.value = templateName;
@@ -2181,5 +2199,30 @@ window.switchMobileTab = function(tab) {
 document.addEventListener("DOMContentLoaded", () => {
     if (window.innerWidth <= 768) {
         window.switchMobileTab("edit");
+    }
+});
+
+window.toggleTemplateDropdown = function(e) {
+    const menu = document.getElementById("template-dropdown-menu");
+    if (!menu) return;
+    menu.classList.toggle("show");
+    if (e) e.stopPropagation();
+};
+
+window.selectTemplateOption = function(val, labelText) {
+    const menu = document.getElementById("template-dropdown-menu");
+    if (menu) menu.classList.remove("show");
+    
+    switchTemplate(val);
+    
+    const label = document.getElementById("current-template-label");
+    if (label) label.innerText = labelText;
+};
+
+document.addEventListener("click", (e) => {
+    const container = document.getElementById("template-dropdown-container");
+    const menu = document.getElementById("template-dropdown-menu");
+    if (container && menu && !container.contains(e.target)) {
+        menu.classList.remove("show");
     }
 });
