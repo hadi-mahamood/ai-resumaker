@@ -9,6 +9,15 @@
  * 5. Formatting length and Template-level ATS compatibility warnings
  */
 
+// Delegate global saveState helper to autoSave if defined, otherwise fall back to localStorage
+window.saveState = function() {
+    if (typeof autoSave === "function") {
+        autoSave();
+    } else {
+        localStorage.setItem('resumake_state', JSON.stringify(state));
+    }
+};
+
 const ATSAuditor = {
     // Extensive dictionary of standard technical, business, design, and soft skills
     skillsLexicon: [
