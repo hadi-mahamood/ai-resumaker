@@ -18,6 +18,22 @@ const AIService = {
     webllmEngine: null,
     webllmLoading: false,
     
+    getCache(key) {
+        try {
+            return localStorage.getItem(`resumake_ai_cache_${key}`);
+        } catch (e) {
+            return null;
+        }
+    },
+    
+    setCache(key, value) {
+        try {
+            localStorage.setItem(`resumake_ai_cache_${key}`, value);
+        } catch (e) {
+            // ignore
+        }
+    },
+    
     // Core database of keywords and templates for high-quality mock/offline generation
     knowledgeBase: {
         skills: {
@@ -161,42 +177,56 @@ const AIService = {
      * AI Work Experience Rewriter
      */
     async rewriteExperience(text, jobTitle) {
+        const cacheKey = `rewrite_${btoa(unescape(encodeURIComponent(jobTitle + "_" + text))).slice(0, 100)}`;
+        const cached = this.getCache(cacheKey);
+        if (cached) return cached;
+
         const prompt = `Rewrite this job description for a "${jobTitle}" role using strong action verbs, quantify achievements where possible, and optimize it for ATS systems. Output ONLY the rewritten paragraphs as bullet points:\n\n${text}`;
         
+        let result;
         if (this.activeProvider === "webgpu") {
-            return await this.callWebGPULLM(prompt);
-        }
-        if (this.apiKey) {
-            return await this.callGeminiAPI(prompt);
+            result = await this.callWebGPULLM(prompt);
+        } else if (this.apiKey) {
+            result = await this.callGeminiAPI(prompt);
+        } else {
+            // Offline / Mock engine
+            result = await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(this.getOfflineRewriteMock(text));
+                }, 1000);
+            });
         }
         
-        // Offline / Mock engine
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.getOfflineRewriteMock(text));
-            }, 1000);
-        });
+        this.setCache(cacheKey, result);
+        return result;
     },
 
     /**
      * AI Skill Suggester
      */
     async suggestSkills(existingSkills, jobTitle) {
+        const cacheKey = `skills_${btoa(unescape(encodeURIComponent(jobTitle + "_" + existingSkills.join(',')))).slice(0, 100)}`;
+        const cached = this.getCache(cacheKey);
+        if (cached) return cached;
+
         const prompt = `Based on this target job "${jobTitle}" and existing skills [${existingSkills.join(', ')}], recommend exactly 10 relevant technical and soft skills as a comma-separated list. Output ONLY the comma-separated skills:`;
         
+        let result;
         if (this.activeProvider === "webgpu") {
-            return await this.callWebGPULLM(prompt);
-        }
-        if (this.apiKey) {
-            return await this.callGeminiAPI(prompt);
+            result = await this.callWebGPULLM(prompt);
+        } else if (this.apiKey) {
+            result = await this.callGeminiAPI(prompt);
+        } else {
+            // Offline / Mock engine
+            result = await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(this.getOfflineSkillsMock(jobTitle, existingSkills));
+                }, 800);
+            });
         }
 
-        // Offline / Mock engine
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.getOfflineSkillsMock(jobTitle, existingSkills));
-            }, 800);
-        });
+        this.setCache(cacheKey, result);
+        return result;
     },
 
     /**
@@ -205,23 +235,31 @@ const AIService = {
     async generateCoverLetter(resumeData) {
         let name = resumeData.name || "John Doe";
         let role = resumeData.targetJob || "Software Developer";
-        let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 3).join(', ') : "Software Engineering";
         
+        const summary = `${name}_${role}_${(resumeData.skills || []).join(',')}_${(resumeData.experience || []).map(e => e.date + e.company).join(',')}`;
+        const cacheKey = `cover_${btoa(unescape(encodeURIComponent(summary))).slice(0, 100)}`;
+        const cached = this.getCache(cacheKey);
+        if (cached) return cached;
+
+        let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 3).join(', ') : "Software Engineering";
         const prompt = `Write a highly professional and compelling cover letter. Candidate Name: ${name}. Target Role: ${role}. Skills: ${resumeData.skills.join(', ')}. Experience Summary: ${JSON.stringify(resumeData.experience)}. Output ONLY the letter text with greetings and signature. No markdown comments or brackets:`;
         
+        let result;
         if (this.activeProvider === "webgpu") {
-            return await this.callWebGPULLM(prompt);
-        }
-        if (this.apiKey) {
-            return await this.callGeminiAPI(prompt);
+            result = await this.callWebGPULLM(prompt);
+        } else if (this.apiKey) {
+            result = await this.callGeminiAPI(prompt);
+        } else {
+            // Offline / Mock engine
+            result = await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(this.getOfflineCoverLetterMock(resumeData));
+                }, 1200);
+            });
         }
 
-        // Offline / Mock engine
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.getOfflineCoverLetterMock(resumeData));
-            }, 1200);
-        });
+        this.setCache(cacheKey, result);
+        return result;
     },
 
     /**
