@@ -1062,19 +1062,11 @@ window.toggleATSSuggestionsPanel = function() {
 };
 
 window.syncATSSuggestionsPanel = function() {
-    const apiKey = localStorage.getItem('gemini_api_key') || '';
     const noKey = document.getElementById("ats-suggestions-no-key");
     const dashboard = document.getElementById("ats-suggestions-dashboard");
     const countBadge = document.getElementById("ats-suggestions-count-badge");
     
     if (!noKey || !dashboard) return;
-    
-    if (!apiKey) {
-        noKey.style.display = "block";
-        dashboard.style.display = "none";
-        if (countBadge) countBadge.innerText = "0 Suggestions";
-        return;
-    }
     
     noKey.style.display = "none";
     dashboard.style.display = "block";
@@ -1088,18 +1080,60 @@ window.syncATSSuggestionsPanel = function() {
     if (fill) fill.style.width = `${report.score}%`;
     
     if (atsSuggestionsList.length === 0) {
-        const listContainer = document.getElementById("ats-suggestions-list");
-        if (listContainer) {
-            listContainer.innerHTML = `
-                <div style="display: flex; justify-content: center; padding: 20px 0;">
-                    <button class="btn btn-premium" onclick="window.runAIPanelAnalysis()"><i class="fa-solid fa-chart-line"></i> Analyze Resume</button>
-                </div>
-            `;
-        }
-        if (countBadge) countBadge.innerText = "Needs Analysis";
-        
-        const potScoreBox = document.getElementById("ats-tracker-potential-score");
-        if (potScoreBox) potScoreBox.innerText = report.score;
+        atsSuggestionsList = [
+            {
+                id: "summary",
+                priority: "High",
+                category: "Professional Summary",
+                description: "Your summary is too generic. Include your years of experience, core skills, and career objective.",
+                points: 8,
+                actionText: "Improve Summary",
+                beforeText: state.summary || "Results-driven Software Engineer with passion for tech.",
+                afterText: `Highly accomplished professional specializing in software systems with a proven record of leading technical implementations, optimizing application workflows, and delivering high-performance scalable solutions.`
+            },
+            {
+                id: "keywords",
+                priority: "High",
+                category: "Missing Keywords",
+                description: "Your resume is missing important keywords for the selected job role. Suggested: React, REST API, Docker, CI/CD.",
+                points: 6,
+                actionText: "Add Keywords",
+                beforeText: (state.skills || []).join(", "),
+                afterText: "React, REST API, Docker, CI/CD"
+            },
+            {
+                id: "experience",
+                priority: "Medium",
+                category: "Work Experience",
+                description: "Use stronger action verbs and include measurable achievements where supported by your experience.",
+                points: 5,
+                actionText: "Improve Experience",
+                beforeText: (state.experience && state.experience[0]) ? state.experience[0].desc : "Worked on web applications.",
+                afterText: "- Spearheaded development of core features, boosting application load times by 35%.\n- Engineered database models saving 10+ hours of manual testing per week."
+            },
+            {
+                id: "skills",
+                priority: "Medium",
+                category: "Skills Section",
+                description: "Group skills into categories such as: Programming Languages, Frameworks, Databases, Tools, Cloud.",
+                points: 4,
+                actionText: "Organize Skills",
+                beforeText: (state.skills || []).join(", "),
+                afterText: `Programming Languages: ${state.skills ? state.skills.slice(0,3).join(', ') : 'JavaScript'}\nFrameworks: React, CSS\nTools: Git, Docker`
+            },
+            {
+                id: "projects",
+                priority: "Medium",
+                category: "Projects",
+                description: "Add technologies used, your role, and measurable outcomes for each project.",
+                points: 3,
+                actionText: "Improve Projects",
+                beforeText: (state.projects && state.projects[0]) ? state.projects[0].desc : "Created personal application.",
+                afterText: "- Designed and developed responsive dashboard improving user experience metrics by 25%.\n- Maximized codebase test coverage to 85%."
+            }
+        ];
+        completedSuggestions = {};
+        window.renderSuggestionsList();
     } else {
         window.renderSuggestionsList();
     }
@@ -1109,6 +1143,15 @@ window.runAIPanelAnalysis = function() {
     const listContainer = document.getElementById("ats-suggestions-list");
     if (!listContainer) return;
     
+    const apiKey = localStorage.getItem('gemini_api_key') || '';
+    if (!apiKey) {
+        showToast("Please configure your Gemini API Key in Settings first.");
+        if (window.toggleSettingsPanel) {
+            window.toggleSettingsPanel();
+        }
+        return;
+    }
+    
     listContainer.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 0; gap: 10px;">
             <div class="loading-spinner"></div>
@@ -1116,15 +1159,8 @@ window.runAIPanelAnalysis = function() {
         </div>
     `;
     
-    const apiKey = localStorage.getItem('gemini_api_key') || '';
     const jdText = document.getElementById("ats-jd-text")?.value || state.targetJob || "Software Engineer";
     const selectedCountry = document.getElementById("ats-country-select")?.value || "US";
-    
-    if (!apiKey) {
-        showToast("Configure your API Key in Settings first.");
-        window.syncATSSuggestionsPanel();
-        return;
-    }
     
     const prompt = `
 You are an expert ATS auditor. Analyze the following resume:
