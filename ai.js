@@ -282,20 +282,35 @@ const AIService = {
         try {
             const webllm = await import("https://esm.run/@mlc-ai/web-llm");
             
-            if (progressStatus) progressStatus.innerText = "Downloading model weights...";
+            if (progressStatus) progressStatus.innerText = "Spawning background worker...";
             
-            this.webllmEngine = new webllm.MLCEngine();
-            this.webllmEngine.setInitProgressCallback((report) => {
-                if (progressStatus) {
-                    const statusText = report.text.split("]")[1] || report.text;
-                    progressStatus.innerText = statusText.trim();
+            // Create inline worker module to run LLM off the main thread
+            const workerCode = `
+                import { WebWorkerMLCEngineHandler } from "https://esm.run/@mlc-ai/web-llm";
+                const handler = new WebWorkerMLCEngineHandler();
+                self.onmessage = (msg) => {
+                    handler.onmessage(msg);
+                };
+            `;
+            const blob = new Blob([workerCode], { type: "application/javascript" });
+            const workerUrl = URL.createObjectURL(blob);
+            const worker = new Worker(workerUrl, { type: "module" });
+            
+            this.webllmEngine = await webllm.CreateWebWorkerMLCEngine(
+                worker,
+                this.webgpuModel,
+                {
+                    initProgressCallback: (report) => {
+                        if (progressStatus) {
+                            const statusText = report.text.split("]")[1] || report.text;
+                            progressStatus.innerText = statusText.trim();
+                        }
+                        const percent = Math.round(report.progress * 100);
+                        if (progressPercent) progressPercent.innerText = `${percent}%`;
+                        if (progressBar) progressBar.style.width = `${percent}%`;
+                    }
                 }
-                const percent = Math.round(report.progress * 100);
-                if (progressPercent) progressPercent.innerText = `${percent}%`;
-                if (progressBar) progressBar.style.width = `${percent}%`;
-            });
-            
-            await this.webllmEngine.reload(this.webgpuModel);
+            );
             
             showToast("Local GPU Model ready!");
             if (progressStatus) progressStatus.innerText = "Model Active & Ready";
