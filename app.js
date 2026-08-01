@@ -604,9 +604,49 @@ function renderResumePreview() {
     
     // Trigger score checking
     updateATSScore();
-
     // Scale sheet dynamically
     resizeResumePreview();
+}
+
+// Helper to compile regional details beautifully for standard templates
+function compileRegionalSection(titleLabel = "Personal & Regional Details", isTableFormat = false) {
+    let items = [];
+    if (state.dob) items.push({ label: "Date of Birth", value: state.dob });
+    if (state.nationality) items.push({ label: "Nationality", value: state.nationality });
+    if (state.visaStatus) items.push({ label: "Visa / Residency", value: state.visaStatus });
+    if (state.maritalStatus) items.push({ label: "Marital Status / Gender", value: state.maritalStatus });
+    if (state.languages) items.push({ label: "Languages Known", value: state.languages });
+    
+    if (items.length === 0) return "";
+    
+    if (isTableFormat) {
+        let rows = items.map(it => `
+            <tr>
+                <td style="width:180px; font-weight:600; font-size:0.82rem; padding:4px 0; border:none; color:var(--text-primary);">${it.label}:</td>
+                <td style="font-size:0.82rem; padding:4px 0; border:none; color:var(--text-primary);">${it.value}</td>
+            </tr>
+        `).join('');
+        return `
+            <div class="resume-section" style="page-break-inside:avoid;">
+                <h2 class="resume-section-title">${titleLabel}</h2>
+                <div class="resume-section-content">
+                    <table style="width:100%; border-collapse:collapse; margin-top:5px; border:none;">
+                        ${rows}
+                    </table>
+                </div>
+            </div>
+        `;
+    } else {
+        let textList = items.map(it => `<strong>${it.label}:</strong> ${it.value}`).join('  |  ');
+        return `
+            <div class="resume-section" style="page-break-inside:avoid;">
+                <h2 class="resume-section-title">${titleLabel}</h2>
+                <div class="resume-section-content">
+                    <p style="font-size:0.82rem; line-height:1.5; margin-top:5px;">${textList}</p>
+                </div>
+            </div>
+        `;
+    }
 }
 
 // Template 1 Compiler: Modern layout
@@ -651,11 +691,11 @@ function compileModernTemplate() {
             <div class="experience-item">
                 <div class="item-header">
                     <div>
-                        <span class="item-title">${edu.degree || "Degree Details"}</span>
+                        <span class="item-title">${edu.institution || "College Name"}</span>
                     </div>
-                    <span class="item-date">${edu.date || "Graduation Year"}</span>
+                    <span class="item-date">${edu.date || "Timeline"}</span>
                 </div>
-                <div class="item-subtitle">${edu.institution || "College Name"}</div>
+                <div class="item-subtitle">${edu.degree || "Degree"}</div>
                 ${edu.desc ? `<div class="item-desc" style="margin-top:2px;">${edu.desc}</div>` : ''}
             </div>
         `).join('');
@@ -673,10 +713,13 @@ function compileModernTemplate() {
         let items = state.projects.map(proj => `
             <div class="project-item">
                 <div class="item-header">
-                    <span class="item-title">${proj.title || "Project Name"}</span>
-                    <span class="item-subtitle">${proj.role || "Role"}</span>
+                    <div>
+                        <span class="item-title">${proj.title || "Project Title"}</span>
+                        <span class="item-subtitle">(${proj.role || "Role"})</span>
+                    </div>
+                    <span class="item-date">${proj.date || "Timeline"}</span>
                 </div>
-                <div class="item-desc" style="margin-top:2px;">${formatMultiline(proj.desc || "Description...")}</div>
+                <div class="item-desc" style="margin-top:2px;">${formatMultiline(proj.desc || "Details...")}</div>
             </div>
         `).join('');
         projHTML = `
@@ -711,6 +754,7 @@ function compileModernTemplate() {
         ${skillsHTML}
         ${projHTML}
         ${eduHTML}
+        ${compileRegionalSection("Personal & Regional Details", false)}
     `;
 }
 
@@ -816,6 +860,7 @@ function compileClassicTemplate() {
         ${skillsHTML}
         ${projHTML}
         ${eduHTML}
+        ${compileRegionalSection("Personal & Regional Details", true)}
     `;
 }
 
@@ -906,6 +951,23 @@ function compileExecutiveTemplate() {
         `;
     }
 
+    // Regional details for Executive sidebar layout
+    let regionalHTML = "";
+    let regionalItems = [];
+    if (state.dob) regionalItems.push(`<div class="contact-item"><strong>DOB:</strong> ${state.dob}</div>`);
+    if (state.nationality) regionalItems.push(`<div class="contact-item"><strong>Nationality:</strong> ${state.nationality}</div>`);
+    if (state.visaStatus) regionalItems.push(`<div class="contact-item"><strong>Visa / Residency:</strong> ${state.visaStatus}</div>`);
+    if (state.maritalStatus) regionalItems.push(`<div class="contact-item"><strong>Status:</strong> ${state.maritalStatus}</div>`);
+    if (state.languages) regionalItems.push(`<div class="contact-item"><strong>Languages:</strong> ${state.languages}</div>`);
+    if (regionalItems.length > 0) {
+        regionalHTML = `
+            <div class="resume-section" style="margin-top: 15px;">
+                <h2 class="resume-section-title">Personal Details</h2>
+                <div class="contact-info-list" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">${regionalItems.join('')}</div>
+            </div>
+        `;
+    }
+
     return `
         <div class="sidebar-col">
             <header class="resume-header">
@@ -914,6 +976,7 @@ function compileExecutiveTemplate() {
             </header>
             ${contactBox}
             ${skillsHTML}
+            ${regionalHTML}
         </div>
         <div class="main-col">
             ${expHTML}
@@ -1150,6 +1213,7 @@ function compileIndiaTemplate() {
     let personalItems = [];
     if (state.dob) personalItems.push(`<tr><td style="width:150px; font-weight:600; font-size:0.82rem; padding: 4px 0;">Date of Birth:</td><td style="font-size:0.82rem; padding: 4px 0;">${state.dob}</td></tr>`);
     if (state.nationality) personalItems.push(`<tr><td style="font-weight:600; font-size:0.82rem; padding: 4px 0;">Nationality:</td><td style="font-size:0.82rem; padding: 4px 0;">${state.nationality}</td></tr>`);
+    if (state.visaStatus) personalItems.push(`<tr><td style="font-weight:600; font-size:0.82rem; padding: 4px 0;">Visa / Residency:</td><td style="font-size:0.82rem; padding: 4px 0;">${state.visaStatus}</td></tr>`);
     if (state.maritalStatus) personalItems.push(`<tr><td style="font-weight:600; font-size:0.82rem; padding: 4px 0;">Marital Status:</td><td style="font-size:0.82rem; padding: 4px 0;">${state.maritalStatus}</td></tr>`);
     if (state.languages) personalItems.push(`<tr><td style="font-weight:600; font-size:0.82rem; padding: 4px 0;">Languages Known:</td><td style="font-size:0.82rem; padding: 4px 0;">${state.languages}</td></tr>`);
 
@@ -1192,6 +1256,7 @@ function compileEuropeTemplate() {
     if (state.dob) contacts.push(`<div class="europe-contact-item"><i class="fa-solid fa-calendar-days"></i> DOB: ${state.dob}</div>`);
     if (state.nationality) contacts.push(`<div class="europe-contact-item"><i class="fa-solid fa-flag"></i> Nationality: ${state.nationality}</div>`);
     if (state.visaStatus) contacts.push(`<div class="europe-contact-item"><i class="fa-solid fa-id-card"></i> ${state.visaStatus}</div>`);
+    if (state.maritalStatus) contacts.push(`<div class="europe-contact-item"><i class="fa-solid fa-user-check"></i> Status: ${state.maritalStatus}</div>`);
     let contactCol = contacts.length > 0 ? `<div class="europe-contact-col">${contacts.join('')}</div>` : '';
 
     // Languages (Europass specific format)
@@ -1423,6 +1488,7 @@ function compileUSTemplate() {
         ${eduHTML}
         ${projHTML}
         ${skillsHTML}
+        ${compileRegionalSection("Additional Information", false)}
     `;
 }
 
@@ -1529,6 +1595,7 @@ function compileUKTemplate() {
         ${expHTML}
         ${skillsHTML}
         ${eduHTML}
+        ${compileRegionalSection("Additional Details", false)}
         ${referencesHTML}
     `;
 }
@@ -1552,6 +1619,8 @@ function compileAsiaTemplate() {
     let metaItems = [];
     if (state.dob) metaItems.push(`<div class="asia-meta-item"><strong>DOB:</strong> ${state.dob}</div>`);
     if (state.nationality) metaItems.push(`<div class="asia-meta-item"><strong>Nationality:</strong> ${state.nationality}</div>`);
+    if (state.visaStatus) metaItems.push(`<div class="asia-meta-item"><strong>Visa Status:</strong> ${state.visaStatus}</div>`);
+    if (state.maritalStatus) metaItems.push(`<div class="asia-meta-item"><strong>Status:</strong> ${state.maritalStatus}</div>`);
     if (state.languages) metaItems.push(`<div class="asia-meta-item"><strong>Languages:</strong> ${state.languages}</div>`);
 
     if (metaItems.length > 0) {
@@ -1675,6 +1744,7 @@ function compileLATAMTemplate() {
     let latamMeta = [];
     if (state.dob) latamMeta.push(`Fecha de Nacimiento: ${state.dob}`);
     if (state.nationality) latamMeta.push(`Nacionalidad: ${state.nationality}`);
+    if (state.visaStatus) latamMeta.push(`Visa / Residencia: ${state.visaStatus}`);
     if (state.maritalStatus) latamMeta.push(`Estado Civil: ${state.maritalStatus}`);
     if (state.languages) latamMeta.push(`Idiomas: ${state.languages}`);
 
