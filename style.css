@@ -2202,6 +2202,13 @@ textarea {
         overflow: visible !important;
     }
     
+    .resume-sheet-scaler {
+        width: 100% !important;
+        height: auto !important;
+        transform: none !important;
+        display: block !important;
+    }
+    
     .resume-sheet {
         width: 100% !important;
         height: auto !important;
