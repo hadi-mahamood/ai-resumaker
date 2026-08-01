@@ -13,6 +13,10 @@
 const AIService = {
     // Optional API configuration if user wants to supply their own key
     apiKey: localStorage.getItem('gemini_api_key') || '',
+    activeProvider: localStorage.getItem('ai_provider') || 'gemini',
+    webgpuModel: localStorage.getItem('webgpu_model') || 'TinyLlama-1.1B-Chat-v1.0-q4f32_1-MLC',
+    webllmEngine: null,
+    webllmLoading: false,
     
     // Core database of keywords and templates for high-quality mock/offline generation
     knowledgeBase: {
@@ -347,11 +351,6 @@ window.switchAIProvider = function(provider) {
         const modelSelect = document.getElementById("webgpu-model-select");
         if (modelSelect) {
             modelSelect.value = AIService.webgpuModel;
-            modelSelect.onchange = (e) => {
-                AIService.webgpuModel = e.target.value;
-                localStorage.setItem('webgpu_model', e.target.value);
-                AIService.webllmEngine = null;
-            };
         }
     }
 };
@@ -394,6 +393,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const prov = localStorage.getItem('ai_provider') || 'gemini';
     window.switchAIProvider(prov);
     window.checkWebGPUSupport();
+    
+    // Sync model select configuration
+    const modelSelect = document.getElementById("webgpu-model-select");
+    if (modelSelect) {
+        modelSelect.value = AIService.webgpuModel;
+        modelSelect.addEventListener("change", (e) => {
+            AIService.webgpuModel = e.target.value;
+            localStorage.setItem('webgpu_model', e.target.value);
+            AIService.webllmEngine = null;
+        });
+    }
     
     // Sync Auto-load checkbox state
     const autoLoad = localStorage.getItem('webgpu_auto_load') === 'true';
