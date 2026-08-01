@@ -2153,10 +2153,18 @@ textarea {
 
 /* Print Styles */
 @media print {
+    @page {
+        size: A4;
+        margin: 0;
+    }
+    
     body {
         background: white !important;
         background-image: none !important;
         color: black !important;
+        margin: 0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
     
     .app-container {
@@ -2181,10 +2189,11 @@ textarea {
         height: auto !important;
         min-height: auto !important;
         box-shadow: none !important;
-        padding: 0 !important;
+        padding: 20mm !important;
         margin: 0 !important;
         transform: none !important;
         page-break-after: avoid;
+        box-sizing: border-box !important;
     }
 }
 
