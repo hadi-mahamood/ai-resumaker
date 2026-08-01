@@ -7,7 +7,7 @@
  */
 
 // Core App State
-let state = {
+var state = {
     targetJob: "Software Developer",
     name: "Alex Mercer",
     title: "Full Stack Software Engineer",
