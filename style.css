@@ -219,21 +219,26 @@ body {
 .settings-panel {
     max-height: 0;
     overflow: hidden;
-    background: rgba(0, 0, 0, 0.15);
-    border-bottom: 0 solid var(--border-color);
-    transition: max-height 0.3s ease-out;
+    background: rgba(255, 255, 255, 0.02);
+    border: 0 solid var(--border-color);
+    border-radius: 12px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 0;
+    opacity: 0;
 }
 
 .settings-panel.open {
-    max-height: 180px;
-    border-bottom: 1px solid var(--border-color);
+    max-height: 500px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 12px;
+    opacity: 1;
 }
 
 .settings-panel-inner {
-    padding: 16px 24px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .sidebar-badge {
