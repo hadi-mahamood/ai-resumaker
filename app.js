@@ -88,6 +88,11 @@ function collapseAllAccordions() {
 
 // Initialize Application
 document.addEventListener("DOMContentLoaded", () => {
+    // Initialize mobile view classes on load
+    if (window.innerWidth <= 768) {
+        document.body.classList.add("mobile-view-edit");
+    }
+
     // Initialize Profiles Manager
     if (window.initProfiles) {
         window.initProfiles();
