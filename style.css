@@ -2184,14 +2184,19 @@ textarea {
 @media print {
     @page {
         size: A4;
-        margin: 15mm; /* Apply standard 15mm page margins to all sheets */
+        margin: 0; /* Forces Chrome and standard browsers to completely omit date/title/URL headers/footers */
     }
     
-    html, body {
+    html {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body {
         background: white !important;
         background-image: none !important;
         color: black !important;
-        margin: 0 !important;
+        margin: 15mm 20mm !important; /* Serves as the page margin, repeating cleanly on every printed page */
         padding: 0 !important;
         height: auto !important;
         overflow: visible !important;
@@ -2264,11 +2269,11 @@ textarea {
     }
     
     .resume-sheet {
-        width: 100% !important; /* Rely on page margin for boundary scaling */
+        width: 100% !important;
         height: auto !important;
         min-height: 0 !important;
         box-shadow: none !important;
-        padding: 0 !important; /* Page margin handles outer margins */
+        padding: 0 !important;
         margin: 0 !important;
         transform: none !important;
         page-break-after: avoid;
