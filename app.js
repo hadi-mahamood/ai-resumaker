@@ -11,6 +11,7 @@ import {
     compileLATAMTemplate
 } from "./templates/regional.js";
 import { formatMultiline } from "./templates/utils.js";
+import { renderDiffHTML } from "./templates/diff.js";
 
 // Debounce helper to prevent rapid main-thread blocks during fast typing
 function debounce(func, wait) {
@@ -713,57 +714,6 @@ function openAIPanel(titleText) {
 
 function closeAIPanel() {
     document.getElementById("ai-panel").classList.remove("open");
-}
-
-// Word-level LCS diff algorithm helper
-function diffWords(original, revised) {
-    const origWords = (original || "").split(/\s+/).filter(Boolean);
-    const revWords = (revised || "").split(/\s+/).filter(Boolean);
-    
-    const n = origWords.length;
-    const m = revWords.length;
-    const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
-    
-    for (let i = 1; i <= n; i++) {
-        for (let j = 1; j <= m; j++) {
-            if (origWords[i - 1].toLowerCase() === revWords[j - 1].toLowerCase()) {
-                dp[i][j] = dp[i - 1][j - 1] + 1;
-            } else {
-                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
-            }
-        }
-    }
-    
-    let i = n, j = m;
-    const diff = [];
-    while (i > 0 || j > 0) {
-        if (i > 0 && j > 0 && origWords[i - 1].toLowerCase() === revWords[j - 1].toLowerCase()) {
-            diff.push({ type: 'unchanged', text: revWords[j - 1] });
-            i--;
-            j--;
-        } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
-            diff.push({ type: 'addition', text: revWords[j - 1] });
-            j--;
-        } else if (i > 0 && (j === 0 || dp[i][j - 1] < dp[i - 1][j])) {
-            diff.push({ type: 'deletion', text: origWords[i - 1] });
-            i--;
-        }
-    }
-    diff.reverse();
-    return diff;
-}
-
-function renderDiffHTML(original, revised) {
-    const diffs = diffWords(original, revised);
-    return diffs.map(d => {
-        if (d.type === 'addition') {
-            return `<ins style="background-color: #dcfce7; color: #15803d; text-decoration: none; padding: 2px 4px; border-radius: 2px; font-weight: 500; display: inline-block; margin: 1px 0;">${d.text}</ins>`;
-        } else if (d.type === 'deletion') {
-            return `<del style="background-color: #fee2e2; color: #b91c1c; text-decoration: line-through; padding: 2px 4px; border-radius: 2px; display: inline-block; margin: 1px 0;">${d.text}</del>`;
-        } else {
-            return `<span>${d.text}</span>`;
-        }
-    }).join(' ');
 }
 
 function toggleRewriteView(view) {
