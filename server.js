@@ -16,7 +16,25 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Middlewares
-app.use(cors());
+
+// Redirect HTTP to HTTPS in production
+if (process.env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+        if (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] !== 'https') {
+            return res.redirect('https://' + req.headers.host + req.url);
+        }
+        next();
+    });
+}
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS || '*';
+const corsOptions = {
+    origin: allowedOrigins === '*' ? '*' : allowedOrigins.split(',').map(o => o.trim()),
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'x-api-key']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' })); // Support larger payload sizes for profile syncs
 
 // Serve static assets from the current directory
