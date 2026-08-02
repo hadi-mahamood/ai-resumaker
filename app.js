@@ -289,10 +289,31 @@ function autoSave() {
 }
 
 // Toast Alert Manager
-function showToast(message) {
+function showToast(message, type = 'success') {
     const toast = document.getElementById("toast-notify");
     const toastMsg = document.getElementById("toast-message");
+    const toastIcon = toast.querySelector("i");
+    if (!toast || !toastMsg) return;
+    
     toastMsg.innerText = message;
+    
+    if (toastIcon) {
+        toastIcon.className = ""; // Clear existing classes
+        if (type === 'error') {
+            toastIcon.className = "fa-solid fa-triangle-exclamation";
+            toastIcon.style.color = "#ef4444";
+            toast.style.borderColor = "rgba(239, 68, 68, 0.4)";
+        } else if (type === 'warning') {
+            toastIcon.className = "fa-solid fa-circle-exclamation";
+            toastIcon.style.color = "#f59e0b";
+            toast.style.borderColor = "rgba(245, 158, 11, 0.4)";
+        } else {
+            toastIcon.className = "fa-solid fa-circle-check";
+            toastIcon.style.color = ""; // Fallback to CSS var(--success)
+            toast.style.borderColor = ""; // Fallback to CSS var(--border-color)
+        }
+    }
+    
     toast.classList.add("show");
     
     setTimeout(() => {
@@ -1192,7 +1213,7 @@ window.openAuthModal = function() {
 
 window.handleOAuthLogin = async function(provider) {
     if (!window.supabaseClient) {
-        showToast("Cloud authentication not configured.");
+        showToast("Cloud authentication not configured.", "warning");
         return;
     }
     try {
@@ -1202,10 +1223,10 @@ window.handleOAuthLogin = async function(provider) {
                 redirectTo: window.location.origin
             }
         });
-        if (error) showToast(`OAuth Error: ${error.message}`);
+        if (error) showToast(`OAuth Error: ${error.message}`, "error");
     } catch (e) {
         console.error("OAuth exception: ", e);
-        showToast("Social login request failed.");
+        showToast("Social login request failed.", "error");
     }
 };
 
@@ -1252,7 +1273,7 @@ window.switchAuthTab = function(tab) {
 window.handleAuthSubmit = async function(event, mode) {
     event.preventDefault();
     if (!window.supabaseClient) {
-        showToast("Cloud database not configured on server.");
+        showToast("Cloud database not configured on server.", "warning");
         return;
     }
     
@@ -1273,10 +1294,10 @@ window.handleAuthSubmit = async function(event, mode) {
         
         if (result.error) {
             console.error("Auth error details: ", result.error);
-            showToast(`Authentication failed: ${result.error.message}`);
+            showToast(`Authentication failed: ${result.error.message}`, "error");
         } else {
             if (mode === 'register' && result.data?.user?.identities?.length === 0) {
-                showToast("Account already exists. Try signing in.");
+                showToast("Account already exists. Try signing in.", "warning");
             } else {
                 showToast(mode === 'login' ? "Logged in successfully!" : "Account created! Confirm your email.");
                 window.closeAuthModal();
@@ -1284,7 +1305,7 @@ window.handleAuthSubmit = async function(event, mode) {
         }
     } catch (e) {
         console.error("Supabase auth exception: ", e);
-        showToast("Authentication request failed.");
+        showToast("Authentication request failed.", "error");
     }
 };
 
@@ -1296,7 +1317,7 @@ window.handleAuthLogout = async function() {
         window.closeAuthModal();
     } catch (e) {
         console.error("Sign out exception: ", e);
-        showToast("Failed to sign out.");
+        showToast("Failed to sign out.", "error");
     }
 };
 
