@@ -2184,7 +2184,7 @@ textarea {
 @media print {
     @page {
         size: A4;
-        margin: 0;
+        margin: 15mm; /* Apply standard 15mm page margins to all sheets */
     }
     
     html, body {
@@ -2192,10 +2192,51 @@ textarea {
         background-image: none !important;
         color: black !important;
         margin: 0 !important;
+        padding: 0 !important;
         height: auto !important;
         overflow: visible !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+    }
+    
+    /* If cover letter printing is active, hide main resume and display cover letter modal only */
+    body:not(.cover-letter-printing-active) .ats-modal {
+        display: none !important;
+    }
+    
+    body.cover-letter-printing-active .app-container {
+        display: none !important;
+    }
+    
+    body.cover-letter-printing-active #cover-letter-preview-modal {
+        display: block !important;
+        position: relative !important;
+        background: white !important;
+        z-index: 99999 !important;
+    }
+    
+    body.cover-letter-printing-active #cover-letter-preview-modal .ats-modal-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: white !important;
+        transform: none !important;
+    }
+    
+    body.cover-letter-printing-active #cover-letter-preview-modal .ats-modal-header,
+    body.cover-letter-printing-active #cover-letter-preview-modal .ats-modal-close,
+    body.cover-letter-printing-active #cover-letter-preview-modal .ats-modal-tabs,
+    body.cover-letter-printing-active #cover-letter-preview-modal .ats-modal-footer {
+        display: none !important;
+    }
+    
+    body.cover-letter-printing-active #cover-letter-preview-modal .ats-modal-body {
+        padding: 0 !important;
+        overflow: visible !important;
+        background: white !important;
     }
     
     .app-container, .preview-container {
@@ -2204,7 +2245,7 @@ textarea {
         overflow: visible !important;
     }
     
-    .sidebar, .toolbar, .ai-panel, .ats-modal, .toast, .ats-suggestions-card, .ats-simulator-display, .mobile-tab-bar {
+    .sidebar, .toolbar, .ai-panel, .toast, .ats-suggestions-card, .ats-simulator-display, .mobile-tab-bar {
         display: none !important;
     }
     
@@ -2223,15 +2264,26 @@ textarea {
     }
     
     .resume-sheet {
-        width: 210mm !important;
+        width: 100% !important; /* Rely on page margin for boundary scaling */
         height: auto !important;
-        min-height: 297mm !important;
+        min-height: 0 !important;
         box-shadow: none !important;
-        padding: 20mm !important;
-        margin: 0 auto !important;
+        padding: 0 !important; /* Page margin handles outer margins */
+        margin: 0 !important;
         transform: none !important;
         page-break-after: avoid;
         box-sizing: border-box !important;
+    }
+
+    /* Prevent orphan headings and breaking list items in half */
+    h1, h2, h3, h4, h5, h6, .resume-section-title, .item-header {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+
+    .experience-item, .education-item, .project-item, .list-item-card {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 }
 

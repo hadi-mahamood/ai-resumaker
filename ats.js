@@ -2237,8 +2237,13 @@ window.closeCoverLetterPreviewModal = function() {
 };
 
 window.printCoverLetter = function() {
+    document.body.classList.add("cover-letter-printing-active");
     window.print();
 };
+
+window.addEventListener("afterprint", () => {
+    document.body.classList.remove("cover-letter-printing-active");
+});
 
 window.resizeCoverLetterPreview = function() {
     const modalBody = document.querySelector("#cover-letter-preview-modal .ats-modal-body");
