@@ -1643,6 +1643,12 @@ textarea {
     flex-direction: column;
 }
 
+/* Compact modals (e.g. Auth popup) auto-adjust height to contents */
+.ats-modal-card-compact {
+    height: auto !important;
+    max-height: 90vh !important;
+}
+
 .ats-modal.open .ats-modal-card {
     transform: translateY(0);
 }
