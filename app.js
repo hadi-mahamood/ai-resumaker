@@ -1153,3 +1153,178 @@ window.applyExperienceRewrite = applyExperienceRewrite;
 window.closeAIPanel = closeAIPanel;
 window.toggleRewriteView = toggleRewriteView;
 window.runAIEperienceRewrite = runAIEperienceRewrite;
+
+// Supabase Authentication state management globals
+window.supabaseClient = null;
+window.supabaseSessionToken = null;
+window.supabaseUserEmail = null;
+
+window.openAuthModal = function() {
+    const modal = document.getElementById("auth-modal");
+    if (!modal) return;
+    
+    // Toggle active display view depending on user login state
+    const loginForm = document.getElementById("auth-login-form");
+    const registerForm = document.getElementById("auth-register-form");
+    const userPanel = document.getElementById("auth-user-panel");
+    const tabs = document.getElementById("auth-modal-tabs");
+    
+    if (window.supabaseSessionToken) {
+        if (loginForm) loginForm.style.display = "none";
+        if (registerForm) registerForm.style.display = "none";
+        if (tabs) tabs.style.display = "none";
+        if (userPanel) {
+            userPanel.style.display = "block";
+            const emailLabel = document.getElementById("auth-user-email");
+            if (emailLabel) emailLabel.innerText = window.supabaseUserEmail || "User Session Active";
+        }
+    } else {
+        if (userPanel) userPanel.style.display = "none";
+        if (tabs) tabs.style.display = "flex";
+        window.switchAuthTab('login');
+    }
+    
+    modal.classList.add("open");
+};
+
+window.closeAuthModal = function() {
+    const modal = document.getElementById("auth-modal");
+    if (modal) modal.classList.remove("open");
+};
+
+window.switchAuthTab = function(tab) {
+    const tabLogin = document.getElementById("auth-tab-login");
+    const tabRegister = document.getElementById("auth-tab-register");
+    const formLogin = document.getElementById("auth-login-form");
+    const formRegister = document.getElementById("auth-register-form");
+    
+    if (tab === 'login') {
+        if (tabLogin) {
+            tabLogin.classList.add("active");
+            tabLogin.style.color = "var(--primary)";
+            tabLogin.style.borderBottomColor = "var(--primary)";
+        }
+        if (tabRegister) {
+            tabRegister.classList.remove("active");
+            tabRegister.style.color = "#64748b";
+            tabRegister.style.borderBottomColor = "transparent";
+        }
+        if (formLogin) formLogin.style.display = "block";
+        if (formRegister) formRegister.style.display = "none";
+    } else {
+        if (tabRegister) {
+            tabRegister.classList.add("active");
+            tabRegister.style.color = "var(--primary)";
+            tabRegister.style.borderBottomColor = "var(--primary)";
+        }
+        if (tabLogin) {
+            tabLogin.classList.remove("active");
+            tabLogin.style.color = "#64748b";
+            tabLogin.style.borderBottomColor = "transparent";
+        }
+        if (formRegister) formRegister.style.display = "block";
+        if (formLogin) formLogin.style.display = "none";
+    }
+};
+
+window.handleAuthSubmit = async function(event, mode) {
+    event.preventDefault();
+    if (!window.supabaseClient) {
+        showToast("Cloud database not configured on server.");
+        return;
+    }
+    
+    const emailInput = document.getElementById(mode === 'login' ? 'login-email' : 'register-email');
+    const passwordInput = document.getElementById(mode === 'login' ? 'login-password' : 'register-password');
+    if (!emailInput || !passwordInput) return;
+    
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    
+    try {
+        let result;
+        if (mode === 'login') {
+            result = await window.supabaseClient.auth.signInWithPassword({ email, password });
+        } else {
+            result = await window.supabaseClient.auth.signUp({ email, password });
+        }
+        
+        if (result.error) {
+            console.error("Auth error details: ", result.error);
+            showToast(`Authentication failed: ${result.error.message}`);
+        } else {
+            if (mode === 'register' && result.data?.user?.identities?.length === 0) {
+                showToast("Account already exists. Try signing in.");
+            } else {
+                showToast(mode === 'login' ? "Logged in successfully!" : "Account created! Confirm your email.");
+                window.closeAuthModal();
+            }
+        }
+    } catch (e) {
+        console.error("Supabase auth exception: ", e);
+        showToast("Authentication request failed.");
+    }
+};
+
+window.handleAuthLogout = async function() {
+    if (!window.supabaseClient) return;
+    try {
+        await window.supabaseClient.auth.signOut();
+        showToast("Signed out successfully.");
+        window.closeAuthModal();
+    } catch (e) {
+        console.error("Sign out exception: ", e);
+        showToast("Failed to sign out.");
+    }
+};
+
+// Initialize client side Supabase client
+async function initClientSupabase() {
+    try {
+        const response = await fetch('/api/config');
+        if (!response.ok) return;
+        const config = await response.json();
+        
+        if (config.supabaseUrl && config.supabaseAnonKey && typeof supabase !== 'undefined') {
+            window.supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+            
+            // Listen to Auth State changes in Supabase
+            window.supabaseClient.auth.onAuthStateChange((event, session) => {
+                const prevToken = window.supabaseSessionToken;
+                window.supabaseSessionToken = session?.access_token || null;
+                window.supabaseUserEmail = session?.user?.email || null;
+                
+                const authBtn = document.getElementById("auth-status-btn");
+                const saveStatus = document.querySelector(".save-status");
+                
+                if (session) {
+                    if (authBtn) {
+                        authBtn.innerHTML = `<i class="fa-solid fa-cloud" style="color: #10b981;"></i> Synced`;
+                        authBtn.title = `Synced with Cloud: ${session.user.email}`;
+                    }
+                    if (saveStatus) {
+                        saveStatus.innerHTML = `<span class="save-dot" style="background-color: #10b981;"></span> Saved to Cloud`;
+                    }
+                } else {
+                    if (authBtn) {
+                        authBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Sync`;
+                        authBtn.title = "Sync to Cloud Database";
+                    }
+                    if (saveStatus) {
+                        saveStatus.innerHTML = `<span class="save-dot"></span> Saved Locally`;
+                    }
+                }
+                
+                // Only reload profiles if token actually changed (prevents recursive loops)
+                if (prevToken !== window.supabaseSessionToken) {
+                    window.initProfiles();
+                }
+            });
+        }
+    } catch (e) {
+        console.error("Failed to query public supabase configuration: ", e);
+    }
+}
+
+// Kick off client check on script load
+initClientSupabase();

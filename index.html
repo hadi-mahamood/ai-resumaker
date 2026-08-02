@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="style.css?v=15.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase Client JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -23,7 +25,7 @@
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span class="premium-badge">Pro</span>
+                    <button class="ai-btn ai-btn-outline" id="auth-status-btn" onclick="window.openAuthModal()" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px;"><i class="fa-solid fa-cloud-arrow-up"></i> Sync</button>
                     <button class="settings-btn" id="settings-toggle-btn" onclick="toggleSettingsPanel()" title="Gemini API Settings"><i class="fa-solid fa-gear"></i></button>
                 </div>
             </div>
@@ -730,6 +732,64 @@
     <div class="toast" id="toast-notify">
         <i class="fa-solid fa-circle-check"></i>
         <span id="toast-message">Resume Auto-saved!</span>
+    </div>
+
+    <!-- Cloud Authentication Modal -->
+    <div class="ats-modal" id="auth-modal">
+        <div class="ats-modal-card" style="max-width: 420px;">
+            <button class="ats-modal-close" onclick="window.closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="ats-modal-header" style="border-bottom: none; padding-bottom: 0;">
+                <h3 class="ats-modal-title" id="auth-modal-title" style="font-size: 1.3rem; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-user-shield" style="color: var(--primary);"></i> Account Sync</h3>
+            </div>
+            <div class="ats-modal-body" style="padding-top: 15px;">
+                <!-- Login/Register Toggle Tabs -->
+                <div class="ats-modal-tabs" id="auth-modal-tabs" style="display: flex; gap: 10px; border-bottom: 1.5px solid var(--border-color); margin-bottom: 20px; padding-bottom: 8px;">
+                    <button class="ats-modal-tab active" id="auth-tab-login" onclick="window.switchAuthTab('login')" style="background: none; border: none; font-size: 0.85rem; font-weight: 600; color: var(--primary); cursor: pointer; padding-bottom: 4px; border-bottom: 2px solid var(--primary); outline: none;">Sign In</button>
+                    <button class="ats-modal-tab" id="auth-tab-register" onclick="window.switchAuthTab('register')" style="background: none; border: none; font-size: 0.85rem; font-weight: 600; color: #64748b; cursor: pointer; padding-bottom: 4px; border-bottom: 2px solid transparent; outline: none;">Create Account</button>
+                </div>
+
+                <!-- Sign In Form -->
+                <form id="auth-login-form" onsubmit="window.handleAuthSubmit(event, 'login')">
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        <div>
+                            <label style="font-size: 0.75rem; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Email Address</label>
+                            <input type="email" id="login-email" class="form-input" placeholder="you@example.com" required style="width: 100%; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75rem; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Password</label>
+                            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required style="width: 100%; box-sizing: border-box;">
+                        </div>
+                        <button type="submit" class="ai-btn" style="width: 100%; justify-content: center; margin-top: 6px; padding: 10px; font-weight: 600;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+                    </div>
+                </form>
+
+                <!-- Sign Up Form (hidden by default) -->
+                <form id="auth-register-form" onsubmit="window.handleAuthSubmit(event, 'register')" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        <div>
+                            <label style="font-size: 0.75rem; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Email Address</label>
+                            <input type="email" id="register-email" class="form-input" placeholder="you@example.com" required style="width: 100%; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75rem; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Password (Min. 6 characters)</label>
+                            <input type="password" id="register-password" class="form-input" placeholder="••••••••" minlength="6" required style="width: 100%; box-sizing: border-box;">
+                        </div>
+                        <button type="submit" class="ai-btn" style="width: 100%; justify-content: center; margin-top: 6px; padding: 10px; font-weight: 600;"><i class="fa-solid fa-user-plus"></i> Create Account</button>
+                    </div>
+                </form>
+
+                <!-- Authenticated User Panel (hidden by default) -->
+                <div id="auth-user-panel" style="display: none; text-align: center; padding: 10px 0;">
+                    <i class="fa-solid fa-circle-user" style="font-size: 3rem; color: var(--primary); margin-bottom: 12px; display: block;"></i>
+                    <p style="font-size: 0.85rem; font-weight: 600; color: #0f172a; margin-bottom: 2px;">Signed in as:</p>
+                    <p id="auth-user-email" style="font-size: 0.8rem; color: #475569; margin-bottom: 20px; font-family: monospace; word-break: break-all;"></p>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="ai-btn ai-btn-outline" onclick="window.closeAuthModal()" style="flex: 1; justify-content: center; outline: none; border: 1px solid var(--border-color);">Close</button>
+                        <button class="ai-btn" onclick="window.handleAuthLogout()" style="flex: 1; justify-content: center; background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; outline: none;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Script dependencies -->

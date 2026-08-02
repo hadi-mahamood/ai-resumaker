@@ -1663,9 +1663,13 @@ window.profiles = [];
 // Synchronize all profiles and current state with Express Server Database
 window.syncProfilesToServer = async function() {
     try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (window.supabaseSessionToken) {
+            headers['Authorization'] = `Bearer ${window.supabaseSessionToken}`;
+        }
         await fetch('/api/profiles', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
             body: JSON.stringify({
                 profiles: window.profiles,
                 activeProfileId: window.activeProfileId,
@@ -1680,7 +1684,11 @@ window.syncProfilesToServer = async function() {
 window.initProfiles = async function() {
     // Try to load profiles from Express Server JSON Database
     try {
-        const response = await fetch('/api/profiles');
+        const headers = {};
+        if (window.supabaseSessionToken) {
+            headers['Authorization'] = `Bearer ${window.supabaseSessionToken}`;
+        }
+        const response = await fetch('/api/profiles', { headers });
         if (response.ok) {
             const db = await response.json();
             if (db.profiles && db.profiles.length > 0) {

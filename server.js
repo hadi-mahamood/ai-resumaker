@@ -4,12 +4,38 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js';
 
 // Load environment configurations
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Initialize Supabase Client dynamically if credentials are provided in .env
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+let supabase = null;
+
+if (supabaseUrl && supabaseServiceKey && supabaseUrl.trim() !== "" && supabaseServiceKey.trim() !== "") {
+    try {
+        supabase = createClient(supabaseUrl, supabaseServiceKey, {
+            auth: {
+                persistSession: false
+            }
+        });
+        console.log("================================================================");
+        console.log("  ✅ Supabase Cloud Database integration active!");
+        console.log("================================================================");
+    } catch (e) {
+        console.error("Failed to initialize Supabase client: ", e);
+    }
+} else {
+    console.log("================================================================");
+    console.log("  ⚠️  Supabase configurations missing in .env.");
+    console.log("  💾 Falling back to local file storage: profiles_db.json");
+    console.log("================================================================");
+}
 
 // Resolve directory name in ES Module scope
 const __filename = fileURLToPath(import.meta.url);
@@ -31,7 +57,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS || '*';
 const corsOptions = {
     origin: allowedOrigins === '*' ? '*' : allowedOrigins.split(',').map(o => o.trim()),
     methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'x-api-key']
+    allowedHeaders: ['Content-Type', 'x-api-key', 'Authorization']
 };
 
 app.use(cors(corsOptions));
@@ -121,27 +147,121 @@ app.post('/api/ai/chat', async (req, res) => {
     }
 });
 
+// Expose public Supabase credentials for client-side authentication library
+app.get('/api/config', (req, res) => {
+    res.json({
+        supabaseUrl: process.env.SUPABASE_URL || "",
+        supabaseAnonKey: process.env.SUPABASE_ANON_KEY || ""
+    });
+});
+
+/**
+ * Helper: Resolve authenticated Supabase user from headers JWT
+ */
+async function getAuthenticatedUser(req) {
+    if (!supabase) return null;
+    
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return null;
+    }
+    
+    const token = authHeader.split(' ')[1];
+    try {
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+        if (error || !user) {
+            console.error("JWT Verification failed: ", error);
+            return null;
+        }
+        return user;
+    } catch (e) {
+        console.error("JWT verification exception: ", e);
+        return null;
+    }
+}
+
 /* =========================================================================
    2. DATABASE PERSISTENCE ENDPOINTS
    ========================================================================= */
 
 // Retrieve all user profiles
-app.get('/api/profiles', (req, res) => {
-    const db = readDB();
-    res.json(db);
+app.get('/api/profiles', async (req, res) => {
+    const user = await getAuthenticatedUser(req);
+    
+    if (user && supabase) {
+        try {
+            // Fetch from Supabase PostgreSQL table 'resumake_users'
+            const { data, error } = await supabase
+                .from('resumake_users')
+                .select('*')
+                .eq('user_id', user.id)
+                .maybeSingle();
+
+            if (error) {
+                console.error("Supabase SELECT profiles failed: ", error);
+                return res.status(500).json({ error: "Failed to load profiles from cloud database." });
+            }
+
+            if (data) {
+                return res.json({
+                    profiles: data.profiles || [],
+                    activeProfileId: data.active_profile_id || 'default',
+                    resumeData: data.resume_data || null
+                });
+            } else {
+                // If user has no record, return default empty state structure (upsert will occur on first autoSave)
+                return res.json({ profiles: [], activeProfileId: 'default', resumeData: null });
+            }
+        } catch (e) {
+            console.error("Supabase profiles query exception: ", e);
+            return res.status(500).json({ error: "Internal server error querying cloud database." });
+        }
+    } else {
+        // Guest mode fallback: Local file DB
+        const db = readDB();
+        return res.json(db);
+    }
 });
 
 // Update/Save user profiles
-app.post('/api/profiles', (req, res) => {
+app.post('/api/profiles', async (req, res) => {
     const { profiles, activeProfileId, resumeData } = req.body;
-    const db = readDB();
+    const user = await getAuthenticatedUser(req);
 
-    if (profiles !== undefined) db.profiles = profiles;
-    if (activeProfileId !== undefined) db.activeProfileId = activeProfileId;
-    if (resumeData !== undefined) db.resumeData = resumeData;
+    if (user && supabase) {
+        try {
+            // Upsert into Supabase PostgreSQL table 'resumake_users'
+            const { error } = await supabase
+                .from('resumake_users')
+                .upsert({
+                    user_id: user.id,
+                    profiles: profiles || [],
+                    active_profile_id: activeProfileId || 'default',
+                    resume_data: resumeData || null,
+                    updated_at: new Date().toISOString()
+                });
 
-    writeDB(db);
-    res.json({ success: true, message: "Profiles and resume data synchronized on the server." });
+            if (error) {
+                console.error("Supabase UPSERT profiles failed: ", error);
+                return res.status(500).json({ error: "Failed to save profiles to cloud database." });
+            }
+
+            return res.json({ success: true, message: "Profiles and resume data synchronized on the cloud database." });
+        } catch (e) {
+            console.error("Supabase profiles save exception: ", e);
+            return res.status(500).json({ error: "Internal server error writing to cloud database." });
+        }
+    } else {
+        // Guest mode fallback: Local file DB
+        const db = readDB();
+
+        if (profiles !== undefined) db.profiles = profiles;
+        if (activeProfileId !== undefined) db.activeProfileId = activeProfileId;
+        if (resumeData !== undefined) db.resumeData = resumeData;
+
+        writeDB(db);
+        return res.json({ success: true, message: "Profiles and resume data synchronized on the local server." });
+    }
 });
 
 // Start the Express Server
