@@ -176,25 +176,21 @@ const AIService = {
     /**
      * AI Work Experience Rewriter
      */
-    async rewriteExperience(text, jobTitle) {
+    async rewriteExperience(text, jobTitle, onChunk) {
         const cacheKey = `rewrite_${btoa(unescape(encodeURIComponent(jobTitle + "_" + text))).slice(0, 100)}`;
         const cached = this.getCache(cacheKey);
-        if (cached) return cached;
+        if (cached) return await this.simulateStreaming(cached, onChunk);
 
         const prompt = `Rewrite this job description for a "${jobTitle}" role using strong action verbs, quantify achievements where possible, and optimize it for ATS systems. Output ONLY the rewritten paragraphs as bullet points:\n\n${text}`;
         
         let result;
         if (this.activeProvider === "webgpu") {
-            result = await this.callWebGPULLM(prompt);
+            result = await this.callWebGPULLM(prompt, onChunk);
         } else if (this.apiKey) {
-            result = await this.callGeminiAPI(prompt);
+            result = await this.callGeminiAPI(prompt, onChunk);
         } else {
-            // Offline / Mock engine
-            result = await new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(this.getOfflineRewriteMock(text));
-                }, 1000);
-            });
+            const mock = this.getOfflineRewriteMock(text);
+            result = await this.simulateStreaming(mock, onChunk);
         }
         
         this.setCache(cacheKey, result);
@@ -204,25 +200,21 @@ const AIService = {
     /**
      * AI Skill Suggester
      */
-    async suggestSkills(existingSkills, jobTitle) {
+    async suggestSkills(existingSkills, jobTitle, onChunk) {
         const cacheKey = `skills_${btoa(unescape(encodeURIComponent(jobTitle + "_" + existingSkills.join(',')))).slice(0, 100)}`;
         const cached = this.getCache(cacheKey);
-        if (cached) return cached;
+        if (cached) return await this.simulateStreaming(cached, onChunk);
 
         const prompt = `Based on this target job "${jobTitle}" and existing skills [${existingSkills.join(', ')}], recommend exactly 10 relevant technical and soft skills as a comma-separated list. Output ONLY the comma-separated skills:`;
         
         let result;
         if (this.activeProvider === "webgpu") {
-            result = await this.callWebGPULLM(prompt);
+            result = await this.callWebGPULLM(prompt, onChunk);
         } else if (this.apiKey) {
-            result = await this.callGeminiAPI(prompt);
+            result = await this.callGeminiAPI(prompt, onChunk);
         } else {
-            // Offline / Mock engine
-            result = await new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(this.getOfflineSkillsMock(jobTitle, existingSkills));
-                }, 800);
-            });
+            const mock = this.getOfflineSkillsMock(jobTitle, existingSkills);
+            result = await this.simulateStreaming(mock, onChunk);
         }
 
         this.setCache(cacheKey, result);
@@ -232,30 +224,26 @@ const AIService = {
     /**
      * AI Cover Letter Generator
      */
-    async generateCoverLetter(resumeData) {
+    async generateCoverLetter(resumeData, onChunk) {
         let name = resumeData.name || "John Doe";
         let role = resumeData.targetJob || "Software Developer";
         
         const summary = `${name}_${role}_${(resumeData.skills || []).join(',')}_${(resumeData.experience || []).map(e => e.date + e.company).join(',')}`;
         const cacheKey = `cover_${btoa(unescape(encodeURIComponent(summary))).slice(0, 100)}`;
         const cached = this.getCache(cacheKey);
-        if (cached) return cached;
+        if (cached) return await this.simulateStreaming(cached, onChunk);
 
         let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 3).join(', ') : "Software Engineering";
         const prompt = `Write a highly professional and compelling cover letter. Candidate Name: ${name}. Target Role: ${role}. Skills: ${resumeData.skills.join(', ')}. Experience Summary: ${JSON.stringify(resumeData.experience)}. Output ONLY the letter text with greetings and signature. No markdown comments or brackets:`;
         
         let result;
         if (this.activeProvider === "webgpu") {
-            result = await this.callWebGPULLM(prompt);
+            result = await this.callWebGPULLM(prompt, onChunk);
         } else if (this.apiKey) {
-            result = await this.callGeminiAPI(prompt);
+            result = await this.callGeminiAPI(prompt, onChunk);
         } else {
-            // Offline / Mock engine
-            result = await new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(this.getOfflineCoverLetterMock(resumeData));
-                }, 1200);
-            });
+            const mock = this.getOfflineCoverLetterMock(resumeData);
+            result = await this.simulateStreaming(mock, onChunk);
         }
 
         this.setCache(cacheKey, result);
@@ -265,7 +253,7 @@ const AIService = {
     /**
      * Gemini API Client Call
      */
-    async callGeminiAPI(promptText) {
+    async callGeminiAPI(promptText, onChunk) {
         try {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`;
             const response = await fetch(url, {

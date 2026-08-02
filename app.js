@@ -835,8 +835,14 @@ async function runAIEperienceRewrite(expId) {
         diffBox.style.display = "none";
     }
 
-    // Call AIService
-    const optimized = await AIService.rewriteExperience(textInput, state.targetJob);
+    // Call AIService with streaming support for real-time typing effect
+    const optimized = await AIService.rewriteExperience(textInput, state.targetJob, (chunkText) => {
+        resultBox.className = "ai-result-box";
+        resultBox.innerText = chunkText;
+        if (diffBox) {
+            diffBox.innerHTML = renderDiffHTML(textInput, chunkText);
+        }
+    });
     
     resultBox.className = "ai-result-box";
     resultBox.innerText = optimized;
