@@ -155,29 +155,67 @@ app.get('/api/config', (req, res) => {
     });
 });
 
+function getUserDBFile(userId) {
+    const safeId = userId.replace(/[^a-zA-Z0-9_-]/g, '');
+    return path.join(__dirname, `profiles_db_${safeId}.json`);
+}
+
+function readUserDB(userId) {
+    const userFile = getUserDBFile(userId);
+    try {
+        if (!fs.existsSync(userFile)) {
+            return { profiles: [], activeProfileId: 'default', resumeData: null };
+        }
+        const data = fs.readFileSync(userFile, 'utf8');
+        return JSON.parse(data || '{"profiles":[], "activeProfileId":"default", "resumeData":null}');
+    } catch (e) {
+        console.error(`Failed to read user profile database file ${userFile}: `, e);
+        return { profiles: [], activeProfileId: 'default', resumeData: null };
+    }
+}
+
+function writeUserDB(userId, data) {
+    const userFile = getUserDBFile(userId);
+    try {
+        fs.writeFileSync(userFile, JSON.stringify(data, null, 2), 'utf8');
+    } catch (e) {
+        console.error(`Failed to write user profile database file ${userFile}: `, e);
+    }
+}
+
 /**
- * Helper: Resolve authenticated Supabase user from headers JWT
+ * Helper: Resolve authenticated Supabase user from headers JWT (supports Real Supabase & Mock Sessions)
  */
 async function getAuthenticatedUser(req) {
-    if (!supabase) return null;
-    
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return null;
     }
     
     const token = authHeader.split(' ')[1];
-    try {
-        const { data: { user }, error } = await supabase.auth.getUser(token);
-        if (error || !user) {
-            console.error("JWT Verification failed: ", error);
-            return null;
+    
+    // 1. Try real Supabase JWT check if client is active
+    if (supabase) {
+        try {
+            const { data: { user }, error } = await supabase.auth.getUser(token);
+            if (!error && user) return user;
+        } catch (e) {
+            console.error("JWT Verification exception: ", e);
         }
-        return user;
-    } catch (e) {
-        console.error("JWT verification exception: ", e);
-        return null;
     }
+    
+    // 2. Fallback: Parse mock JWT tokens (e.g. mock-jwt-token-for-test@example.com)
+    if (token && token.startsWith('mock-jwt-token-for-')) {
+        const email = token.replace('mock-jwt-token-for-', '');
+        const userId = 'mock-uuid-' + Buffer.from(email).toString('base64');
+        return {
+            id: userId,
+            email: email,
+            isMock: true
+        };
+    }
+    
+    return null;
 }
 
 /* =========================================================================
@@ -188,36 +226,41 @@ async function getAuthenticatedUser(req) {
 app.get('/api/profiles', async (req, res) => {
     const user = await getAuthenticatedUser(req);
     
-    if (user && supabase) {
-        try {
-            // Fetch from Supabase PostgreSQL table 'resumake_users'
-            const { data, error } = await supabase
-                .from('resumake_users')
-                .select('*')
-                .eq('user_id', user.id)
-                .maybeSingle();
+    if (user) {
+        if (!user.isMock && supabase) {
+            try {
+                // Fetch from Supabase PostgreSQL table 'resumake_users'
+                const { data, error } = await supabase
+                    .from('resumake_users')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .maybeSingle();
 
-            if (error) {
-                console.error("Supabase SELECT profiles failed: ", error);
-                return res.status(500).json({ error: "Failed to load profiles from cloud database." });
-            }
+                if (error) {
+                    console.error("Supabase SELECT profiles failed: ", error);
+                    return res.status(500).json({ error: "Failed to load profiles from cloud database." });
+                }
 
-            if (data) {
-                return res.json({
-                    profiles: data.profiles || [],
-                    activeProfileId: data.active_profile_id || 'default',
-                    resumeData: data.resume_data || null
-                });
-            } else {
-                // If user has no record, return default empty state structure (upsert will occur on first autoSave)
-                return res.json({ profiles: [], activeProfileId: 'default', resumeData: null });
+                if (data) {
+                    return res.json({
+                        profiles: data.profiles || [],
+                        activeProfileId: data.active_profile_id || 'default',
+                        resumeData: data.resume_data || null
+                    });
+                } else {
+                    return res.json({ profiles: [], activeProfileId: 'default', resumeData: null });
+                }
+            } catch (e) {
+                console.error("Supabase profiles query exception: ", e);
+                return res.status(500).json({ error: "Internal server error querying cloud database." });
             }
-        } catch (e) {
-            console.error("Supabase profiles query exception: ", e);
-            return res.status(500).json({ error: "Internal server error querying cloud database." });
+        } else {
+            // Mock Auth multi-user mode: load from user-specific local file
+            const db = readUserDB(user.id);
+            return res.json(db);
         }
     } else {
-        // Guest mode fallback: Local file DB
+        // Guest mode fallback: Local global file DB
         const db = readDB();
         return res.json(db);
     }
@@ -228,37 +271,45 @@ app.post('/api/profiles', async (req, res) => {
     const { profiles, activeProfileId, resumeData } = req.body;
     const user = await getAuthenticatedUser(req);
 
-    if (user && supabase) {
-        try {
-            // Upsert into Supabase PostgreSQL table 'resumake_users'
-            const { error } = await supabase
-                .from('resumake_users')
-                .upsert({
-                    user_id: user.id,
-                    profiles: profiles || [],
-                    active_profile_id: activeProfileId || 'default',
-                    resume_data: resumeData || null,
-                    updated_at: new Date().toISOString()
-                });
+    if (user) {
+        if (!user.isMock && supabase) {
+            try {
+                // Upsert into Supabase PostgreSQL table 'resumake_users'
+                const { error } = await supabase
+                    .from('resumake_users')
+                    .upsert({
+                        user_id: user.id,
+                        profiles: profiles || [],
+                        active_profile_id: activeProfileId || 'default',
+                        resume_data: resumeData || null,
+                        updated_at: new Date().toISOString()
+                    });
 
-            if (error) {
-                console.error("Supabase UPSERT profiles failed: ", error);
-                return res.status(500).json({ error: "Failed to save profiles to cloud database." });
+                if (error) {
+                    console.error("Supabase UPSERT profiles failed: ", error);
+                    return res.status(500).json({ error: "Failed to save profiles to cloud database." });
+                }
+
+                return res.json({ success: true, message: "Profiles and resume data synchronized on the cloud database." });
+            } catch (e) {
+                console.error("Supabase profiles save exception: ", e);
+                return res.status(500).json({ error: "Internal server error writing to cloud database." });
             }
-
-            return res.json({ success: true, message: "Profiles and resume data synchronized on the cloud database." });
-        } catch (e) {
-            console.error("Supabase profiles save exception: ", e);
-            return res.status(500).json({ error: "Internal server error writing to cloud database." });
+        } else {
+            // Mock Auth multi-user mode: save to user-specific local file
+            const db = readUserDB(user.id);
+            if (profiles !== undefined) db.profiles = profiles;
+            if (activeProfileId !== undefined) db.activeProfileId = activeProfileId;
+            if (resumeData !== undefined) db.resumeData = resumeData;
+            writeUserDB(user.id, db);
+            return res.json({ success: true, message: "Profiles and resume data synchronized on user-specific mock file." });
         }
     } else {
-        // Guest mode fallback: Local file DB
+        // Guest mode fallback: Local global file DB
         const db = readDB();
-
         if (profiles !== undefined) db.profiles = profiles;
         if (activeProfileId !== undefined) db.activeProfileId = activeProfileId;
         if (resumeData !== undefined) db.resumeData = resumeData;
-
         writeDB(db);
         return res.json({ success: true, message: "Profiles and resume data synchronized on the local server." });
     }
