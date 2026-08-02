@@ -1322,123 +1322,140 @@ window.handleAuthLogout = async function() {
 };
 
 // Initialize client side Supabase client
+// Initialize client side Supabase client
 async function initClientSupabase() {
+    let config = null;
     try {
         const response = await fetch('/api/config');
-        if (!response.ok) return;
-        const config = await response.json();
-        
-        if (config.supabaseUrl && config.supabaseAnonKey && typeof supabase !== 'undefined') {
-            window.supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
-            
-            // Listen to Auth State changes in Supabase
-            window.supabaseClient.auth.onAuthStateChange((event, session) => {
-                const prevToken = window.supabaseSessionToken;
-                window.supabaseSessionToken = session?.access_token || null;
-                window.supabaseUserEmail = session?.user?.email || null;
-                
-                const authBtn = document.getElementById("auth-status-btn");
-                const saveStatus = document.querySelector(".save-status");
-                
-                if (session) {
-                    if (authBtn) {
-                        authBtn.innerHTML = `<i class="fa-solid fa-cloud" style="color: #10b981;"></i> Synced`;
-                        authBtn.title = `Synced with Cloud: ${session.user.email}`;
-                    }
-                    if (saveStatus) {
-                        saveStatus.innerHTML = `<span class="save-dot" style="background-color: #10b981;"></span> Saved to Cloud`;
-                    }
-                } else {
-                    if (authBtn) {
-                        authBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Sync`;
-                        authBtn.title = "Sync to Cloud Database";
-                    }
-                    if (saveStatus) {
-                        saveStatus.innerHTML = `<span class="save-dot"></span> Saved Locally`;
-                    }
-                }
-                
-                // Only reload profiles if token actually changed (prevents recursive loops)
-                if (prevToken !== window.supabaseSessionToken) {
-                    window.initProfiles();
-                }
-            });
-        } else {
-            console.log("Supabase configurations not present in .env. Initializing local Mock Auth simulation engine.");
-            let mockCallback = () => {};
-            window.supabaseClient = {
-                auth: {
-                    getSession: async () => {
-                        const sessionStr = localStorage.getItem("mock_supabase_session");
-                        return { data: { session: sessionStr ? JSON.parse(sessionStr) : null } };
-                    },
-                    signInWithPassword: async ({ email, password }) => {
-                        const session = {
-                            access_token: "mock-jwt-token-for-" + email,
-                            user: { email: email, id: "mock-uuid-" + btoa(email) }
-                        };
-                        localStorage.setItem("mock_supabase_session", JSON.stringify(session));
-                        mockCallback("SIGNED_IN", session);
-                        return { data: session, error: null };
-                    },
-                    signUp: async ({ email, password }) => {
-                        const session = {
-                            access_token: "mock-jwt-token-for-" + email,
-                            user: { email: email, id: "mock-uuid-" + btoa(email) }
-                        };
-                        localStorage.setItem("mock_supabase_session", JSON.stringify(session));
-                        mockCallback("SIGNED_IN", session);
-                        return { data: session, error: null };
-                    },
-                    signOut: async () => {
-                        localStorage.removeItem("mock_supabase_session");
-                        mockCallback("SIGNED_OUT", null);
-                        return { error: null };
-                    },
-                    onAuthStateChange: (cb) => {
-                        mockCallback = cb;
-                        const sessionStr = localStorage.getItem("mock_supabase_session");
-                        const currentSession = sessionStr ? JSON.parse(sessionStr) : null;
-                        cb("INITIAL_SESSION", currentSession);
-                        return { data: { subscription: { unsubscribe: () => {} } } };
-                    }
-                }
-            };
-            
-            // Listen to Mock Auth state changes
-            window.supabaseClient.auth.onAuthStateChange((event, session) => {
-                const prevToken = window.supabaseSessionToken;
-                window.supabaseSessionToken = session?.access_token || null;
-                window.supabaseUserEmail = session?.user?.email || null;
-                
-                const authBtn = document.getElementById("auth-status-btn");
-                const saveStatus = document.querySelector(".save-status");
-                
-                if (session) {
-                    if (authBtn) {
-                        authBtn.innerHTML = `<i class="fa-solid fa-cloud" style="color: #10b981;"></i> Synced`;
-                        authBtn.title = `Synced with Local Mock Cloud: ${session.user.email}`;
-                    }
-                    if (saveStatus) {
-                        saveStatus.innerHTML = `<span class="save-dot" style="background-color: #10b981;"></span> Saved to Cloud (Mock)`;
-                    }
-                } else {
-                    if (authBtn) {
-                        authBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Sync`;
-                        authBtn.title = "Sync to Cloud Database (Mock)";
-                    }
-                    if (saveStatus) {
-                        saveStatus.innerHTML = `<span class="save-dot"></span> Saved Locally`;
-                    }
-                }
-                
-                if (prevToken !== window.supabaseSessionToken) {
-                    window.initProfiles();
-                }
-            });
+        if (response.ok) {
+            config = await response.json();
         }
     } catch (e) {
-        console.error("Failed to query public supabase configuration: ", e);
+        console.warn("Could not fetch server configurations. Using offline Mock Auth.", e);
+    }
+    
+    const hasRealConfig = config && config.supabaseUrl && config.supabaseAnonKey && typeof supabase !== 'undefined';
+    
+    if (hasRealConfig) {
+        window.supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+        
+        // Listen to Auth State changes in Supabase
+        window.supabaseClient.auth.onAuthStateChange((event, session) => {
+            const prevToken = window.supabaseSessionToken;
+            window.supabaseSessionToken = session?.access_token || null;
+            window.supabaseUserEmail = session?.user?.email || null;
+            
+            const authBtn = document.getElementById("auth-status-btn");
+            const saveStatus = document.querySelector(".save-status");
+            
+            if (session) {
+                if (authBtn) {
+                    authBtn.innerHTML = `<i class="fa-solid fa-cloud" style="color: #10b981;"></i> Synced`;
+                    authBtn.title = `Synced with Cloud: ${session.user.email}`;
+                }
+                if (saveStatus) {
+                    saveStatus.innerHTML = `<span class="save-dot" style="background-color: #10b981;"></span> Saved to Cloud`;
+                }
+            } else {
+                if (authBtn) {
+                    authBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Sync`;
+                    authBtn.title = "Sync to Cloud Database";
+                }
+                if (saveStatus) {
+                    saveStatus.innerHTML = `<span class="save-dot"></span> Saved Locally`;
+                }
+            }
+            
+            // Only reload profiles if token actually changed (prevents recursive loops)
+            if (prevToken !== window.supabaseSessionToken) {
+                window.initProfiles();
+            }
+        });
+    } else {
+        console.log("Supabase configurations not present on backend. Initializing local Mock Auth simulation engine.");
+        let mockCallback = () => {};
+        window.supabaseClient = {
+            auth: {
+                getSession: async () => {
+                    const sessionStr = localStorage.getItem("mock_supabase_session");
+                    return { data: { session: sessionStr ? JSON.parse(sessionStr) : null } };
+                },
+                signInWithPassword: async ({ email, password }) => {
+                    const session = {
+                        access_token: "mock-jwt-token-for-" + email,
+                        user: { email: email, id: "mock-uuid-" + btoa(email) }
+                    };
+                    localStorage.setItem("mock_supabase_session", JSON.stringify(session));
+                    mockCallback("SIGNED_IN", session);
+                    return { data: session, error: null };
+                },
+                signUp: async ({ email, password }) => {
+                    const session = {
+                        access_token: "mock-jwt-token-for-" + email,
+                        user: { email: email, id: "mock-uuid-" + btoa(email) }
+                    };
+                    localStorage.setItem("mock_supabase_session", JSON.stringify(session));
+                    mockCallback("SIGNED_IN", session);
+                    return { data: session, error: null };
+                },
+                signInWithOAuth: async ({ provider }) => {
+                    // Simulate social login by signing in as a mock email
+                    const email = `${provider}-user@mock.com`;
+                    const session = {
+                        access_token: "mock-jwt-token-for-" + email,
+                        user: { email: email, id: "mock-uuid-" + btoa(email) }
+                    };
+                    localStorage.setItem("mock_supabase_session", JSON.stringify(session));
+                    mockCallback("SIGNED_IN", session);
+                    showToast(`Logged in via ${provider.toUpperCase()}!`);
+                    return { data: session, error: null };
+                },
+                signOut: async () => {
+                    localStorage.removeItem("mock_supabase_session");
+                    mockCallback("SIGNED_OUT", null);
+                    return { error: null };
+                },
+                onAuthStateChange: (cb) => {
+                    mockCallback = cb;
+                    const sessionStr = localStorage.getItem("mock_supabase_session");
+                    const currentSession = sessionStr ? JSON.parse(sessionStr) : null;
+                    cb("INITIAL_SESSION", currentSession);
+                    return { data: { subscription: { unsubscribe: () => {} } } };
+                }
+            }
+        };
+        
+        // Listen to Mock Auth state changes
+        window.supabaseClient.auth.onAuthStateChange((event, session) => {
+            const prevToken = window.supabaseSessionToken;
+            window.supabaseSessionToken = session?.access_token || null;
+            window.supabaseUserEmail = session?.user?.email || null;
+            
+            const authBtn = document.getElementById("auth-status-btn");
+            const saveStatus = document.querySelector(".save-status");
+            
+            if (session) {
+                if (authBtn) {
+                    authBtn.innerHTML = `<i class="fa-solid fa-cloud" style="color: #10b981;"></i> Synced`;
+                    authBtn.title = `Synced with Local Mock Cloud: ${session.user.email}`;
+                }
+                if (saveStatus) {
+                    saveStatus.innerHTML = `<span class="save-dot" style="background-color: #10b981;"></span> Saved to Cloud (Mock)`;
+                }
+            } else {
+                if (authBtn) {
+                    authBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Sync`;
+                    authBtn.title = "Sync to Cloud Database (Mock)";
+                }
+                if (saveStatus) {
+                    saveStatus.innerHTML = `<span class="save-dot"></span> Saved Locally`;
+                }
+            }
+            
+            if (prevToken !== window.supabaseSessionToken) {
+                window.initProfiles();
+            }
+        });
     }
 }
 
