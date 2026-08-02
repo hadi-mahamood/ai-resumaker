@@ -186,7 +186,7 @@ const AIService = {
         let result;
         if (this.activeProvider === "webgpu") {
             result = await this.callWebGPULLM(prompt, onChunk);
-        } else if (this.apiKey) {
+        } else if (this.activeProvider === "gemini") {
             result = await this.callGeminiAPI(prompt, onChunk);
         } else {
             const mock = this.getOfflineRewriteMock(text);
@@ -210,7 +210,7 @@ const AIService = {
         let result;
         if (this.activeProvider === "webgpu") {
             result = await this.callWebGPULLM(prompt, onChunk);
-        } else if (this.apiKey) {
+        } else if (this.activeProvider === "gemini") {
             result = await this.callGeminiAPI(prompt, onChunk);
         } else {
             const mock = this.getOfflineSkillsMock(jobTitle, existingSkills);
@@ -239,7 +239,7 @@ const AIService = {
         let result;
         if (this.activeProvider === "webgpu") {
             result = await this.callWebGPULLM(prompt, onChunk);
-        } else if (this.apiKey) {
+        } else if (this.activeProvider === "gemini") {
             result = await this.callGeminiAPI(prompt, onChunk);
         } else {
             const mock = this.getOfflineCoverLetterMock(resumeData);
@@ -255,31 +255,30 @@ const AIService = {
      */
     async callGeminiAPI(promptText, onChunk) {
         try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`;
-            const response = await fetch(url, {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (this.apiKey) {
+                headers['x-api-key'] = this.apiKey;
+            }
+            
+            const response = await fetch('/api/ai/chat', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: promptText
-                        }]
-                    }]
-                })
+                headers: headers,
+                body: JSON.stringify({ prompt: promptText })
             });
             
             if (!response.ok) {
-                throw new Error(`API Error: ${response.statusText}`);
+                const errData = await response.json();
+                throw new Error(errData.error || response.statusText);
             }
             
             const data = await response.json();
             const text = data.candidates[0].content.parts[0].text.trim();
             return await this.simulateStreaming(text, onChunk);
         } catch (error) {
-            console.error("Gemini API call failed: ", error);
-            const fallback = "Gemini API Error. Falling back to local offline AI results:\n\n" + await this.offlineFallback(promptText);
+            console.error("Gemini Proxy API call failed: ", error);
+            const fallback = "API Proxy Error. Falling back to local offline AI results:\n\n" + await this.offlineFallback(promptText);
             return await this.simulateStreaming(fallback, onChunk);
         }
     },

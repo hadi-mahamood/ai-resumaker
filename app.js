@@ -273,6 +273,10 @@ function autoSave() {
                 localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
             }
         }
+        
+        if (window.syncProfilesToServer) {
+            window.syncProfilesToServer();
+        }
 
         updateATSScore();
         updateSidebarBadges();

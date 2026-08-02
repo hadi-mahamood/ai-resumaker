@@ -1660,7 +1660,52 @@ window.animateScoreIncrease = function(targetScore) {
 window.activeProfileId = "default";
 window.profiles = [];
 
-window.initProfiles = function() {
+// Synchronize all profiles and current state with Express Server Database
+window.syncProfilesToServer = async function() {
+    try {
+        await fetch('/api/profiles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                profiles: window.profiles,
+                activeProfileId: window.activeProfileId,
+                resumeData: state
+            })
+        });
+    } catch (e) {
+        console.error("Failed to sync profiles with Express server: ", e);
+    }
+};
+
+window.initProfiles = async function() {
+    // Try to load profiles from Express Server JSON Database
+    try {
+        const response = await fetch('/api/profiles');
+        if (response.ok) {
+            const db = await response.json();
+            if (db.profiles && db.profiles.length > 0) {
+                window.profiles = db.profiles;
+                window.activeProfileId = db.activeProfileId || window.profiles[0].id;
+                const active = window.profiles.find(p => p.id === window.activeProfileId) || window.profiles[0];
+                state = JSON.parse(JSON.stringify(active.resumeData));
+                
+                // Re-render UI forms and preview
+                setFormFields();
+                updateSidebarBadges();
+                renderExperienceList();
+                renderEducationList();
+                renderProjectsList();
+                renderSkillsTags();
+                renderResumePreview();
+                updateATSScore();
+                window.renderProfileDropdown();
+                return;
+            }
+        }
+    } catch (e) {
+        console.error("Failed to load profiles from server, falling back to local storage: ", e);
+    }
+
     const savedProfiles = localStorage.getItem('resumake_profiles');
     const savedActiveId = localStorage.getItem('resumake_active_profile_id');
     const savedState = localStorage.getItem('resumake_state');
@@ -1701,6 +1746,9 @@ window.initProfiles = function() {
         window.activeProfileId = active.id;
         localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
     }
+    
+    // Sync migrations back to server
+    window.syncProfilesToServer();
     
     window.renderProfileDropdown();
 };
@@ -1744,6 +1792,7 @@ window.switchProfile = function(profileId) {
         renderSkillsTags();
         renderResumePreview();
         updateATSScore();
+        window.syncProfilesToServer();
         showToast(`Switched to profile: "${target.name}"`);
     }
 };
@@ -1795,6 +1844,7 @@ window.createNewProfile = function() {
     renderResumePreview();
     updateATSScore();
     window.renderProfileDropdown();
+    window.syncProfilesToServer();
     showToast(`Created new profile: "${name}"`);
 };
 
@@ -1828,6 +1878,7 @@ window.duplicateCurrentProfile = function() {
     renderResumePreview();
     updateATSScore();
     window.renderProfileDropdown();
+    window.syncProfilesToServer();
     showToast(`Duplicated profile: "${newProfile.name}"`);
 };
 
@@ -1843,6 +1894,7 @@ window.renameCurrentProfile = function() {
     
     localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
     window.renderProfileDropdown();
+    window.syncProfilesToServer();
     showToast(`Profile renamed to: "${active.name}"`);
 };
 
@@ -1875,6 +1927,7 @@ window.deleteCurrentProfile = function() {
     renderResumePreview();
     updateATSScore();
     window.renderProfileDropdown();
+    window.syncProfilesToServer();
     showToast("Profile deleted successfully.");
 };
 

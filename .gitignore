@@ -1,11 +1,12 @@
-# System files
-.DS_Store
-Thumbs.db
+# Dependency directories
+node_modules/
 
-# Editor configurations
-.vscode/
-.idea/
-
-# Local backup / environment files
+# Local env files
 .env
-*.log
+.env.local
+
+# Server database files
+profiles_db.json
+
+# Lockfiles (optional, but keep package-lock.json out if we want clean simple git)
+# package-lock.json
