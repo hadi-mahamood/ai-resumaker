@@ -778,6 +778,19 @@
                     </div>
                 </form>
 
+                <!-- Social Sign In Divider & Buttons -->
+                <div id="auth-social-container" style="margin-top: 20px;">
+                    <div style="display: flex; align-items: center; text-align: center; margin-bottom: 16px;">
+                        <div style="flex: 1; border-bottom: 1px solid var(--border-color);"></div>
+                        <span style="padding: 0 10px; font-size: 0.75rem; color: #64748b; font-weight: 500;">or continue with</span>
+                        <div style="flex: 1; border-bottom: 1px solid var(--border-color);"></div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="window.handleOAuthLogin('google')" class="ai-btn ai-btn-outline" style="flex: 1; justify-content: center; padding: 10px; font-size: 0.8rem; cursor: pointer; outline: none; border: 1px solid var(--border-color);"><i class="fa-brands fa-google" style="color: #ea4335;"></i> Google</button>
+                        <button onclick="window.handleOAuthLogin('github')" class="ai-btn ai-btn-outline" style="flex: 1; justify-content: center; padding: 10px; font-size: 0.8rem; cursor: pointer; outline: none; border: 1px solid var(--border-color);"><i class="fa-brands fa-github" style="color: #24292f;"></i> GitHub</button>
+                    </div>
+                </div>
+
                 <!-- Authenticated User Panel (hidden by default) -->
                 <div id="auth-user-panel" style="display: none; text-align: center; padding: 10px 0;">
                     <i class="fa-solid fa-circle-user" style="font-size: 3rem; color: var(--primary); margin-bottom: 12px; display: block;"></i>

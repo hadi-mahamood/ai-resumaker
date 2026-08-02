@@ -1168,11 +1168,13 @@ window.openAuthModal = function() {
     const registerForm = document.getElementById("auth-register-form");
     const userPanel = document.getElementById("auth-user-panel");
     const tabs = document.getElementById("auth-modal-tabs");
+    const socialContainer = document.getElementById("auth-social-container");
     
     if (window.supabaseSessionToken) {
         if (loginForm) loginForm.style.display = "none";
         if (registerForm) registerForm.style.display = "none";
         if (tabs) tabs.style.display = "none";
+        if (socialContainer) socialContainer.style.display = "none";
         if (userPanel) {
             userPanel.style.display = "block";
             const emailLabel = document.getElementById("auth-user-email");
@@ -1181,10 +1183,30 @@ window.openAuthModal = function() {
     } else {
         if (userPanel) userPanel.style.display = "none";
         if (tabs) tabs.style.display = "flex";
+        if (socialContainer) socialContainer.style.display = "block";
         window.switchAuthTab('login');
     }
     
     modal.classList.add("open");
+};
+
+window.handleOAuthLogin = async function(provider) {
+    if (!window.supabaseClient) {
+        showToast("Cloud authentication not configured.");
+        return;
+    }
+    try {
+        const { error } = await window.supabaseClient.auth.signInWithOAuth({
+            provider: provider,
+            options: {
+                redirectTo: window.location.origin
+            }
+        });
+        if (error) showToast(`OAuth Error: ${error.message}`);
+    } catch (e) {
+        console.error("OAuth exception: ", e);
+        showToast("Social login request failed.");
+    }
 };
 
 window.closeAuthModal = function() {

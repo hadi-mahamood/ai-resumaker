@@ -1663,9 +1663,15 @@ window.profiles = [];
 // Synchronize all profiles and current state with Express Server Database
 window.syncProfilesToServer = async function() {
     try {
+        let token = null;
+        if (window.supabaseClient) {
+            const { data: { session } } = await window.supabaseClient.auth.getSession();
+            token = session?.access_token || null;
+        }
+        
         const headers = { 'Content-Type': 'application/json' };
-        if (window.supabaseSessionToken) {
-            headers['Authorization'] = `Bearer ${window.supabaseSessionToken}`;
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
         }
         await fetch('/api/profiles', {
             method: 'POST',
@@ -1682,15 +1688,29 @@ window.syncProfilesToServer = async function() {
 };
 
 window.initProfiles = async function() {
-    // Try to load profiles from Express Server JSON Database
+    // Try to load profiles from Express Server Database
     try {
+        let token = null;
+        if (window.supabaseClient) {
+            const { data: { session } } = await window.supabaseClient.auth.getSession();
+            token = session?.access_token || null;
+        }
+
         const headers = {};
-        if (window.supabaseSessionToken) {
-            headers['Authorization'] = `Bearer ${window.supabaseSessionToken}`;
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
         }
         const response = await fetch('/api/profiles', { headers });
         if (response.ok) {
             const db = await response.json();
+            
+            // If authenticated and cloud is empty, but local has profiles, auto-upload local profiles to cloud!
+            if (token && (!db.profiles || db.profiles.length === 0) && window.profiles.length > 0) {
+                showToast("Uploading local profiles to cloud...");
+                await window.syncProfilesToServer();
+                return;
+            }
+
             if (db.profiles && db.profiles.length > 0) {
                 window.profiles = db.profiles;
                 window.activeProfileId = db.activeProfileId || window.profiles[0].id;
