@@ -1072,7 +1072,7 @@ textarea {
     right: 0;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .ai-panel {
         width: 100% !important;
         right: -100% !important;
