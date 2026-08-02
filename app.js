@@ -12,6 +12,20 @@ import {
 } from "./templates/regional.js";
 import { formatMultiline } from "./templates/utils.js";
 
+// Debounce helper to prevent rapid main-thread blocks during fast typing
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+// Debounced wrapper for preview rendering to keep typing butter-smooth
+const debouncedRenderPreview = debounce(() => {
+    renderResumePreview();
+}, 150);
+
 /**
  * ResuMake AI - Main Application Controller
  * 
@@ -212,7 +226,7 @@ function bindInputEvents() {
             el.addEventListener("input", (e) => {
                 state[item.key] = e.target.value;
                 autoSave();
-                renderResumePreview();
+                debouncedRenderPreview();
             });
         }
     });
@@ -414,7 +428,7 @@ function updateExperience(id, field, value) {
     if (idx !== -1) {
         state.experience[idx][field] = value;
         autoSave();
-        renderResumePreview();
+        debouncedRenderPreview();
     }
 }
 
@@ -480,7 +494,7 @@ function updateEducation(id, field, value) {
     if (idx !== -1) {
         state.education[idx][field] = value;
         autoSave();
-        renderResumePreview();
+        debouncedRenderPreview();
     }
 }
 
@@ -541,7 +555,7 @@ function updateProject(id, field, value) {
     if (idx !== -1) {
         state.projects[idx][field] = value;
         autoSave();
-        renderResumePreview();
+        debouncedRenderPreview();
     }
 }
 

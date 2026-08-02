@@ -1,4 +1,4 @@
-import { formatMultiline } from "./utils.js";
+import { formatMultiline, escapeHTML } from "./utils.js";
 
 export function compileExecutiveTemplate(state) {
     let name = state.name || "YOUR NAME";
@@ -6,16 +6,16 @@ export function compileExecutiveTemplate(state) {
     
     // Assemble sidebar contact column
     let contactItems = [];
-    if (state.email) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-envelope" style="width:14px; margin-right:4px;"></i> ${state.email}</div>`);
-    if (state.phone) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-phone" style="width:14px; margin-right:4px;"></i> ${state.phone}</div>`);
-    if (state.location) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-location-dot" style="width:14px; margin-right:4px;"></i> ${state.location}</div>`);
-    if (state.website) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-globe" style="width:14px; margin-right:4px;"></i> ${state.website}</div>`);
+    if (state.email) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-envelope" style="width:14px; margin-right:4px;"></i> ${escapeHTML(state.email)}</div>`);
+    if (state.phone) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-phone" style="width:14px; margin-right:4px;"></i> ${escapeHTML(state.phone)}</div>`);
+    if (state.location) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-location-dot" style="width:14px; margin-right:4px;"></i> ${escapeHTML(state.location)}</div>`);
+    if (state.website) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-globe" style="width:14px; margin-right:4px;"></i> ${escapeHTML(state.website)}</div>`);
     let contactBox = contactItems.length > 0 ? `<div class="contact-info-list">${contactItems.join('')}</div>` : '';
 
     // Skills
     let skillsHTML = "";
     if (state.skills && state.skills.length > 0) {
-        let badges = state.skills.map(s => `<span class="skill-badge-preview">${s}</span>`).join('');
+        let badges = state.skills.map(s => `<span class="skill-badge-preview">${escapeHTML(s)}</span>`).join('');
         skillsHTML = `
             <div class="resume-section" style="margin-top: 15px;">
                 <h2 class="resume-section-title">Expertise</h2>
@@ -30,11 +30,11 @@ export function compileExecutiveTemplate(state) {
         let items = state.experience.map(exp => `
             <div class="experience-item">
                 <div class="item-header">
-                    <span class="item-title">${exp.role || "Role"}</span>
-                    <span class="item-subtitle">${exp.company || "Company"}</span>
-                    <span class="item-date">${exp.date || "Dates"}</span>
+                    <span class="item-title">${escapeHTML(exp.role || "Role")}</span>
+                    <span class="item-subtitle">${escapeHTML(exp.company || "Company")}</span>
+                    <span class="item-date">${escapeHTML(exp.date || "Dates")}</span>
                 </div>
-                <div class="item-desc">${formatMultiline(exp.desc || "Accomplishments...")}</div>
+                <div class="item-desc">${formatMultiline(escapeHTML(exp.desc || "Accomplishments..."))}</div>
             </div>
         `).join('');
         expHTML = `
@@ -51,10 +51,10 @@ export function compileExecutiveTemplate(state) {
         let items = state.projects.map(proj => `
             <div class="project-item">
                 <div class="item-header">
-                    <span class="item-title">${proj.title || "Project"}</span>
-                    <span class="item-subtitle">${proj.role || "Role"}</span>
+                    <span class="item-title">${escapeHTML(proj.title || "Project")}</span>
+                    <span class="item-subtitle">${escapeHTML(proj.role || "Role")}</span>
                 </div>
-                <div class="item-desc">${formatMultiline(proj.desc || "Details...")}</div>
+                <div class="item-desc">${formatMultiline(escapeHTML(proj.desc || "Details..."))}</div>
             </div>
         `).join('');
         projHTML = `
@@ -71,11 +71,11 @@ export function compileExecutiveTemplate(state) {
         let items = state.education.map(edu => `
             <div class="experience-item">
                 <div class="item-header">
-                    <span class="item-title">${edu.degree || "Degree"}</span>
-                    <span class="item-subtitle">${edu.institution || "Institution"}</span>
-                    <span class="item-date">${edu.date || "Dates"}</span>
+                    <span class="item-title">${escapeHTML(edu.degree || "Degree")}</span>
+                    <span class="item-subtitle">${escapeHTML(edu.institution || "Institution")}</span>
+                    <span class="item-date">${escapeHTML(edu.date || "Dates")}</span>
                 </div>
-                ${edu.desc ? `<div class="item-desc" style="margin-top:2px;">${edu.desc}</div>` : ''}
+                ${edu.desc ? `<div class="item-desc" style="margin-top:2px;">${escapeHTML(edu.desc)}</div>` : ''}
             </div>
         `).join('');
         eduHTML = `
@@ -89,11 +89,11 @@ export function compileExecutiveTemplate(state) {
     // Regional details for Executive sidebar layout
     let regionalHTML = "";
     let regionalItems = [];
-    if (state.dob) regionalItems.push(`<div class="contact-item"><strong>DOB:</strong> ${state.dob}</div>`);
-    if (state.nationality) regionalItems.push(`<div class="contact-item"><strong>Nationality:</strong> ${state.nationality}</div>`);
-    if (state.visaStatus) regionalItems.push(`<div class="contact-item"><strong>Visa / Residency:</strong> ${state.visaStatus}</div>`);
-    if (state.maritalStatus) regionalItems.push(`<div class="contact-item"><strong>Status:</strong> ${state.maritalStatus}</div>`);
-    if (state.languages) regionalItems.push(`<div class="contact-item"><strong>Languages:</strong> ${state.languages}</div>`);
+    if (state.dob) regionalItems.push(`<div class="contact-item"><strong>DOB:</strong> ${escapeHTML(state.dob)}</div>`);
+    if (state.nationality) regionalItems.push(`<div class="contact-item"><strong>Nationality:</strong> ${escapeHTML(state.nationality)}</div>`);
+    if (state.visaStatus) regionalItems.push(`<div class="contact-item"><strong>Visa / Residency:</strong> ${escapeHTML(state.visaStatus)}</div>`);
+    if (state.maritalStatus) regionalItems.push(`<div class="contact-item"><strong>Status:</strong> ${escapeHTML(state.maritalStatus)}</div>`);
+    if (state.languages) regionalItems.push(`<div class="contact-item"><strong>Languages:</strong> ${escapeHTML(state.languages)}</div>`);
     if (regionalItems.length > 0) {
         regionalHTML = `
             <div class="resume-section" style="margin-top: 15px;">
@@ -106,8 +106,8 @@ export function compileExecutiveTemplate(state) {
     return `
         <div class="sidebar-col">
             <header class="resume-header">
-                <h1 class="resume-name">${name}</h1>
-                <div class="resume-title">${title}</div>
+                <h1 class="resume-name">${escapeHTML(name)}</h1>
+                <div class="resume-title">${escapeHTML(title)}</div>
             </header>
             ${contactBox}
             ${skillsHTML}

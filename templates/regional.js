@@ -1,7 +1,8 @@
-import { formatMultiline } from "./utils.js";
+import { formatMultiline, sanitizeState } from "./utils.js";
 
 // Helper to compile regional details beautifully for standard templates
 export function compileRegionalSection(state, titleLabel = "Personal & Regional Details", isTableFormat = false) {
+    state = sanitizeState(state);
     let items = [];
     if (state.dob) items.push({ label: "Date of Birth", value: state.dob });
     if (state.nationality) items.push({ label: "Nationality", value: state.nationality });
@@ -42,6 +43,7 @@ export function compileRegionalSection(state, titleLabel = "Personal & Regional 
 }
 
 export function compileGCCTemplate(state) {
+    state = sanitizeState(state);
     let name = state.name || "YOUR NAME";
     let title = state.title || "Target Professional Title";
     
@@ -163,6 +165,7 @@ export function compileGCCTemplate(state) {
 }
 
 export function compileIndiaTemplate(state) {
+    state = sanitizeState(state);
     let name = state.name || "YOUR NAME";
     let title = state.title || "Target Professional Title";
     
@@ -300,6 +303,7 @@ export function compileIndiaTemplate(state) {
 }
 
 export function compileEuropeTemplate(state) {
+    state = sanitizeState(state);
     let name = state.name || "YOUR NAME";
     let title = state.title || "Target Professional Title";
     
@@ -443,6 +447,7 @@ export function compileEuropeTemplate(state) {
 }
 
 export function compileUSTemplate(state) {
+    state = sanitizeState(state);
     let name = state.name || "YOUR NAME";
     let title = state.title || "Target Professional Title";
     
@@ -548,6 +553,7 @@ export function compileUSTemplate(state) {
 }
 
 export function compileUKTemplate(state) {
+    state = sanitizeState(state);
     let name = state.name || "YOUR NAME";
     let title = state.title || "Target Professional Title";
     
@@ -656,6 +662,7 @@ export function compileUKTemplate(state) {
 }
 
 export function compileAsiaTemplate(state) {
+    state = sanitizeState(state);
     let name = state.name || "YOUR NAME";
     let title = state.title || "Target Professional Title";
 
@@ -785,6 +792,7 @@ export function compileAsiaTemplate(state) {
 }
 
 export function compileLATAMTemplate(state) {
+    state = sanitizeState(state);
     let name = state.name || "YOUR NAME";
     let title = state.title || "Target Professional Title";
     

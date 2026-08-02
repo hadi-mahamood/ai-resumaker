@@ -1,4 +1,4 @@
-import { formatMultiline } from "./utils.js";
+import { formatMultiline, escapeHTML } from "./utils.js";
 import { compileRegionalSection } from "./regional.js";
 
 export function compileClassicTemplate(state) {
@@ -6,10 +6,10 @@ export function compileClassicTemplate(state) {
     let title = state.title || "Target Professional Title";
     
     let contacts = [];
-    if (state.email) contacts.push(state.email);
-    if (state.phone) contacts.push(state.phone);
-    if (state.location) contacts.push(state.location);
-    if (state.website) contacts.push(state.website);
+    if (state.email) contacts.push(escapeHTML(state.email));
+    if (state.phone) contacts.push(escapeHTML(state.phone));
+    if (state.location) contacts.push(escapeHTML(state.location));
+    if (state.website) contacts.push(escapeHTML(state.website));
     let contactBar = contacts.length > 0 ? `<div class="resume-contact-bar">${contacts.join('   •   ')}</div>` : '';
 
     // Experience
@@ -19,12 +19,12 @@ export function compileClassicTemplate(state) {
             <div class="experience-item">
                 <div class="item-header">
                     <div>
-                        <span class="item-title">${exp.company || "Company"}</span> — 
-                        <span class="item-subtitle">${exp.role || "Role"}</span>
+                        <span class="item-title">${escapeHTML(exp.company || "Company")}</span> — 
+                        <span class="item-subtitle">${escapeHTML(exp.role || "Role")}</span>
                     </div>
-                    <span class="item-date">${exp.date || "Dates"}</span>
+                    <span class="item-date">${escapeHTML(exp.date || "Dates")}</span>
                 </div>
-                <div class="item-desc">${formatMultiline(exp.desc || "Bullet achievements...")}</div>
+                <div class="item-desc">${formatMultiline(escapeHTML(exp.desc || "Bullet achievements..."))}</div>
             </div>
         `).join('');
         expHTML = `
@@ -38,7 +38,7 @@ export function compileClassicTemplate(state) {
     // Skills
     let skillsHTML = "";
     if (state.skills && state.skills.length > 0) {
-        let badges = state.skills.map(s => `<span class="skill-badge-preview">${s}</span>`).join('');
+        let badges = state.skills.map(s => `<span class="skill-badge-preview">${escapeHTML(s)}</span>`).join('');
         skillsHTML = `
             <div class="resume-section">
                 <h2 class="resume-section-title">Key Competencies</h2>
@@ -55,10 +55,10 @@ export function compileClassicTemplate(state) {
         let items = state.projects.map(proj => `
             <div class="project-item">
                 <div class="item-header">
-                    <span class="item-title">${proj.title || "Project"}</span>
-                    <span class="item-subtitle">${proj.role || "Role"}</span>
+                    <span class="item-title">${escapeHTML(proj.title || "Project")}</span>
+                    <span class="item-subtitle">${escapeHTML(proj.role || "Role")}</span>
                 </div>
-                <div class="item-desc">${formatMultiline(proj.desc || "Description...")}</div>
+                <div class="item-desc">${formatMultiline(escapeHTML(proj.desc || "Description..."))}</div>
             </div>
         `).join('');
         projHTML = `
@@ -76,12 +76,12 @@ export function compileClassicTemplate(state) {
             <div class="experience-item">
                 <div class="item-header">
                     <div>
-                        <span class="item-title">${edu.institution || "School"}</span> — 
-                        <span class="item-subtitle">${edu.degree || "Degree"}</span>
+                        <span class="item-title">${escapeHTML(edu.institution || "School")}</span> — 
+                        <span class="item-subtitle">${escapeHTML(edu.degree || "Degree")}</span>
                     </div>
-                    <span class="item-date">${edu.date || "Dates"}</span>
+                    <span class="item-date">${escapeHTML(edu.date || "Dates")}</span>
                 </div>
-                ${edu.desc ? `<div class="item-desc">${edu.desc}</div>` : ''}
+                ${edu.desc ? `<div class="item-desc">${escapeHTML(edu.desc)}</div>` : ''}
             </div>
         `).join('');
         eduHTML = `
@@ -94,8 +94,8 @@ export function compileClassicTemplate(state) {
 
     return `
         <header class="resume-header">
-            <h1 class="resume-name">${name}</h1>
-            <div class="resume-title">${title}</div>
+            <h1 class="resume-name">${escapeHTML(name)}</h1>
+            <div class="resume-title">${escapeHTML(title)}</div>
             ${contactBar}
         </header>
         ${expHTML}
