@@ -338,14 +338,20 @@ body {
     background: rgba(255, 255, 255, 0.02);
     overflow: hidden;
     flex-shrink: 0;
-    transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.accordion-item:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.05);
 }
 
 .accordion-item.active {
     background: rgba(255, 255, 255, 0.04);
     border-color: rgba(255, 255, 255, 0.08);
     border-left: 4px solid var(--section-color);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 .accordion-header {
@@ -363,7 +369,7 @@ body {
 }
 
 .accordion-header:hover .accordion-title {
-    transform: translateX(4px);
+    transform: translateX(6px);
 }
 
 .accordion-title {
@@ -372,7 +378,7 @@ body {
     gap: 12px;
     font-weight: 500;
     font-size: 0.95rem;
-    transition: var(--transition-fast);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .accordion-title i {
@@ -517,19 +523,26 @@ textarea {
 }
 
 .list-item-card {
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid var(--border-color);
-    padding: 16px 0;
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
     position: relative;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    transition: var(--transition-fast);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.list-item-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
 }
 
 .list-item-card:last-of-type {
-    border-bottom: none;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .list-item-card:hover .list-item-card-header {
@@ -580,9 +593,9 @@ textarea {
 }
 
 .btn-add {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed var(--border-color);
+    color: var(--text-secondary);
     padding: 10px;
     border-radius: 8px;
     font-weight: 500;
@@ -591,13 +604,18 @@ textarea {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: var(--transition-fast);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-add:hover {
-    background: rgba(99, 102, 241, 0.1);
-    border-color: var(--primary);
-    color: var(--primary);
+    background: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.35);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-add:active {
+    transform: scale(0.98);
 }
 
 /* Skill Tags Input */
@@ -879,8 +897,12 @@ textarea {
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: var(--transition-fast);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border: none;
+}
+
+.btn:active {
+    transform: scale(0.96) !important;
 }
 
 .btn-primary {
@@ -890,8 +912,8 @@ textarea {
 }
 
 .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 22px rgba(99, 102, 241, 0.55);
 }
 
 .btn-premium {
@@ -901,8 +923,8 @@ textarea {
 }
 
 .btn-premium:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 25px rgba(139, 92, 246, 0.55);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 28px rgba(139, 92, 246, 0.6);
 }
 
 .btn-success {
@@ -912,8 +934,8 @@ textarea {
 }
 
 .btn-success:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 25px rgba(16, 185, 129, 0.55);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 28px rgba(16, 185, 129, 0.6);
 }
 
 .btn-secondary {
@@ -924,6 +946,7 @@ textarea {
 
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px) scale(1.02);
 }
 
 /* ATS Score Widget */
@@ -1112,6 +1135,12 @@ textarea {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ai-card:hover {
+    border-color: rgba(168, 85, 247, 0.25);
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.05);
 }
 
 .ai-card-title {
