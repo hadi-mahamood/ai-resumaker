@@ -161,6 +161,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Render preview
     renderResumePreview();
     
+    // Bind inline editing event handlers
+    bindInlineEditEvents();
+    
     // Switch templates to active one
     switchTemplate(state.activeTemplate);
 
@@ -671,6 +674,118 @@ function renderResumePreview() {
     updateATSScore();
     // Scale sheet dynamically
     resizeResumePreview();
+    // Setup contenteditable attributes on personal fields
+    makePreviewSheetEditable();
+}
+
+function makePreviewSheetEditable() {
+    const sheet = document.getElementById("resume-sheet");
+    if (!sheet) return;
+
+    // Helper to find and tag text nodes or elements matching state values
+    const fields = [
+        { key: "name", value: state.name },
+        { key: "title", value: state.title },
+        { key: "email", value: state.email },
+        { key: "phone", value: state.phone },
+        { key: "location", value: state.location },
+        { key: "website", value: state.website },
+        { key: "dob", value: state.dob },
+        { key: "nationality", value: state.nationality },
+        { key: "visaStatus", value: state.visaStatus },
+        { key: "maritalStatus", value: state.maritalStatus },
+        { key: "languages", value: state.languages }
+    ];
+
+    // 1. Tag name and title directly using selectors as robust targets
+    const nameEl = sheet.querySelector(".resume-name, h1.name-preview");
+    if (nameEl && state.name) {
+        nameEl.setAttribute("contenteditable", "true");
+        nameEl.setAttribute("data-path", "name");
+        nameEl.style.outline = "none";
+    }
+    const titleEl = sheet.querySelector(".resume-title, .title-preview");
+    if (titleEl && state.title) {
+        titleEl.setAttribute("contenteditable", "true");
+        titleEl.setAttribute("data-path", "title");
+        titleEl.style.outline = "none";
+    }
+
+    // 2. Walk text nodes in the DOM to search and wrap all remaining personal details dynamically
+    const walk = document.createTreeWalker(sheet, NodeFilter.SHOW_TEXT, null, false);
+    let node;
+    const matches = [];
+
+    while (node = walk.nextNode()) {
+        const text = node.nodeValue.trim();
+        if (!text) continue;
+
+        for (const field of fields) {
+            if (!field.value || field.key === "name" || field.key === "title") continue;
+            
+            if (text === field.value.trim()) {
+                matches.push({ node, field });
+                break;
+            }
+        }
+    }
+
+    // Wrap the text node in a contenteditable span
+    matches.forEach(({ node, field }) => {
+        const parent = node.parentNode;
+        if (parent.getAttribute("data-path") === field.key) return;
+
+        const span = document.createElement("span");
+        span.setAttribute("contenteditable", "true");
+        span.setAttribute("data-path", field.key);
+        span.style.outline = "none";
+        span.style.display = "inline-block";
+        span.style.minWidth = "10px";
+        span.innerText = node.nodeValue.trim();
+
+        parent.replaceChild(span, node);
+    });
+}
+
+function bindInlineEditEvents() {
+    const sheet = document.getElementById("resume-sheet");
+    if (!sheet) return;
+
+    // Real-time keyboard input updates state and sidebar form fields
+    sheet.addEventListener("input", (e) => {
+        const target = e.target;
+        const path = target.getAttribute("data-path");
+        if (!path) return;
+
+        const val = target.innerText;
+        state[path] = val;
+
+        let inputId = `input-${path}`;
+        if (path === "visaStatus") inputId = "input-visa";
+        if (path === "maritalStatus") inputId = "input-marital";
+
+        const inputEl = document.getElementById(inputId);
+        if (inputEl) {
+            inputEl.value = val;
+        }
+
+        // Save progress to local storage and queue cloud sync
+        if (window.saveState) {
+            window.saveState();
+        }
+    });
+
+    // Blur (focus out) triggers a full preview compile to recalculate page metrics and breaks
+    sheet.addEventListener("blur", (e) => {
+        const target = e.target;
+        if (target.getAttribute("data-path")) {
+            if (window.debouncedRenderPreview) {
+                window.debouncedRenderPreview();
+            } else {
+                renderResumePreview();
+            }
+        }
+    }, true);
 }
 
 

@@ -1074,6 +1074,26 @@ textarea {
     flex-shrink: 0;
 }
 
+/* Interactive WYSIWYG Inline Editing Indicators */
+.resume-sheet [contenteditable="true"] {
+    transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+    cursor: text;
+    border-radius: 4px;
+    padding: 0 4px;
+    margin: 0 -4px;
+}
+
+.resume-sheet [contenteditable="true"]:hover {
+    background: rgba(99, 102, 241, 0.08);
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3);
+}
+
+.resume-sheet [contenteditable="true"]:focus {
+    background: rgba(99, 102, 241, 0.12);
+    box-shadow: 0 0 0 2px var(--primary);
+    outline: none;
+}
+
 @media (max-width: 900px) {
     .preview-workspace {
         padding: 16px;

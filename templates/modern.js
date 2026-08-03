@@ -6,10 +6,10 @@ export function compileModernTemplate(state) {
     let title = state.title || "Target Professional Title";
     
     let contacts = [];
-    if (state.email) contacts.push(`<i class="fa-solid fa-envelope"></i> ${escapeHTML(state.email)}`);
-    if (state.phone) contacts.push(`<i class="fa-solid fa-phone"></i> ${escapeHTML(state.phone)}`);
-    if (state.location) contacts.push(`<i class="fa-solid fa-location-dot"></i> ${escapeHTML(state.location)}`);
-    if (state.website) contacts.push(`<i class="fa-solid fa-globe"></i> ${escapeHTML(state.website)}`);
+    if (state.email) contacts.push(`<span><i class="fa-solid fa-envelope"></i> <span contenteditable="true" data-path="email" style="outline:none; display:inline-block;">${escapeHTML(state.email)}</span></span>`);
+    if (state.phone) contacts.push(`<span><i class="fa-solid fa-phone"></i> <span contenteditable="true" data-path="phone" style="outline:none; display:inline-block;">${escapeHTML(state.phone)}</span></span>`);
+    if (state.location) contacts.push(`<span><i class="fa-solid fa-location-dot"></i> <span contenteditable="true" data-path="location" style="outline:none; display:inline-block;">${escapeHTML(state.location)}</span></span>`);
+    if (state.website) contacts.push(`<span><i class="fa-solid fa-globe"></i> <span contenteditable="true" data-path="website" style="outline:none; display:inline-block;">${escapeHTML(state.website)}</span></span>`);
     let contactBar = contacts.length > 0 ? `<div class="resume-contact-bar">${contacts.join(' | ')}</div>` : '';
 
     // Experience compilation
@@ -97,8 +97,8 @@ export function compileModernTemplate(state) {
 
     return `
         <header class="resume-header">
-            <h1 class="resume-name">${escapeHTML(name)}</h1>
-            <div class="resume-title">${escapeHTML(title)}</div>
+            <h1 class="resume-name" contenteditable="true" data-path="name" style="outline:none;">${escapeHTML(name)}</h1>
+            <div class="resume-title" contenteditable="true" data-path="title" style="outline:none;">${escapeHTML(title)}</div>
             ${contactBar}
         </header>
         ${expHTML}

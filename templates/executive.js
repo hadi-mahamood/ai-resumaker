@@ -6,10 +6,10 @@ export function compileExecutiveTemplate(state) {
     
     // Assemble sidebar contact column
     let contactItems = [];
-    if (state.email) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-envelope" style="width:14px; margin-right:4px;"></i> ${escapeHTML(state.email)}</div>`);
-    if (state.phone) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-phone" style="width:14px; margin-right:4px;"></i> ${escapeHTML(state.phone)}</div>`);
-    if (state.location) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-location-dot" style="width:14px; margin-right:4px;"></i> ${escapeHTML(state.location)}</div>`);
-    if (state.website) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-globe" style="width:14px; margin-right:4px;"></i> ${escapeHTML(state.website)}</div>`);
+    if (state.email) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-envelope" style="width:14px; margin-right:4px;"></i> <span contenteditable="true" data-path="email" style="outline:none; display:inline-block;">${escapeHTML(state.email)}</span></div>`);
+    if (state.phone) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-phone" style="width:14px; margin-right:4px;"></i> <span contenteditable="true" data-path="phone" style="outline:none; display:inline-block;">${escapeHTML(state.phone)}</span></div>`);
+    if (state.location) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-location-dot" style="width:14px; margin-right:4px;"></i> <span contenteditable="true" data-path="location" style="outline:none; display:inline-block;">${escapeHTML(state.location)}</span></div>`);
+    if (state.website) contactItems.push(`<div class="contact-item"><i class="fa-solid fa-globe" style="width:14px; margin-right:4px;"></i> <span contenteditable="true" data-path="website" style="outline:none; display:inline-block;">${escapeHTML(state.website)}</span></div>`);
     let contactBox = contactItems.length > 0 ? `<div class="contact-info-list">${contactItems.join('')}</div>` : '';
 
     // Skills
@@ -106,8 +106,8 @@ export function compileExecutiveTemplate(state) {
     return `
         <div class="sidebar-col">
             <header class="resume-header">
-                <h1 class="resume-name">${escapeHTML(name)}</h1>
-                <div class="resume-title">${escapeHTML(title)}</div>
+                <h1 class="resume-name" contenteditable="true" data-path="name" style="outline:none;">${escapeHTML(name)}</h1>
+                <div class="resume-title" contenteditable="true" data-path="title" style="outline:none;">${escapeHTML(title)}</div>
             </header>
             ${contactBox}
             ${skillsHTML}

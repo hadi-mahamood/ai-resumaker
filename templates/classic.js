@@ -6,10 +6,10 @@ export function compileClassicTemplate(state) {
     let title = state.title || "Target Professional Title";
     
     let contacts = [];
-    if (state.email) contacts.push(escapeHTML(state.email));
-    if (state.phone) contacts.push(escapeHTML(state.phone));
-    if (state.location) contacts.push(escapeHTML(state.location));
-    if (state.website) contacts.push(escapeHTML(state.website));
+    if (state.email) contacts.push(`<span contenteditable="true" data-path="email" style="outline:none; display:inline-block;">${escapeHTML(state.email)}</span>`);
+    if (state.phone) contacts.push(`<span contenteditable="true" data-path="phone" style="outline:none; display:inline-block;">${escapeHTML(state.phone)}</span>`);
+    if (state.location) contacts.push(`<span contenteditable="true" data-path="location" style="outline:none; display:inline-block;">${escapeHTML(state.location)}</span>`);
+    if (state.website) contacts.push(`<span contenteditable="true" data-path="website" style="outline:none; display:inline-block;">${escapeHTML(state.website)}</span>`);
     let contactBar = contacts.length > 0 ? `<div class="resume-contact-bar">${contacts.join('   •   ')}</div>` : '';
 
     // Experience
@@ -94,8 +94,8 @@ export function compileClassicTemplate(state) {
 
     return `
         <header class="resume-header">
-            <h1 class="resume-name">${escapeHTML(name)}</h1>
-            <div class="resume-title">${escapeHTML(title)}</div>
+            <h1 class="resume-name" contenteditable="true" data-path="name" style="outline:none;">${escapeHTML(name)}</h1>
+            <div class="resume-title" contenteditable="true" data-path="title" style="outline:none;">${escapeHTML(title)}</div>
             ${contactBar}
         </header>
         ${expHTML}
