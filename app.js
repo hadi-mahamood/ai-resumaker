@@ -1184,6 +1184,7 @@ window.openATSModal = openATSModal;
 window.openAIEngine = openAIEngine;
 window.openAISkills = openAISkills;
 window.openAICoverLetter = openAICoverLetter;
+window.runAICoverLetter = runAICoverLetter;
 window.applyExperienceRewrite = applyExperienceRewrite;
 window.closeAIPanel = closeAIPanel;
 window.toggleRewriteView = toggleRewriteView;
