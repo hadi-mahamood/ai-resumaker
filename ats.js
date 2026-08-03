@@ -2362,9 +2362,6 @@ window.previewCoverLetterTheme = function() {
     sheet.innerHTML = `
         ${headerHtml}
         <div class="cover-letter-content-body" style="padding: 20px 0; text-align: left;">
-            <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 16px;">
-                Date: ${new Date().toLocaleDateString()}
-            </div>
             ${bodyHtml}
         </div>
     `;
