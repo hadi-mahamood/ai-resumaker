@@ -338,7 +338,8 @@ body {
     background: rgba(255, 255, 255, 0.02);
     overflow: hidden;
     flex-shrink: 0;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-left: 0px solid transparent;
+    transition: border-left-width 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .accordion-item:hover {
@@ -506,7 +507,7 @@ input, select, textarea {
 
 input:focus, select:focus, textarea:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 0 0 3px var(--primary-glow, rgba(99, 102, 241, 0.15));
     background: rgba(0, 0, 0, 0.3);
 }
 
@@ -947,6 +948,8 @@ textarea {
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.1);
     transform: translateY(-2px) scale(1.02);
+    border-color: var(--primary);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), 0 0 8px var(--primary);
 }
 
 /* ATS Score Widget */
@@ -1011,10 +1014,25 @@ textarea {
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    position: relative;
     background: #0f1118;
     background-image: 
         radial-gradient(#1e293b 1px, transparent 1px);
     background-size: 20px 20px;
+}
+
+.preview-workspace::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 30%, var(--primary) 0%, transparent 70%);
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity 0.5s ease;
 }
 
 /* The A4 Sheet Scaler Wrapper */
@@ -3622,5 +3640,20 @@ textarea {
     .custom-dropdown-trigger {
         max-width: 150px !important;
     }
+}
+
+/* Theme Switcher accent bubbles styles */
+.theme-bubble {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+.theme-bubble:hover {
+    transform: scale(1.25);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
 }
 

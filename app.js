@@ -1481,25 +1481,29 @@ window.setThemeAccent = function(theme) {
             primary: "#6366f1",
             accent: "#a855f7",
             gradient: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
-            glow: "0 0 15px rgba(99, 102, 241, 0.35)"
+            glow: "0 0 15px rgba(99, 102, 241, 0.35)",
+            glowColor: "rgba(99, 102, 241, 0.15)"
         },
         emerald: {
             primary: "#10b981",
             accent: "#14b8a6",
             gradient: "linear-gradient(135deg, #10b981 0%, #14b8a6 100%)",
-            glow: "0 0 15px rgba(16, 185, 129, 0.35)"
+            glow: "0 0 15px rgba(16, 185, 129, 0.35)",
+            glowColor: "rgba(16, 185, 129, 0.15)"
         },
         amber: {
             primary: "#f59e0b",
             accent: "#d97706",
             gradient: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-            glow: "0 0 15px rgba(245, 158, 11, 0.35)"
+            glow: "0 0 15px rgba(245, 158, 11, 0.35)",
+            glowColor: "rgba(245, 158, 11, 0.15)"
         },
         amethyst: {
             primary: "#a855f7",
             accent: "#ec4899",
             gradient: "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
-            glow: "0 0 15px rgba(168, 85, 247, 0.35)"
+            glow: "0 0 15px rgba(168, 85, 247, 0.35)",
+            glowColor: "rgba(168, 85, 247, 0.15)"
         }
     };
     
@@ -1508,6 +1512,7 @@ window.setThemeAccent = function(theme) {
     document.documentElement.style.setProperty('--primary-gradient', selected.gradient);
     document.documentElement.style.setProperty('--accent', selected.accent);
     document.documentElement.style.setProperty('--glow', selected.glow);
+    document.documentElement.style.setProperty('--primary-glow', selected.glowColor);
     
     // Highlight active selection border
     document.querySelectorAll(".theme-bubble").forEach(el => {
