@@ -364,16 +364,16 @@ function renderExperienceList() {
             <div class="form-row">
                 <div class="form-group">
                     <label>Company</label>
-                    <input type="text" value="${exp.company}" oninput="updateExperience('${exp.id}', 'company', this.value)" placeholder="e.g. Google">
+                    <input type="text" id="exp-company-${exp.id}" value="${exp.company}" oninput="updateExperience('${exp.id}', 'company', this.value)" placeholder="e.g. Google">
                 </div>
                 <div class="form-group">
                     <label>Role</label>
-                    <input type="text" value="${exp.role}" oninput="updateExperience('${exp.id}', 'role', this.value)" placeholder="e.g. Lead Engineer">
+                    <input type="text" id="exp-role-${exp.id}" value="${exp.role}" oninput="updateExperience('${exp.id}', 'role', this.value)" placeholder="e.g. Lead Engineer">
                 </div>
             </div>
             <div class="form-group">
                 <label>Date Range</label>
-                <input type="text" value="${exp.date}" oninput="updateExperience('${exp.id}', 'date', this.value)" placeholder="e.g. Jan 2022 - Present">
+                <input type="text" id="exp-date-${exp.id}" value="${exp.date}" oninput="updateExperience('${exp.id}', 'date', this.value)" placeholder="e.g. Jan 2022 - Present">
             </div>
             <div class="form-group">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
@@ -382,7 +382,7 @@ function renderExperienceList() {
                         <i class="fa-solid fa-wand-magic-sparkles"></i> AI Rewrite
                     </button>
                 </div>
-                <textarea oninput="updateExperience('${exp.id}', 'desc', this.value)" placeholder="Include bullet points for achievements...">${exp.desc}</textarea>
+                <textarea id="exp-desc-${exp.id}" oninput="updateExperience('${exp.id}', 'desc', this.value)" placeholder="Include bullet points for achievements...">${exp.desc}</textarea>
             </div>
 
             <!-- STAR Method Helper Toggle -->
@@ -481,20 +481,20 @@ function renderEducationList() {
             <div class="form-row">
                 <div class="form-group">
                     <label>Institution</label>
-                    <input type="text" value="${edu.institution}" oninput="updateEducation('${edu.id}', 'institution', this.value)" placeholder="e.g. Stanford University">
+                    <input type="text" id="edu-institution-${edu.id}" value="${edu.institution}" oninput="updateEducation('${edu.id}', 'institution', this.value)" placeholder="e.g. Stanford University">
                 </div>
                 <div class="form-group">
                     <label>Degree / Certificate</label>
-                    <input type="text" value="${edu.degree}" oninput="updateEducation('${edu.id}', 'degree', this.value)" placeholder="e.g. MS in Computer Science">
+                    <input type="text" id="edu-degree-${edu.id}" value="${edu.degree}" oninput="updateEducation('${edu.id}', 'degree', this.value)" placeholder="e.g. MS in Computer Science">
                 </div>
             </div>
             <div class="form-group">
                 <label>Timeline / Dates</label>
-                <input type="text" value="${edu.date}" oninput="updateEducation('${edu.id}', 'date', this.value)" placeholder="e.g. 2018 - 2020">
+                <input type="text" id="edu-date-${edu.id}" value="${edu.date}" oninput="updateEducation('${edu.id}', 'date', this.value)" placeholder="e.g. 2018 - 2020">
             </div>
             <div class="form-group">
                 <label>Additional Info (Optional)</label>
-                <textarea oninput="updateEducation('${edu.id}', 'desc', this.value)" placeholder="GPA, notable courses...">${edu.desc}</textarea>
+                <textarea id="edu-desc-${edu.id}" oninput="updateEducation('${edu.id}', 'desc', this.value)" placeholder="GPA, notable courses...">${edu.desc}</textarea>
             </div>
         `;
         container.appendChild(card);

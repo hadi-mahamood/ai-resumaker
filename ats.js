@@ -1991,137 +1991,184 @@ window.toggleATSSimulator = function() {
     }
 };
 
+window.focusSidebarInput = function(inputId, sectionId) {
+    // If sidebar is collapsed on mobile viewports, slide it open!
+    const sidebar = document.querySelector(".sidebar");
+    if (sidebar && sidebar.style.left && sidebar.style.left.startsWith("-")) {
+        if (window.toggleSidebar) window.toggleSidebar();
+    }
+    
+    // Auto-expand accordion section first
+    if (sectionId && window.toggleAccordion) {
+        const section = document.getElementById(sectionId);
+        if (section && !section.classList.contains("active")) {
+            window.toggleAccordion(sectionId);
+        }
+    }
+    
+    // Focus target element with highlighted glow
+    setTimeout(() => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.focus();
+            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            const originalBorder = input.style.borderColor;
+            const originalShadow = input.style.boxShadow;
+            input.style.borderColor = "var(--primary-color)";
+            input.style.boxShadow = "0 0 12px var(--primary-color)";
+            
+            setTimeout(() => {
+                input.style.borderColor = originalBorder;
+                input.style.boxShadow = originalShadow;
+            }, 1500);
+        }
+    }, 150);
+};
+
 window.runATSSimulation = function() {
     const rawContent = document.getElementById("ats-sim-raw-content");
     if (!rawContent) return;
     
-    const name = state.personal?.name || "";
-    const email = state.personal?.email || "";
-    const phone = state.personal?.phone || "";
-    const address = state.personal?.address || "";
-    const linkedin = state.personal?.linkedin || "";
-    const github = state.personal?.github || "";
+    const name = state.name || "";
+    const email = state.email || "";
+    const phone = state.phone || "";
+    const address = state.location || "";
+    const website = state.website || "";
+    const linkedin = website.includes("linkedin.com") ? website : "";
+    const github = website.includes("github.com") ? website : "";
     
     let html = "";
     
-    // Helper to generate status badge/text
-    const getStatusHTML = (value, isCritical, inputId) => {
-        if (value) {
-            return `<span style="color: #10b981; font-weight: 500;"><i class="fa-solid fa-circle-check"></i> ${value}</span>`;
-        }
-        if (isCritical) {
-            return `<span class="ats-fix-link" onclick="window.focusEditorInput('${inputId}')" title="Click to fix in form" style="color: #f87171; font-weight: 500; text-decoration: underline; cursor: pointer;"><i class="fa-solid fa-circle-xmark"></i> [MISSING] (Click to Fix)</span>`;
-        }
-        return `<span class="ats-fix-link" onclick="window.focusEditorInput('${inputId}')" title="Click to add in form" style="color: #fbbf24; font-weight: 500; text-decoration: underline; cursor: pointer;"><i class="fa-solid fa-triangle-exclamation"></i> [NOT FOUND] (Click to Add)</span>`;
-    };
-    
-    html += `<div style="margin-bottom: 20px; padding: 12px; background: rgba(59, 130, 246, 0.05); border-radius: 6px; border-left: 3px solid #3b82f6; font-family: system-ui, sans-serif; font-size: 0.82rem;">
-        🤖 <strong>Parser Analysis:</strong> Below is a preview of how applicant tracking bots read your resume text. Click on any highlighted red/yellow fields to edit them directly in the sidebar form.
-    </div>`;
-    
-    html += `<div style="margin-bottom: 20px;">
-        <h4 style="color: #60a5fa; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.9rem; font-family: system-ui, sans-serif;">[CANDIDATE INFORMATION]</h4>
-        <div style="display: grid; grid-template-columns: 160px 1fr; gap: 8px; font-family: monospace; font-size: 0.8rem;">
-            <span style="color: #94a3b8;">Candidate Name:</span>
-            <span>${getStatusHTML(name, true, 'personal-name')}</span>
-            
-            <span style="color: #94a3b8;">Email Address:</span>
-            <span>${getStatusHTML(email, true, 'personal-email')}</span>
-            
-            <span style="color: #94a3b8;">Phone Number:</span>
-            <span>${getStatusHTML(phone, true, 'personal-phone')}</span>
-            
-            <span style="color: #94a3b8;">Address/Location:</span>
-            <span>${getStatusHTML(address, false, 'personal-address')}</span>
-            
-            <span style="color: #94a3b8;">LinkedIn Profile:</span>
-            <span>${getStatusHTML(linkedin, false, 'personal-linkedin')}</span>
-            
-            <span style="color: #94a3b8;">GitHub Account:</span>
-            <span>${getStatusHTML(github, false, 'personal-github')}</span>
+    // 1. Candidate Contact Information Section
+    html += `
+    <div style="margin-bottom: 24px; font-family: system-ui, -apple-system, sans-serif;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #60a5fa; border-bottom: 1px solid rgba(96,165,250,0.15); padding-bottom: 6px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-address-card"></i> [CANDIDATE INFORMATION]
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            <div style="background: rgba(30,41,59,0.3); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 12px; border-left: 4px solid ${name ? '#10b981' : '#ef4444'};">
+                <div style="font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Candidate Name</div>
+                <div style="margin-top: 4px; font-size: 0.85rem;">
+                    ${name ? `<span style="color: #10b981; font-weight: 500;"><i class="fa-solid fa-circle-check"></i> ${name}</span>` : `<a href="javascript:void(0)" onclick="window.focusSidebarInput('input-name', 'sec-personal')" style="color: #ef4444; font-weight: 600; text-decoration: underline;"><i class="fa-solid fa-circle-xmark"></i> [MISSING] (Click to Fix)</a>`}
+                </div>
+            </div>
+            <div style="background: rgba(30,41,59,0.3); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 12px; border-left: 4px solid ${email ? '#10b981' : '#ef4444'};">
+                <div style="font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Email Address</div>
+                <div style="margin-top: 4px; font-size: 0.85rem;">
+                    ${email ? `<span style="color: #10b981; font-weight: 500;"><i class="fa-solid fa-circle-check"></i> ${email}</span>` : `<a href="javascript:void(0)" onclick="window.focusSidebarInput('input-email', 'sec-personal')" style="color: #ef4444; font-weight: 600; text-decoration: underline;"><i class="fa-solid fa-circle-xmark"></i> [MISSING] (Click to Fix)</a>`}
+                </div>
+            </div>
+            <div style="background: rgba(30,41,59,0.3); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 12px; border-left: 4px solid ${phone ? '#10b981' : '#ef4444'};">
+                <div style="font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Phone Number</div>
+                <div style="margin-top: 4px; font-size: 0.85rem;">
+                    ${phone ? `<span style="color: #10b981; font-weight: 500;"><i class="fa-solid fa-circle-check"></i> ${phone}</span>` : `<a href="javascript:void(0)" onclick="window.focusSidebarInput('input-phone', 'sec-personal')" style="color: #ef4444; font-weight: 600; text-decoration: underline;"><i class="fa-solid fa-circle-xmark"></i> [MISSING] (Click to Fix)</a>`}
+                </div>
+            </div>
+            <div style="background: rgba(30,41,59,0.3); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 12px; border-left: 4px solid ${address ? '#10b981' : '#f59e0b'};">
+                <div style="font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Address/Location</div>
+                <div style="margin-top: 4px; font-size: 0.85rem;">
+                    ${address ? `<span style="color: #10b981; font-weight: 500;"><i class="fa-solid fa-circle-check"></i> ${address}</span>` : `<a href="javascript:void(0)" onclick="window.focusSidebarInput('input-location', 'sec-personal')" style="color: #f59e0b; font-weight: 600; text-decoration: underline;"><i class="fa-solid fa-triangle-exclamation"></i> [MISSING] (Click to Fix)</a>`}
+                </div>
+            </div>
+            <div style="background: rgba(30,41,59,0.3); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 12px; border-left: 4px solid ${linkedin ? '#10b981' : '#94a3b8'};">
+                <div style="font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase;">LinkedIn Profile</div>
+                <div style="margin-top: 4px; font-size: 0.85rem;">
+                    ${linkedin ? `<span style="color: #10b981; font-weight: 500;"><i class="fa-solid fa-circle-check"></i> ${linkedin}</span>` : `<a href="javascript:void(0)" onclick="window.focusSidebarInput('input-website', 'sec-personal')" style="color: #94a3b8; font-weight: 500; text-decoration: underline;"><i class="fa-solid fa-ellipsis"></i> [NOT FOUND]</a>`}
+                </div>
+            </div>
+            <div style="background: rgba(30,41,59,0.3); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 12px; border-left: 4px solid ${github ? '#10b981' : '#94a3b8'};">
+                <div style="font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase;">GitHub Account</div>
+                <div style="margin-top: 4px; font-size: 0.85rem;">
+                    ${github ? `<span style="color: #10b981; font-weight: 500;"><i class="fa-solid fa-circle-check"></i> ${github}</span>` : `<a href="javascript:void(0)" onclick="window.focusSidebarInput('input-website', 'sec-personal')" style="color: #94a3b8; font-weight: 500; text-decoration: underline;"><i class="fa-solid fa-ellipsis"></i> [NOT FOUND]</a>`}
+                </div>
+            </div>
         </div>
-    </div>`;
+    </div>
     
-    html += `<div style="margin-bottom: 20px;">
-        <h4 style="color: #60a5fa; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.9rem; font-family: system-ui, sans-serif;">[PROFESSIONAL SUMMARY]</h4>
-        <div style="font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 4px; line-height: 1.4;">`;
-    if (state.summary) {
-        html += `<span style="color: #e2e8f0;">${state.summary}</span>`;
-    } else {
-        html += `<span class="ats-fix-link" onclick="window.focusEditorInput('personal-summary')" style="color: #f87171; text-decoration: underline; cursor: pointer;"><i class="fa-solid fa-circle-xmark"></i> [MISSING] Click to add professional summary</span>`;
-    }
-    html += `</div></div>`;
+    <!-- 2. Work History Section -->
+    <div style="margin-bottom: 24px; font-family: system-ui, -apple-system, sans-serif;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #60a5fa; border-bottom: 1px solid rgba(96,165,250,0.15); padding-bottom: 6px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-briefcase"></i> [WORK HISTORY TIMELINE]
+        </h4>
+    `;
     
-    html += `<div style="margin-bottom: 20px;">
-        <h4 style="color: #60a5fa; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.9rem; font-family: system-ui, sans-serif;">[WORK HISTORY TIMELINE]</h4>`;
     if (state.experience && state.experience.length > 0) {
         state.experience.forEach((exp, idx) => {
-            html += `<div style="margin-bottom: 12px; padding: 8px; border-left: 2px solid #10b981; background: rgba(16, 185, 129, 0.02); font-family: monospace; font-size: 0.8rem; line-height: 1.4;">
-                <strong>Record #${idx+1}:</strong><br>
-                Role/Title: <span style="color: #e2e8f0;">${exp.role || '[MISSING]'}</span><br>
-                Company:    <span style="color: #e2e8f0;">${exp.company || '[MISSING]'}</span><br>
-                Date:       <span style="color: #e2e8f0;">${exp.date || '[MISSING]'}</span><br>
-                Details:<br>
-                <span style="color: #94a3b8; font-size: 0.78rem; display: block; white-space: pre-wrap; margin-top: 4px;">${exp.desc || '[No achievements bulleted]'}</span>
+            html += `
+            <div style="background: rgba(30,41,59,0.2); border: 1px solid rgba(255,255,255,0.02); border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 600;">
+                    <span style="color: #e2e8f0;">${exp.role || '[Missing Role]'} at ${exp.company || '[Missing Company]'}</span>
+                    <a href="javascript:void(0)" onclick="window.focusSidebarInput('exp-role-${exp.id}', 'sec-experience')" style="color: #3b82f6; font-size: 0.75rem; text-decoration: none;"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+                </div>
+                <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Timeline: ${exp.date || '[Missing Dates]'}</div>
+                <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px; white-space: pre-wrap; font-family: monospace; line-height: 1.4;">${exp.desc || '[No achievements listed]'}</div>
             </div>`;
         });
     } else {
-        html += `<div style="color: #f87171; font-family: monospace; font-size: 0.8rem;"><i class="fa-solid fa-triangle-exclamation"></i> [WARNING] No work history parsed. Try adding details in the form.</div>`;
+        html += `
+        <div style="border: 1px dashed #ef4444; background: rgba(239,68,68,0.03); border-radius: 6px; padding: 16px; text-align: center;">
+            <a href="javascript:void(0)" onclick="window.focusSidebarInput('experience-list', 'sec-experience')" style="color: #ef4444; font-weight: 600; text-decoration: underline;"><i class="fa-solid fa-circle-xmark"></i> [WARNING] Work history could not be parsed. Click to add your career experience.</a>
+        </div>`;
     }
     html += `</div>`;
     
-    html += `<div style="margin-bottom: 20px;">
-        <h4 style="color: #60a5fa; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.9rem; font-family: system-ui, sans-serif;">[EDUCATION HISTORY TIMELINE]</h4>`;
+    // 3. Education Section
+    html += `
+    <div style="margin-bottom: 24px; font-family: system-ui, -apple-system, sans-serif;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #60a5fa; border-bottom: 1px solid rgba(96,165,250,0.15); padding-bottom: 6px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-graduation-cap"></i> [EDUCATION HISTORY TIMELINE]
+        </h4>
+    `;
+    
     if (state.education && state.education.length > 0) {
         state.education.forEach((edu, idx) => {
-            html += `<div style="margin-bottom: 12px; padding: 8px; border-left: 2px solid #8b5cf6; background: rgba(139, 92, 246, 0.02); font-family: monospace; font-size: 0.8rem; line-height: 1.4;">
-                <strong>Record #${idx+1}:</strong><br>
-                Degree:      <span style="color: #e2e8f0;">${edu.degree || '[MISSING]'}</span><br>
-                Institution: <span style="color: #e2e8f0;">${edu.school || '[MISSING]'}</span><br>
-                Date:        <span style="color: #e2e8f0;">${edu.date || '[MISSING]'}</span>
+            html += `
+            <div style="background: rgba(30,41,59,0.2); border: 1px solid rgba(255,255,255,0.02); border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 600;">
+                    <span style="color: #e2e8f0;">${edu.degree || '[Missing Degree]'} at ${edu.institution || '[Missing Institution]'}</span>
+                    <a href="javascript:void(0)" onclick="window.focusSidebarInput('edu-degree-${edu.id}', 'sec-education')" style="color: #3b82f6; font-size: 0.75rem; text-decoration: none;"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+                </div>
+                <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Timeline: ${edu.date || '[Missing Dates]'}</div>
             </div>`;
         });
     } else {
-        html += `<div style="color: #fbbf24; font-family: monospace; font-size: 0.8rem;"><i class="fa-solid fa-triangle-exclamation"></i> [WARNING] No education records parsed.</div>`;
+        html += `
+        <div style="border: 1px dashed #ef4444; background: rgba(239,68,68,0.03); border-radius: 6px; padding: 16px; text-align: center;">
+            <a href="javascript:void(0)" onclick="window.focusSidebarInput('education-list', 'sec-education')" style="color: #ef4444; font-weight: 600; text-decoration: underline;"><i class="fa-solid fa-circle-xmark"></i> [WARNING] Education history could not be parsed. Click to add your academic degrees.</a>
+        </div>`;
     }
     html += `</div>`;
     
-    html += `<div style="margin-bottom: 10px;">
-        <h4 style="color: #60a5fa; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.9rem; font-family: system-ui, sans-serif;">[SKILLS KEYWORDS INDEX]</h4>`;
+    // 4. Skills Section
+    html += `
+    <div style="margin-bottom: 24px; font-family: system-ui, -apple-system, sans-serif;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #60a5fa; border-bottom: 1px solid rgba(96,165,250,0.15); padding-bottom: 6px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-brain"></i> [SKILLS KEYWORDS INDEX]
+        </h4>
+    `;
+    
     const skills = state.skills || [];
     if (skills.length > 0) {
-        html += `<div style="font-family: monospace; color: #10b981; line-height: 1.6;">`;
-        skills.forEach(skill => {
-            html += `<span style="display: inline-block; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 2px 8px; border-radius: 4px; margin-right: 6px; margin-bottom: 6px; font-size: 0.78rem;">${skill}</span>`;
-        });
-        html += `</div>`;
+        html += `
+        <div style="background: rgba(30,41,59,0.3); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 16px;">
+            <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Keywords Detected by Parsing Bots</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                ${skills.map(s => `<span style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: #34d399; font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; font-weight: 500;">${s}</span>`).join('')}
+            </div>
+            <div style="margin-top: 12px; text-align: right;">
+                <a href="javascript:void(0)" onclick="window.focusSidebarInput('skill-input', 'sec-skills')" style="color: #3b82f6; font-size: 0.78rem; text-decoration: none;"><i class="fa-solid fa-plus"></i> Add More Skills</a>
+            </div>
+        </div>`;
     } else {
-        html += `<div style="color: #fbbf24; font-family: monospace; font-size: 0.8rem;"><i class="fa-solid fa-triangle-exclamation"></i> [WARNING] No indexable skills keywords detected.</div>`;
+        html += `
+        <div style="border: 1px dashed #ef4444; background: rgba(239,68,68,0.03); border-radius: 6px; padding: 16px; text-align: center;">
+            <a href="javascript:void(0)" onclick="window.focusSidebarInput('skill-input', 'sec-skills')" style="color: #ef4444; font-weight: 600; text-decoration: underline;"><i class="fa-solid fa-circle-xmark"></i> [WARNING] No indexable skills detected. Click to add technical tags.</a>
+        </div>`;
     }
     html += `</div>`;
     
     rawContent.innerHTML = html;
-};
-
-window.focusEditorInput = function(inputId) {
-    const input = document.getElementById(inputId);
-    if (input) {
-        // Toggle the input's parent section open if it is an accordion
-        let parent = input.closest('.sidebar-section');
-        if (parent) {
-            parent.classList.add('active');
-        }
-        input.focus();
-        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        
-        // Highlight effect
-        input.style.boxShadow = "0 0 15px var(--primary)";
-        input.style.borderColor = "var(--primary)";
-        setTimeout(() => {
-            input.style.boxShadow = "";
-            input.style.borderColor = "";
-        }, 1500);
-    }
 };
 
 // ==========================================
@@ -2260,13 +2307,14 @@ window.previewCoverLetterTheme = function() {
     
     sheet.className = `resume-sheet t-${state.activeTemplate}`;
     
-    const name = state.personal?.name || "Candidate Name";
-    const title = state.personal?.title || state.targetJob || "Software Engineer";
-    const email = state.personal?.email || "email@example.com";
-    const phone = state.personal?.phone || "(123) 456-7890";
-    const address = state.personal?.address || "City, Country";
-    const linkedin = state.personal?.linkedin || "";
-    const github = state.personal?.github || "";
+    const name = state.name || "Candidate Name";
+    const title = state.title || state.targetJob || "Software Engineer";
+    const email = state.email || "email@example.com";
+    const phone = state.phone || "(123) 456-7890";
+    const address = state.location || "City, Country";
+    const website = state.website || "";
+    const linkedin = website.includes("linkedin.com") ? website : "";
+    const github = website.includes("github.com") ? website : "";
     
     let headerHtml = "";
     
