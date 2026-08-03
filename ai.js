@@ -231,7 +231,9 @@ const AIService = {
         const summary = `${name}_${role}_${(resumeData.skills || []).join(',')}_${(resumeData.experience || []).map(e => e.date + e.company).join(',')}`;
         const cacheKey = `cover_${btoa(unescape(encodeURIComponent(summary))).slice(0, 100)}`;
         const cached = this.getCache(cacheKey);
-        if (cached) return await this.simulateStreaming(cached, onChunk);
+        if (cached && !cached.includes("WebGPU Error") && !cached.includes("API Proxy Error") && !cached.includes("React.js, Node.js")) {
+            return await this.simulateStreaming(cached, onChunk);
+        }
 
         let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 3).join(', ') : "Software Engineering";
         const prompt = `Write a highly professional and compelling cover letter. Candidate Name: ${name}. Target Role: ${role}. Skills: ${skills}. Experience Summary: ${JSON.stringify(resumeData.experience || [])}. Output ONLY the letter text with greetings and signature. No markdown comments or brackets:`;
