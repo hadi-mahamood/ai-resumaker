@@ -2396,7 +2396,7 @@ window.resizeCoverLetterPreview = function() {
     const sheet = document.getElementById("cover-letter-preview-sheet");
     if (!modalBody || !scaler || !sheet) return;
 
-    const availableWidth = modalBody.clientWidth - 40;
+    const availableWidth = modalBody.clientWidth - 64;
     const sheetWidth = 794;
 
     if (availableWidth < sheetWidth) {
