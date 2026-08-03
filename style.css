@@ -13,6 +13,7 @@
     --bg-input-focus: rgba(0, 0, 0, 0.3);
     --bg-glow-1: rgba(99, 102, 241, 0.15);
     --bg-glow-2: rgba(168, 85, 247, 0.1);
+    --bg-grid-color: rgba(255, 255, 255, 0.03);
     
     --primary: #6366f1;
     --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
@@ -1023,7 +1024,7 @@ textarea {
     position: relative;
     background: var(--bg-workspace, #0f1118);
     background-image: 
-        radial-gradient(#1e293b 1px, transparent 1px);
+        radial-gradient(var(--bg-grid-color) 1px, transparent 1px);
     background-size: 20px 20px;
 }
 
@@ -3737,6 +3738,7 @@ body.light-theme {
     --bg-toolbar: rgba(241, 245, 249, 0.85);
     --bg-input: rgba(255, 255, 255, 0.65);
     --bg-input-focus: rgba(255, 255, 255, 0.9);
+    --bg-grid-color: transparent;
 }
 
 body.light-theme .logo-icon {
