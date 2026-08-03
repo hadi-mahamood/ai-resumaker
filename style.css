@@ -2252,6 +2252,8 @@ textarea {
     body.cover-letter-printing-active #cover-letter-preview-modal {
         display: block !important;
         position: relative !important;
+        width: 100% !important;
+        max-width: 100% !important;
         background: white !important;
         z-index: 99999 !important;
     }
