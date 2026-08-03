@@ -2405,12 +2405,14 @@ window.resizeCoverLetterPreview = function() {
         sheet.style.transformOrigin = "top center";
         const scaledHeight = sheet.offsetHeight * scale;
         scaler.style.height = `${scaledHeight}px`;
+        sheet.style.marginBottom = `${-sheet.offsetHeight * (1 - scale)}px`;
         scaler.style.width = "100%";
         scaler.style.justifyContent = "center";
     } else {
         sheet.style.transform = "none";
         sheet.style.transformOrigin = "top center";
         scaler.style.height = "auto";
+        sheet.style.marginBottom = "0px";
         scaler.style.width = "794px";
         scaler.style.justifyContent = "center";
     }
