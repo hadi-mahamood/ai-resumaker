@@ -405,14 +405,15 @@ const AIService = {
         let res = "";
         if (p.includes("rewrite")) {
             res = this.getOfflineRewriteMock("Sample developer description");
-        } else if (p.includes("recommend") || p.includes("suggest") || p.includes("skill")) {
-            res = this.getOfflineSkillsMock("Software Developer");
         } else if (p.includes("cover letter")) {
-            if (typeof state !== "undefined") {
-                res = this.getOfflineCoverLetterMock(state);
+            const activeState = window.state || (typeof state !== "undefined" ? state : null);
+            if (activeState) {
+                res = this.getOfflineCoverLetterMock(activeState);
             } else {
                 res = "Dear Hiring Manager,\n\nI am writing to apply for the position...";
             }
+        } else if (p.includes("recommend") || p.includes("suggest") || p.includes("skill")) {
+            res = this.getOfflineSkillsMock("Software Developer");
         } else {
             res = "Sincerely,\nJohn Doe";
         }
