@@ -2002,57 +2002,126 @@ window.runATSSimulation = function() {
     const linkedin = state.personal?.linkedin || "";
     const github = state.personal?.github || "";
     
-    let output = "";
+    let html = "";
     
-    output += `========================================================\n`;
-    output += `                 ATS PARSER SIMULATOR VIEW              \n`;
-    output += `========================================================\n\n`;
+    // Helper to generate status badge/text
+    const getStatusHTML = (value, isCritical, inputId) => {
+        if (value) {
+            return `<span style="color: #10b981; font-weight: 500;"><i class="fa-solid fa-circle-check"></i> ${value}</span>`;
+        }
+        if (isCritical) {
+            return `<span class="ats-fix-link" onclick="window.focusEditorInput('${inputId}')" title="Click to fix in form" style="color: #f87171; font-weight: 500; text-decoration: underline; cursor: pointer;"><i class="fa-solid fa-circle-xmark"></i> [MISSING] (Click to Fix)</span>`;
+        }
+        return `<span class="ats-fix-link" onclick="window.focusEditorInput('${inputId}')" title="Click to add in form" style="color: #fbbf24; font-weight: 500; text-decoration: underline; cursor: pointer;"><i class="fa-solid fa-triangle-exclamation"></i> [NOT FOUND] (Click to Add)</span>`;
+    };
     
-    output += `[CANDIDATE INFORMATION]\n`;
-    output += `Candidate Name:  ${name ? name : '[MISSING] (Critical Action Required)'}\n`;
-    output += `Email Address:   ${email ? email : '[MISSING] (Critical Action Required)'}\n`;
-    output += `Phone Number:    ${phone ? phone : '[MISSING] (Critical Action Required)'}\n`;
-    output += `Address/Location:${address ? address : '[MISSING] (Medium Action Recommended)'}\n`;
-    output += `LinkedIn Profile:${linkedin ? linkedin : '[NOT FOUND]'}\n`;
-    output += `GitHub Account:  ${github ? github : '[NOT FOUND]'}\n\n`;
+    html += `<div style="margin-bottom: 20px; padding: 12px; background: rgba(59, 130, 246, 0.05); border-radius: 6px; border-left: 3px solid #3b82f6; font-family: system-ui, sans-serif; font-size: 0.82rem;">
+        🤖 <strong>Parser Analysis:</strong> Below is a preview of how applicant tracking bots read your resume text. Click on any highlighted red/yellow fields to edit them directly in the sidebar form.
+    </div>`;
     
-    output += `[PROFESSIONAL SUMMARY]\n`;
-    output += `${state.summary ? state.summary : '[MISSING Summary Section]'}\n\n`;
+    html += `<div style="margin-bottom: 20px;">
+        <h4 style="color: #60a5fa; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.9rem; font-family: system-ui, sans-serif;">[CANDIDATE INFORMATION]</h4>
+        <div style="display: grid; grid-template-columns: 160px 1fr; gap: 8px; font-family: monospace; font-size: 0.8rem;">
+            <span style="color: #94a3b8;">Candidate Name:</span>
+            <span>${getStatusHTML(name, true, 'personal-name')}</span>
+            
+            <span style="color: #94a3b8;">Email Address:</span>
+            <span>${getStatusHTML(email, true, 'personal-email')}</span>
+            
+            <span style="color: #94a3b8;">Phone Number:</span>
+            <span>${getStatusHTML(phone, true, 'personal-phone')}</span>
+            
+            <span style="color: #94a3b8;">Address/Location:</span>
+            <span>${getStatusHTML(address, false, 'personal-address')}</span>
+            
+            <span style="color: #94a3b8;">LinkedIn Profile:</span>
+            <span>${getStatusHTML(linkedin, false, 'personal-linkedin')}</span>
+            
+            <span style="color: #94a3b8;">GitHub Account:</span>
+            <span>${getStatusHTML(github, false, 'personal-github')}</span>
+        </div>
+    </div>`;
     
-    output += `[WORK HISTORY timeline]\n`;
+    html += `<div style="margin-bottom: 20px;">
+        <h4 style="color: #60a5fa; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.9rem; font-family: system-ui, sans-serif;">[PROFESSIONAL SUMMARY]</h4>
+        <div style="font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 4px; line-height: 1.4;">`;
+    if (state.summary) {
+        html += `<span style="color: #e2e8f0;">${state.summary}</span>`;
+    } else {
+        html += `<span class="ats-fix-link" onclick="window.focusEditorInput('personal-summary')" style="color: #f87171; text-decoration: underline; cursor: pointer;"><i class="fa-solid fa-circle-xmark"></i> [MISSING] Click to add professional summary</span>`;
+    }
+    html += `</div></div>`;
+    
+    html += `<div style="margin-bottom: 20px;">
+        <h4 style="color: #60a5fa; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.9rem; font-family: system-ui, sans-serif;">[WORK HISTORY TIMELINE]</h4>`;
     if (state.experience && state.experience.length > 0) {
         state.experience.forEach((exp, idx) => {
-            output += `Timeline Record #${idx+1}:\n`;
-            output += `  Role/Title: ${exp.role || '[MISSING]'}\n`;
-            output += `  Company:    ${exp.company || '[MISSING]'}\n`;
-            output += `  Date:       ${exp.date || '[MISSING]'}\n`;
-            output += `  Details:\n${exp.desc || '[No achievements bulleted]'}\n\n`;
+            html += `<div style="margin-bottom: 12px; padding: 8px; border-left: 2px solid #10b981; background: rgba(16, 185, 129, 0.02); font-family: monospace; font-size: 0.8rem; line-height: 1.4;">
+                <strong>Record #${idx+1}:</strong><br>
+                Role/Title: <span style="color: #e2e8f0;">${exp.role || '[MISSING]'}</span><br>
+                Company:    <span style="color: #e2e8f0;">${exp.company || '[MISSING]'}</span><br>
+                Date:       <span style="color: #e2e8f0;">${exp.date || '[MISSING]'}</span><br>
+                Details:<br>
+                <span style="color: #94a3b8; font-size: 0.78rem; display: block; white-space: pre-wrap; margin-top: 4px;">${exp.desc || '[No achievements bulleted]'}</span>
+            </div>`;
         });
     } else {
-        output += `[WARNING] Work history could not be parsed.\n\n`;
+        html += `<div style="color: #f87171; font-family: monospace; font-size: 0.8rem;"><i class="fa-solid fa-triangle-exclamation"></i> [WARNING] No work history parsed. Try adding details in the form.</div>`;
     }
+    html += `</div>`;
     
-    output += `[EDUCATION HISTORY timeline]\n`;
+    html += `<div style="margin-bottom: 20px;">
+        <h4 style="color: #60a5fa; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.9rem; font-family: system-ui, sans-serif;">[EDUCATION HISTORY TIMELINE]</h4>`;
     if (state.education && state.education.length > 0) {
         state.education.forEach((edu, idx) => {
-            output += `Timeline Record #${idx+1}:\n`;
-            output += `  Degree:     ${edu.degree || '[MISSING]'}\n`;
-            output += `  Institution:${edu.school || '[MISSING]'}\n`;
-            output += `  Date:       ${edu.date || '[MISSING]'}\n\n`;
+            html += `<div style="margin-bottom: 12px; padding: 8px; border-left: 2px solid #8b5cf6; background: rgba(139, 92, 246, 0.02); font-family: monospace; font-size: 0.8rem; line-height: 1.4;">
+                <strong>Record #${idx+1}:</strong><br>
+                Degree:      <span style="color: #e2e8f0;">${edu.degree || '[MISSING]'}</span><br>
+                Institution: <span style="color: #e2e8f0;">${edu.school || '[MISSING]'}</span><br>
+                Date:        <span style="color: #e2e8f0;">${edu.date || '[MISSING]'}</span>
+            </div>`;
         });
     } else {
-        output += `[WARNING] Education records could not be parsed.\n\n`;
+        html += `<div style="color: #fbbf24; font-family: monospace; font-size: 0.8rem;"><i class="fa-solid fa-triangle-exclamation"></i> [WARNING] No education records parsed.</div>`;
     }
+    html += `</div>`;
     
-    output += `[SKILLS KEYWORDS INDEX]\n`;
+    html += `<div style="margin-bottom: 10px;">
+        <h4 style="color: #60a5fa; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.9rem; font-family: system-ui, sans-serif;">[SKILLS KEYWORDS INDEX]</h4>`;
     const skills = state.skills || [];
     if (skills.length > 0) {
-        output += `Keywords Detected: ${skills.join(', ')}\n`;
+        html += `<div style="font-family: monospace; color: #10b981; line-height: 1.6;">`;
+        skills.forEach(skill => {
+            html += `<span style="display: inline-block; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 2px 8px; border-radius: 4px; margin-right: 6px; margin-bottom: 6px; font-size: 0.78rem;">${skill}</span>`;
+        });
+        html += `</div>`;
     } else {
-        output += `[WARNING] No indexable skills keywords detected.\n`;
+        html += `<div style="color: #fbbf24; font-family: monospace; font-size: 0.8rem;"><i class="fa-solid fa-triangle-exclamation"></i> [WARNING] No indexable skills keywords detected.</div>`;
     }
+    html += `</div>`;
     
-    rawContent.innerText = output;
+    rawContent.innerHTML = html;
+};
+
+window.focusEditorInput = function(inputId) {
+    const input = document.getElementById(inputId);
+    if (input) {
+        // Toggle the input's parent section open if it is an accordion
+        let parent = input.closest('.sidebar-section');
+        if (parent) {
+            parent.classList.add('active');
+        }
+        input.focus();
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Highlight effect
+        input.style.boxShadow = "0 0 15px var(--primary)";
+        input.style.borderColor = "var(--primary)";
+        setTimeout(() => {
+            input.style.boxShadow = "";
+            input.style.borderColor = "";
+        }, 1500);
+    }
 };
 
 // ==========================================
