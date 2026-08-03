@@ -3574,3 +3574,34 @@ textarea {
     color: #c084fc;
 }
 
+/* Highlights Switch Toggle styles */
+.switch-toggle input:checked + .switch-slider {
+    background-color: var(--primary) !important;
+}
+.switch-toggle .switch-slider::before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+.switch-toggle input:checked + .switch-slider::before {
+    transform: translateX(14px);
+}
+
+/* Diff toggle filter styling */
+#resume-sheet:not(.diff-highlight-active) ins,
+#resume-sheet:not(.diff-highlight-active) del {
+    background: transparent !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    border: none !important;
+}
+#resume-sheet:not(.diff-highlight-active) del {
+    display: none !important;
+}
+

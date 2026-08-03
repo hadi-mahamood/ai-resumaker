@@ -91,6 +91,17 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Interface Theme Accent Switcher -->
+                        <div style="border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 12px; margin-top: 4px;">
+                            <h4 style="font-size:0.8rem; text-transform:uppercase; margin-bottom:8px; color:#a5b4fc;"><i class="fa-solid fa-palette"></i> Color Theme Accent</h4>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <span class="theme-bubble" data-theme="cobalt" onclick="window.setThemeAccent('cobalt')" style="width: 20px; height: 20px; border-radius: 50%; background: #6366f1; border: 2px solid white; cursor: pointer; transition: transform 0.2s;" title="Royal Cobalt"></span>
+                                <span class="theme-bubble" data-theme="emerald" onclick="window.setThemeAccent('emerald')" style="width: 20px; height: 20px; border-radius: 50%; background: #10b981; border: 2px solid transparent; cursor: pointer; transition: transform 0.2s;" title="Emerald Mint"></span>
+                                <span class="theme-bubble" data-theme="amber" onclick="window.setThemeAccent('amber')" style="width: 20px; height: 20px; border-radius: 50%; background: #f59e0b; border: 2px solid transparent; cursor: pointer; transition: transform 0.2s;" title="Sunset Amber"></span>
+                                <span class="theme-bubble" data-theme="amethyst" onclick="window.setThemeAccent('amethyst')" style="width: 20px; height: 20px; border-radius: 50%; background: #a855f7; border: 2px solid transparent; cursor: pointer; transition: transform 0.2s;" title="Purple Amethyst"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -398,9 +409,14 @@
                 <!-- Middle group: Resume Analysis / Tools -->
                 <div class="toolbar-group middle-group">
                     <!-- ATS Score Indicator -->
-                    <div class="ats-score-pill" onclick="openATSModal()" title="View full ATS Score Details">
-                        <i class="fa-solid fa-gauge-high"></i>
-                        <span class="ats-score-num" id="toolbar-ats-badge">0</span>
+                    <div class="ats-score-pill" onclick="openATSModal()" title="View full ATS Score Details" style="display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 6px; border-radius: 20px;">
+                        <div class="ats-radial-container" style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
+                            <svg width="28" height="28" viewBox="0 0 36 36" style="transform: rotate(-90deg);">
+                                <path stroke="rgba(255,255,255,0.06)" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="ats-radial-progress" stroke="var(--success)" stroke-width="3.5" stroke-dasharray="0, 100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" style="transition: stroke-dasharray 0.5s ease, stroke 0.5s ease;" />
+                            </svg>
+                            <span id="toolbar-ats-badge" style="position: absolute; font-size: 0.72rem; font-weight: 700; color: #f3f4f6; font-family: var(--font-sans);">0</span>
+                        </div>
                         <span class="ats-score-text" id="toolbar-ats-status">Calculating...</span>
                     </div>
 
@@ -420,7 +436,16 @@
                 </div>
 
                 <!-- Right group: Export / Download Actions -->
-                <div class="toolbar-group right-group">
+                <div class="toolbar-group right-group" style="display: flex; align-items: center; gap: 12px;">
+                    <!-- Highlight Diff Toggle Switch -->
+                    <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; color: var(--text-secondary);">
+                        <span>Highlights</span>
+                        <label class="switch-toggle" style="position: relative; display: inline-block; width: 32px; height: 18px; margin: 0;">
+                            <input type="checkbox" id="diff-highlight-toggle" checked onchange="window.toggleDiffHighlights()" style="opacity: 0; width: 0; height: 0;">
+                            <span class="switch-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .3s; border-radius: 34px;"></span>
+                        </label>
+                    </div>
+
                     <button class="btn btn-primary btn-pill" onclick="exportPDF()" title="Download PDF Copy">
                         <i class="fa-solid fa-file-pdf"></i> <span>PDF</span>
                     </button>
@@ -505,7 +530,7 @@
                 </div>
 
                 <div class="resume-sheet-scaler" id="resume-sheet-scaler">
-                    <div class="resume-sheet t-modern" id="resume-sheet">
+                    <div class="resume-sheet t-modern diff-highlight-active" id="resume-sheet">
                         <!-- Live Resume structure filled by javascript -->
                     </div>
                 </div>

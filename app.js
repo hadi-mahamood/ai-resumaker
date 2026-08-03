@@ -685,16 +685,24 @@ window.updateATSScore = function() {
     // Update toolbar indicator
     const tbBadge = document.getElementById("toolbar-ats-badge");
     const tbStatus = document.getElementById("toolbar-ats-status");
+    const radialFill = document.getElementById("ats-radial-progress");
     
     if (tbBadge && tbStatus) {
         tbBadge.innerText = report.score;
         tbStatus.innerText = report.status;
         
-        tbBadge.className = "ats-score-num";
-        if (report.score < 60) {
-            tbBadge.classList.add("low");
-        } else if (report.score < 80) {
-            tbBadge.classList.add("medium");
+        // Update SVG circle percent fill
+        if (radialFill) {
+            radialFill.setAttribute("stroke-dasharray", `${report.score}, 100`);
+            
+            // Set dynamic stroke colors
+            if (report.score < 60) {
+                radialFill.setAttribute("stroke", "#ef4444");
+            } else if (report.score < 80) {
+                radialFill.setAttribute("stroke", "#f59e0b");
+            } else {
+                radialFill.setAttribute("stroke", "#10b981");
+            }
         }
         
         const pill = tbBadge.closest(".ats-score-pill");
@@ -702,8 +710,12 @@ window.updateATSScore = function() {
             pill.className = "ats-score-pill";
             if (report.score < 60) {
                 pill.classList.add("low");
+                pill.style.borderColor = "rgba(239, 68, 68, 0.3)";
             } else if (report.score < 80) {
                 pill.classList.add("medium");
+                pill.style.borderColor = "rgba(245, 158, 11, 0.3)";
+            } else {
+                pill.style.borderColor = "rgba(16, 185, 129, 0.3)";
             }
         }
     }
@@ -1461,3 +1473,67 @@ async function initClientSupabase() {
 
 // Kick off client check on script load
 initClientSupabase();
+
+// Theme Accent Switcher Manager
+window.setThemeAccent = function(theme) {
+    const colors = {
+        cobalt: {
+            primary: "#6366f1",
+            accent: "#a855f7",
+            gradient: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
+            glow: "0 0 15px rgba(99, 102, 241, 0.35)"
+        },
+        emerald: {
+            primary: "#10b981",
+            accent: "#14b8a6",
+            gradient: "linear-gradient(135deg, #10b981 0%, #14b8a6 100%)",
+            glow: "0 0 15px rgba(16, 185, 129, 0.35)"
+        },
+        amber: {
+            primary: "#f59e0b",
+            accent: "#d97706",
+            gradient: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+            glow: "0 0 15px rgba(245, 158, 11, 0.35)"
+        },
+        amethyst: {
+            primary: "#a855f7",
+            accent: "#ec4899",
+            gradient: "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
+            glow: "0 0 15px rgba(168, 85, 247, 0.35)"
+        }
+    };
+    
+    const selected = colors[theme] || colors.cobalt;
+    document.documentElement.style.setProperty('--primary', selected.primary);
+    document.documentElement.style.setProperty('--primary-gradient', selected.gradient);
+    document.documentElement.style.setProperty('--accent', selected.accent);
+    document.documentElement.style.setProperty('--glow', selected.glow);
+    
+    // Highlight active selection border
+    document.querySelectorAll(".theme-bubble").forEach(el => {
+        el.style.borderColor = el.getAttribute("data-theme") === theme ? "white" : "transparent";
+    });
+    
+    localStorage.setItem("resumake_theme_accent", theme);
+};
+
+// Visual Diff Highlights toggle
+window.toggleDiffHighlights = function() {
+    const toggle = document.getElementById("diff-highlight-toggle");
+    const sheet = document.getElementById("resume-sheet");
+    if (!sheet) return;
+    
+    if (toggle && toggle.checked) {
+        sheet.classList.add("diff-highlight-active");
+        showToast("AI Diff Highlights visible.", "info");
+    } else {
+        sheet.classList.remove("diff-highlight-active");
+        showToast("Highlights hidden. Viewing clean layout.", "info");
+    }
+};
+
+// Load saved color theme accent on script execute
+setTimeout(() => {
+    const savedTheme = localStorage.getItem("resumake_theme_accent") || "cobalt";
+    window.setThemeAccent(savedTheme);
+}, 200);
