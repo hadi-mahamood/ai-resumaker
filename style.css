@@ -2307,6 +2307,8 @@ textarea {
     
     .resume-sheet {
         width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
         height: auto !important;
         min-height: 0 !important;
         box-shadow: none !important;
