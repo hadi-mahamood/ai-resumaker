@@ -3605,3 +3605,22 @@ textarea {
     display: none !important;
 }
 
+/* Collapse text labels on medium/small viewports to prevent button overlaps */
+@media (max-width: 1366px) {
+    .btn-pill span {
+        display: none !important;
+    }
+    .ats-score-pill .ats-score-text {
+        display: none !important;
+    }
+    .toolbar-toggle-label {
+        display: none !important;
+    }
+    .toolbar-group {
+        gap: 6px !important;
+    }
+    .custom-dropdown-trigger {
+        max-width: 150px !important;
+    }
+}
+

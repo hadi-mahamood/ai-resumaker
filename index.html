@@ -355,12 +355,11 @@
         <!-- Preview & Output Area -->
         <main class="preview-container">
             <div class="toolbar">
-                <button class="menu-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar Menu">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-                
                 <!-- Left group: Editing / Filter Controls -->
                 <div class="toolbar-group left-group">
+                    <button class="menu-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar Menu" style="margin-right: 4px;">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
                     <div class="custom-dropdown-container" id="template-dropdown-container">
                         <button class="custom-dropdown-trigger" id="template-dropdown-trigger" onclick="window.toggleTemplateDropdown(event)">
                             <i class="fa-solid fa-filter"></i>
@@ -439,7 +438,7 @@
                 <div class="toolbar-group right-group" style="display: flex; align-items: center; gap: 12px;">
                     <!-- Highlight Diff Toggle Switch -->
                     <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; color: var(--text-secondary);">
-                        <span>Highlights</span>
+                        <span class="toolbar-toggle-label">Highlights</span>
                         <label class="switch-toggle" style="position: relative; display: inline-block; width: 32px; height: 18px; margin: 0;">
                             <input type="checkbox" id="diff-highlight-toggle" checked onchange="window.toggleDiffHighlights()" style="opacity: 0; width: 0; height: 0;">
                             <span class="switch-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .3s; border-radius: 34px;"></span>
