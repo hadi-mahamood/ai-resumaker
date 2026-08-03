@@ -1482,42 +1482,54 @@ window.setThemeAccent = function(theme) {
             accent: "#06b6d4",
             gradient: "linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)",
             glow: "0 0 15px rgba(99, 102, 241, 0.35)",
-            glowColor: "rgba(99, 102, 241, 0.15)"
+            glowColor: "rgba(99, 102, 241, 0.15)",
+            bgGlow1: "rgba(99, 102, 241, 0.15)",
+            bgGlow2: "rgba(6, 182, 212, 0.1)"
         },
         emerald: {
             primary: "#059669",
             accent: "#34d399",
             gradient: "linear-gradient(135deg, #059669 0%, #34d399 100%)",
             glow: "0 0 15px rgba(5, 150, 105, 0.35)",
-            glowColor: "rgba(5, 150, 105, 0.15)"
+            glowColor: "rgba(5, 150, 105, 0.15)",
+            bgGlow1: "rgba(5, 150, 105, 0.15)",
+            bgGlow2: "rgba(52, 211, 153, 0.1)"
         },
         amber: {
             primary: "#f97316",
             accent: "#f43f5e",
             gradient: "linear-gradient(135deg, #f97316 0%, #f43f5e 100%)",
             glow: "0 0 15px rgba(249, 115, 22, 0.35)",
-            glowColor: "rgba(249, 115, 22, 0.15)"
+            glowColor: "rgba(249, 115, 22, 0.15)",
+            bgGlow1: "rgba(249, 115, 22, 0.15)",
+            bgGlow2: "rgba(244, 63, 94, 0.1)"
         },
         amethyst: {
             primary: "#8b5cf6",
             accent: "#ec4899",
             gradient: "linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)",
             glow: "0 0 15px rgba(139, 92, 246, 0.35)",
-            glowColor: "rgba(139, 92, 246, 0.15)"
+            glowColor: "rgba(139, 92, 246, 0.15)",
+            bgGlow1: "rgba(139, 92, 246, 0.15)",
+            bgGlow2: "rgba(236, 72, 153, 0.1)"
         },
         aurora: {
             primary: "#0d9488",
             accent: "#84cc16",
             gradient: "linear-gradient(135deg, #0d9488 0%, #84cc16 100%)",
             glow: "0 0 15px rgba(13, 148, 136, 0.35)",
-            glowColor: "rgba(13, 148, 136, 0.15)"
+            glowColor: "rgba(13, 148, 136, 0.15)",
+            bgGlow1: "rgba(13, 148, 136, 0.15)",
+            bgGlow2: "rgba(132, 204, 22, 0.1)"
         },
         champagne: {
             primary: "#fb7185",
             accent: "#f59e0b",
             gradient: "linear-gradient(135deg, #fb7185 0%, #f59e0b 100%)",
             glow: "0 0 15px rgba(251, 113, 133, 0.35)",
-            glowColor: "rgba(251, 113, 133, 0.15)"
+            glowColor: "rgba(251, 113, 133, 0.15)",
+            bgGlow1: "rgba(251, 113, 133, 0.15)",
+            bgGlow2: "rgba(245, 158, 11, 0.1)"
         }
     };
     
@@ -1527,6 +1539,8 @@ window.setThemeAccent = function(theme) {
     document.documentElement.style.setProperty('--accent', selected.accent);
     document.documentElement.style.setProperty('--glow', selected.glow);
     document.documentElement.style.setProperty('--primary-glow', selected.glowColor);
+    document.documentElement.style.setProperty('--bg-glow-1', selected.bgGlow1);
+    document.documentElement.style.setProperty('--bg-glow-2', selected.bgGlow2);
     
     // Highlight active selection border
     document.querySelectorAll(".theme-bubble").forEach(el => {
