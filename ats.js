@@ -1978,7 +1978,7 @@ window.toggleATSSimulator = function() {
         toggleBtn.style.color = "white";
         
         scaler.style.display = "none";
-        display.style.display = "block";
+        display.style.display = "flex";
         
         window.runATSSimulation();
     } else {
@@ -1992,8 +1992,8 @@ window.toggleATSSimulator = function() {
 };
 
 window.runATSSimulation = function() {
-    const display = document.getElementById("ats-simulator-display");
-    if (!display) return;
+    const rawContent = document.getElementById("ats-sim-raw-content");
+    if (!rawContent) return;
     
     const name = state.personal?.name || "";
     const email = state.personal?.email || "";
@@ -2052,7 +2052,7 @@ window.runATSSimulation = function() {
         output += `[WARNING] No indexable skills keywords detected.\n`;
     }
     
-    display.innerText = output;
+    rawContent.innerText = output;
 };
 
 // ==========================================
