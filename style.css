@@ -2280,7 +2280,8 @@ textarea {
         background: white !important;
     }
     
-    .app-container, .preview-container {
+    body:not(.cover-letter-printing-active) .app-container, 
+    body:not(.cover-letter-printing-active) .preview-container {
         display: block !important;
         height: auto !important;
         overflow: visible !important;
@@ -2290,7 +2291,7 @@ textarea {
         display: none !important;
     }
     
-    .preview-workspace {
+    body:not(.cover-letter-printing-active) .preview-workspace {
         padding: 0 !important;
         background: white !important;
         display: block !important;
