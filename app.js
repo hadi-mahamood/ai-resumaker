@@ -1177,6 +1177,12 @@ window.switchTemplate = switchTemplate;
 window.toggleSidebar = toggleSidebar;
 window.exportPDF = exportPDF;
 window.copyCoverLetter = copyCoverLetter;
+window.updateStateObject = function(newData) {
+    if (!newData) return;
+    Object.keys(state).forEach(key => delete state[key]);
+    Object.assign(state, newData);
+};
+
 window.toggleSettingsPanel = toggleSettingsPanel;
 window.saveApiKey = saveApiKey;
 window.closeATSModal = closeATSModal;

@@ -234,7 +234,7 @@ const AIService = {
         if (cached) return await this.simulateStreaming(cached, onChunk);
 
         let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 3).join(', ') : "Software Engineering";
-        const prompt = `Write a highly professional and compelling cover letter. Candidate Name: ${name}. Target Role: ${role}. Skills: ${resumeData.skills.join(', ')}. Experience Summary: ${JSON.stringify(resumeData.experience)}. Output ONLY the letter text with greetings and signature. No markdown comments or brackets:`;
+        const prompt = `Write a highly professional and compelling cover letter. Candidate Name: ${name}. Target Role: ${role}. Skills: ${skills}. Experience Summary: ${JSON.stringify(resumeData.experience || [])}. Output ONLY the letter text with greetings and signature. No markdown comments or brackets:`;
         
         let result;
         if (this.activeProvider === "webgpu") {

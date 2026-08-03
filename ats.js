@@ -1715,7 +1715,7 @@ window.initProfiles = async function() {
                 window.profiles = db.profiles;
                 window.activeProfileId = db.activeProfileId || window.profiles[0].id;
                 const active = window.profiles.find(p => p.id === window.activeProfileId) || window.profiles[0];
-                state = JSON.parse(JSON.stringify(active.resumeData));
+                window.updateStateObject(active.resumeData);
                 
                 // Re-render UI forms and preview
                 setFormFields();
@@ -1770,7 +1770,7 @@ window.initProfiles = async function() {
     
     const active = window.profiles.find(p => p.id === window.activeProfileId) || window.profiles[0];
     if (active) {
-        state = JSON.parse(JSON.stringify(active.resumeData));
+        window.updateStateObject(active.resumeData);
         window.activeProfileId = active.id;
         localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
     }
@@ -1807,7 +1807,7 @@ window.switchProfile = function(profileId) {
     const target = window.profiles.find(p => p.id === profileId);
     if (target) {
         window.activeProfileId = target.id;
-        state = JSON.parse(JSON.stringify(target.resumeData));
+        window.updateStateObject(target.resumeData);
         localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
         localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
         localStorage.setItem('resumake_state', JSON.stringify(state));
@@ -1857,7 +1857,7 @@ window.createNewProfile = function() {
     
     window.profiles.push(newProfile);
     window.activeProfileId = newId;
-    state = newProfile.resumeData;
+    window.updateStateObject(newProfile.resumeData);
     
     localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
     localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
@@ -1891,7 +1891,7 @@ window.duplicateCurrentProfile = function() {
     
     window.profiles.push(newProfile);
     window.activeProfileId = newId;
-    state = newProfile.resumeData;
+    window.updateStateObject(newProfile.resumeData);
     
     localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
     localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
@@ -1940,7 +1940,7 @@ window.deleteCurrentProfile = function() {
     
     window.profiles = window.profiles.filter(p => p.id !== window.activeProfileId);
     window.activeProfileId = window.profiles[0].id;
-    state = JSON.parse(JSON.stringify(window.profiles[0].resumeData));
+    window.updateStateObject(window.profiles[0].resumeData);
     
     localStorage.setItem('resumake_active_profile_id', window.activeProfileId);
     localStorage.setItem('resumake_profiles', JSON.stringify(window.profiles));
