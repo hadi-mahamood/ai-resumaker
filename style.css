@@ -7,6 +7,10 @@
     --text-primary: #f3f4f6;
     --text-secondary: #9ca3af;
     --text-muted: #6b7280;
+    --bg-workspace: #0f1118;
+    --bg-toolbar: rgba(13, 16, 26, 0.8);
+    --bg-input: rgba(0, 0, 0, 0.2);
+    --bg-input-focus: rgba(0, 0, 0, 0.3);
     
     --primary: #6366f1;
     --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
@@ -494,11 +498,11 @@ label {
 
 input, select, textarea {
     width: 100%;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--bg-input, rgba(0, 0, 0, 0.2));
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 10px 14px;
-    color: white;
+    color: var(--text-primary);
     font-family: var(--font-sans);
     font-size: 0.9rem;
     outline: none;
@@ -508,7 +512,7 @@ input, select, textarea {
 input:focus, select:focus, textarea:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 3px var(--primary-glow, rgba(99, 102, 241, 0.15));
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--bg-input-focus, rgba(0, 0, 0, 0.3));
 }
 
 textarea {
@@ -682,7 +686,7 @@ textarea {
 }
 
 .toolbar {
-    background: rgba(13, 16, 26, 0.8);
+    background: var(--bg-toolbar, rgba(13, 16, 26, 0.8));
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     padding: 0 12px;
@@ -1015,7 +1019,7 @@ textarea {
     justify-content: center;
     align-items: flex-start;
     position: relative;
-    background: #0f1118;
+    background: var(--bg-workspace, #0f1118);
     background-image: 
         radial-gradient(#1e293b 1px, transparent 1px);
     background-size: 20px 20px;
@@ -3717,5 +3721,58 @@ textarea {
     100% {
         box-shadow: 0 0 0 0px rgba(99, 102, 241, 0);
     }
+}
+
+/* Light Theme Variables Overrides */
+body.light-theme {
+    --bg-dark: #f8fafc;
+    --bg-card: rgba(255, 255, 255, 0.8);
+    --border-color: rgba(15, 23, 42, 0.08);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --bg-workspace: #f1f5f9;
+    --bg-toolbar: rgba(241, 245, 249, 0.85);
+    --bg-input: rgba(255, 255, 255, 0.65);
+    --bg-input-focus: rgba(255, 255, 255, 0.9);
+}
+
+body.light-theme .logo-icon {
+    background: var(--primary-gradient);
+    color: white !important;
+}
+
+body.light-theme .settings-panel {
+    background: rgba(15, 23, 42, 0.02);
+}
+
+body.light-theme .custom-dropdown-menu {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+}
+
+body.light-theme .custom-dropdown-trigger {
+    background: rgba(15, 23, 42, 0.03);
+    color: #0f172a;
+}
+
+body.light-theme .custom-dropdown-trigger:hover {
+    background: rgba(15, 23, 42, 0.06);
+}
+
+body.light-theme .accordion-item.active {
+    background: rgba(15, 23, 42, 0.02);
+}
+
+body.light-theme .ats-sim-section {
+    background: rgba(15, 23, 42, 0.02);
+}
+
+body.light-theme [data-tooltip]::after {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(15, 23, 42, 0.08);
+    color: #0f172a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 

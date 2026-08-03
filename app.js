@@ -1537,8 +1537,39 @@ window.toggleDiffHighlights = function() {
     }
 };
 
-// Load saved color theme accent on script execute
+// Toggle dark/light theme mode
+window.toggleDarkLightMode = function() {
+    const body = document.body;
+    const btn = document.getElementById("theme-toggle-btn");
+    if (!body || !btn) return;
+    
+    const isLight = body.classList.toggle("light-theme");
+    
+    if (isLight) {
+        btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+        btn.title = "Switch to Dark Mode";
+        localStorage.setItem("resumake_theme_mode", "light");
+        showToast("Switched to Light Theme.", "info");
+    } else {
+        btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+        btn.title = "Switch to Light Mode";
+        localStorage.setItem("resumake_theme_mode", "dark");
+        showToast("Switched to Dark Theme.", "info");
+    }
+};
+
+// Load saved color theme accent & dark/light mode on script execute
 setTimeout(() => {
     const savedTheme = localStorage.getItem("resumake_theme_accent") || "cobalt";
     window.setThemeAccent(savedTheme);
+    
+    const savedMode = localStorage.getItem("resumake_theme_mode") || "dark";
+    if (savedMode === "light") {
+        document.body.classList.add("light-theme");
+        const btn = document.getElementById("theme-toggle-btn");
+        if (btn) {
+            btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            btn.title = "Switch to Dark Mode";
+        }
+    }
 }, 200);
