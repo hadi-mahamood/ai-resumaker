@@ -1479,31 +1479,45 @@ window.setThemeAccent = function(theme) {
     const colors = {
         cobalt: {
             primary: "#6366f1",
-            accent: "#a855f7",
-            gradient: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
+            accent: "#06b6d4",
+            gradient: "linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)",
             glow: "0 0 15px rgba(99, 102, 241, 0.35)",
             glowColor: "rgba(99, 102, 241, 0.15)"
         },
         emerald: {
-            primary: "#10b981",
-            accent: "#14b8a6",
-            gradient: "linear-gradient(135deg, #10b981 0%, #14b8a6 100%)",
-            glow: "0 0 15px rgba(16, 185, 129, 0.35)",
-            glowColor: "rgba(16, 185, 129, 0.15)"
+            primary: "#059669",
+            accent: "#34d399",
+            gradient: "linear-gradient(135deg, #059669 0%, #34d399 100%)",
+            glow: "0 0 15px rgba(5, 150, 105, 0.35)",
+            glowColor: "rgba(5, 150, 105, 0.15)"
         },
         amber: {
-            primary: "#f59e0b",
-            accent: "#d97706",
-            gradient: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-            glow: "0 0 15px rgba(245, 158, 11, 0.35)",
-            glowColor: "rgba(245, 158, 11, 0.15)"
+            primary: "#f97316",
+            accent: "#f43f5e",
+            gradient: "linear-gradient(135deg, #f97316 0%, #f43f5e 100%)",
+            glow: "0 0 15px rgba(249, 115, 22, 0.35)",
+            glowColor: "rgba(249, 115, 22, 0.15)"
         },
         amethyst: {
-            primary: "#a855f7",
+            primary: "#8b5cf6",
             accent: "#ec4899",
-            gradient: "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
-            glow: "0 0 15px rgba(168, 85, 247, 0.35)",
-            glowColor: "rgba(168, 85, 247, 0.15)"
+            gradient: "linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)",
+            glow: "0 0 15px rgba(139, 92, 246, 0.35)",
+            glowColor: "rgba(139, 92, 246, 0.15)"
+        },
+        aurora: {
+            primary: "#0d9488",
+            accent: "#84cc16",
+            gradient: "linear-gradient(135deg, #0d9488 0%, #84cc16 100%)",
+            glow: "0 0 15px rgba(13, 148, 136, 0.35)",
+            glowColor: "rgba(13, 148, 136, 0.15)"
+        },
+        champagne: {
+            primary: "#fb7185",
+            accent: "#f59e0b",
+            gradient: "linear-gradient(135deg, #fb7185 0%, #f59e0b 100%)",
+            glow: "0 0 15px rgba(251, 113, 133, 0.35)",
+            glowColor: "rgba(251, 113, 133, 0.15)"
         }
     };
     
