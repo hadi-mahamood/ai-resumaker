@@ -361,8 +361,8 @@
                         <i class="fa-solid fa-bars"></i>
                     </button>
                     <div class="custom-dropdown-container" id="template-dropdown-container">
-                        <button class="custom-dropdown-trigger" id="template-dropdown-trigger" onclick="window.toggleTemplateDropdown(event)">
-                            <i class="fa-solid fa-filter"></i>
+                        <button class="custom-dropdown-trigger" id="template-dropdown-trigger" onclick="window.toggleTemplateDropdown(event)" data-tooltip="Select Resume Layout Template">
+                            <i class="fa-solid fa-table-columns"></i>
                             <span id="current-template-label">Modern (Global Tech)</span>
                             <i class="fa-solid fa-chevron-down" style="font-size: 0.55rem; margin-left: 2px;"></i>
                         </button>
@@ -408,7 +408,7 @@
                 <!-- Middle group: Resume Analysis / Tools -->
                 <div class="toolbar-group middle-group">
                     <!-- ATS Score Indicator -->
-                    <div class="ats-score-pill" onclick="openATSModal()" title="View full ATS Score Details" style="display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 6px; border-radius: 20px;">
+                    <div class="ats-score-pill" onclick="openATSModal()" data-tooltip="View Full ATS Audit Report" style="display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 6px; border-radius: 20px;">
                         <div class="ats-radial-container" style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
                             <svg width="28" height="28" viewBox="0 0 36 36" style="transform: rotate(-90deg);">
                                 <path stroke="rgba(255,255,255,0.06)" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -420,16 +420,16 @@
                     </div>
 
                     <!-- ATS Parser View Toggle -->
-                    <button class="btn btn-secondary btn-pill" id="ats-sim-toggle-btn" onclick="window.toggleATSSimulator()" title="Simulate ATS Parser View">
+                    <button class="btn btn-secondary btn-pill" id="ats-sim-toggle-btn" onclick="window.toggleATSSimulator()" data-tooltip="Simulate ATS Parser View">
                         <i class="fa-solid fa-microchip"></i> <span>ATS Parser</span>
                     </button>
 
-                    <button class="btn btn-secondary btn-pill" onclick="openAICoverLetter()" title="AI Cover Letter Generator">
+                    <button class="btn btn-secondary btn-pill" onclick="openAICoverLetter()" data-tooltip="Generate AI Tailored Cover Letter">
                         <i class="fa-solid fa-envelope-open-text"></i> <span>Cover Letter</span>
                     </button>
 
                     <!-- Practice Interview Button -->
-                    <button class="btn btn-secondary btn-pill" onclick="window.openInterviewPracticeModal()" title="AI Practice Interview">
+                    <button class="btn btn-secondary btn-pill" onclick="window.openInterviewPracticeModal()" data-tooltip="Launch AI Mock Interview Simulator">
                         <i class="fa-solid fa-comments"></i> <span>Practice</span>
                     </button>
                 </div>
@@ -437,7 +437,7 @@
                 <!-- Right group: Export / Download Actions -->
                 <div class="toolbar-group right-group" style="display: flex; align-items: center; gap: 12px;">
                     <!-- Highlight Diff Toggle Switch -->
-                    <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; color: var(--text-secondary);">
+                    <div data-tooltip="Toggle AI difference highlight coloring" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; color: var(--text-secondary);">
                         <span class="toolbar-toggle-label">Highlights</span>
                         <label class="switch-toggle" style="position: relative; display: inline-block; width: 32px; height: 18px; margin: 0;">
                             <input type="checkbox" id="diff-highlight-toggle" checked onchange="window.toggleDiffHighlights()" style="opacity: 0; width: 0; height: 0;">
@@ -445,7 +445,7 @@
                         </label>
                     </div>
 
-                    <button class="btn btn-primary btn-pill" onclick="exportPDF()" title="Download PDF Copy">
+                    <button class="btn btn-primary btn-pill" onclick="exportPDF()" data-tooltip="Export clean A4 PDF file">
                         <i class="fa-solid fa-file-pdf"></i> <span>PDF</span>
                     </button>
                 </div>

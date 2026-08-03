@@ -1052,7 +1052,9 @@ textarea {
     width: 794px; /* A4 standard size in pixels at 96 DPI */
     min-height: 1123px; /* A4 height */
     padding: 60px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 
+                0 12px 24px -8px rgba(0, 0, 0, 0.4), 
+                0 1px 3px rgba(0, 0, 0, 0.15);
     position: relative;
     transition: transform var(--transition-normal);
     transform-origin: top center;
@@ -3655,5 +3657,65 @@ textarea {
 .theme-bubble:hover {
     transform: scale(1.25);
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
+}
+
+/* Custom CSS Glassmorphic Tooltip engine */
+[data-tooltip] {
+    position: relative;
+}
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -34px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: rgba(13, 16, 26, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    font-size: 0.68rem;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+    transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+[data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+/* Glassmorphic Hover Rings for Toolbar buttons */
+.btn-pill, .ats-score-pill {
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.btn-pill:hover, .ats-score-pill:hover {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px var(--primary-glow, rgba(99, 102, 241, 0.15)) !important;
+    transform: translateY(-1px);
+}
+
+/* Simulator mode active pulsing glow */
+#ats-sim-toggle-btn.active {
+    background: var(--primary-gradient) !important;
+    color: white !important;
+    border-color: transparent !important;
+    animation: ats-active-pulse 2s infinite ease-in-out;
+}
+@keyframes ats-active-pulse {
+    0% {
+        box-shadow: 0 0 0 0px var(--primary-glow, rgba(99, 102, 241, 0.4));
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0px rgba(99, 102, 241, 0);
+    }
 }
 
