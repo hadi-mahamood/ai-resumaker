@@ -1009,8 +1009,10 @@ textarea {
     overflow: auto;
     padding: 40px;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 24px;
     background: #0f1118;
     background-image: 
         radial-gradient(#1e293b 1px, transparent 1px);
