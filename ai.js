@@ -278,7 +278,7 @@ const AIService = {
             return await this.simulateStreaming(text, onChunk);
         } catch (error) {
             console.error("Gemini Proxy API call failed: ", error);
-            const fallback = "API Proxy Error. Falling back to local offline AI results:\n\n" + await this.offlineFallback(promptText);
+            const fallback = await this.offlineFallback(promptText);
             return await this.simulateStreaming(fallback, onChunk);
         }
     },
@@ -328,7 +328,7 @@ const AIService = {
         } catch (error) {
             console.error("WebGPU call failed: ", error);
             showToast("Local WebGPU error. Check WebGPU browser support.");
-            const fallback = "WebGPU Error. Falling back to offline fallback:\n\n" + await this.offlineFallback(promptText);
+            const fallback = await this.offlineFallback(promptText);
             return await this.simulateStreaming(fallback, onChunk);
         }
     },
