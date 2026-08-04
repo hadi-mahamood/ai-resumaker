@@ -1952,3 +1952,46 @@ window.importProfileBackup = function(input) {
     // Reset input value to allow re-upload of same file
     input.value = "";
 };
+
+// Native Touch Swipe Gestures for Mobile Tab Transitions
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.addEventListener("touchstart", (e) => {
+    // Avoid triggering swipes on interactive inputs or editable elements
+    const tag = e.target.tagName.toLowerCase();
+    const isEditable = e.target.closest('[contenteditable="true"]') || e.target.closest('.ats-simulator-display') || e.target.closest('#settings-panel');
+    if (tag === "input" || tag === "textarea" || tag === "select" || isEditable) {
+        return;
+    }
+    touchStartX = e.changedTouches[0].clientX;
+    touchStartY = e.changedTouches[0].clientY;
+}, { passive: true });
+
+document.addEventListener("touchend", (e) => {
+    const tag = e.target.tagName.toLowerCase();
+    const isEditable = e.target.closest('[contenteditable="true"]') || e.target.closest('.ats-simulator-display') || e.target.closest('#settings-panel');
+    if (tag === "input" || tag === "textarea" || tag === "select" || isEditable) {
+        return;
+    }
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    
+    const diffX = touchEndX - touchStartX;
+    const diffY = touchEndY - touchStartY;
+    
+    // Check if horizontal swipe is dominant and exceeds threshold
+    if (Math.abs(diffX) > Math.abs(diffY) * 1.5 && Math.abs(diffX) > 75) {
+        const isEditActive = document.body.classList.contains("mobile-view-edit");
+        if (diffX < 0 && isEditActive) {
+            // Swipe Left -> switch to Preview
+            window.switchMobileTab("preview");
+            showToast("Swiped to Preview");
+        } else if (diffX > 0 && !isEditActive) {
+            // Swipe Right -> switch to Edit Form
+            window.switchMobileTab("edit");
+            showToast("Swiped to Edit Form");
+        }
+    }
+}, { passive: true });
