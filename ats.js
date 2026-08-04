@@ -908,7 +908,7 @@ window.optimizeResumeData = async function(resumeState) {
         return optimizationCache;
     }
     
-    if (provider === "gemini" && apiKey) {
+    if (provider === "gemini") {
         const promptText = `
 You are an expert ATS Resume Optimizer.
 Analyze the following resume and target job description (or job title).
@@ -1011,29 +1011,26 @@ Expected Output Format:
 };
 
 window.callGeminiOptimizerAPI = async function(key, prompt) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+    const url = '/api/ai/chat';
     const requestBody = {
-        contents: [{
-            parts: [{
-                text: prompt
-            }]
-        }]
+        prompt: prompt
     };
     
-    // Log the complete request payload (excluding key)
-    console.log("Gemini API Request Payload:", JSON.stringify(requestBody, null, 2));
+    // Log the complete request payload
+    console.log("Gemini Proxy API Request Payload:", JSON.stringify(requestBody, null, 2));
     
     let response;
     try {
         response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-API-Key': key
             },
             body: JSON.stringify(requestBody)
         });
     } catch (netErr) {
-        console.error("Gemini API Network Error:", netErr);
+        console.error("Gemini Proxy API Network Error:", netErr);
         throw new Error("Network error. Please check your internet connection and try again.");
     }
     
@@ -1041,33 +1038,20 @@ window.callGeminiOptimizerAPI = async function(key, prompt) {
         let errorData = null;
         try {
             errorData = await response.json();
-        } catch (jsonErr) {
-            // response was not JSON
-        }
+        } catch (jsonErr) {}
         
-        // Log the complete error response payload for debugging
-        console.error(`Gemini API Error Response [HTTP ${response.status}]:`, errorData || response.statusText);
+        console.error(`Gemini Proxy API Error Response [HTTP ${response.status}]:`, errorData || response.statusText);
         
         const httpStatus = response.status;
         let errorMessage = response.statusText || "API Error";
-        let apiStatus = "";
-        
         if (errorData && errorData.error) {
-            errorMessage = errorData.error.message || errorMessage;
-            apiStatus = errorData.error.status || "";
+            errorMessage = errorData.error.message || errorData.error;
         }
-        
-        const errObj = new Error(errorMessage);
-        errObj.httpStatus = httpStatus;
-        errObj.apiStatus = apiStatus;
-        errObj.errorData = errorData;
-        throw errObj;
+        throw new Error(errorMessage);
     }
     
     const data = await response.json();
-    
-    // Log response payload for debugging
-    console.log("Gemini API Response Payload:", JSON.stringify(data, null, 2));
+    console.log("Gemini Proxy API Response Payload:", JSON.stringify(data, null, 2));
     
     if (!data.candidates || data.candidates.length === 0 || !data.candidates[0].content || !data.candidates[0].content.parts || data.candidates[0].content.parts.length === 0) {
         throw new Error("Invalid response payload structure returned by Gemini API.");
