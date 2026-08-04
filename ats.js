@@ -1175,6 +1175,25 @@ window.renderRevisions = function(original, optimized) {
         );
     }
     
+    const allSuggested = [
+        ...(optimized.missingKeywords || []),
+        ...(optimized.suggestedKeywords || [])
+    ].filter(Boolean);
+    
+    const currentSkills = original.skills || [];
+    const newKeywords = allSuggested.filter(kw => !currentSkills.includes(kw));
+    
+    if (newKeywords.length > 0) {
+        const originalText = currentSkills.join(", ") || "No skills listed.";
+        const optimizedText = [...currentSkills, ...newKeywords].join(", ");
+        list.innerHTML += window.createRevisionCard(
+            "keywords",
+            "Suggested Skills & Keywords",
+            originalText,
+            optimizedText
+        );
+    }
+    
     if (original.experience && optimized.optimizedExperience) {
         original.experience.forEach((exp, index) => {
             const optExp = optimized.optimizedExperience.find(o => o.id === exp.id) ||
@@ -1266,11 +1285,38 @@ window.applyAllAIOptimizations = function() {
         });
     }
     
+    // Keywords / Skills
+    const acceptKeywords = document.getElementById("accept-check-keywords");
+    if (acceptKeywords && acceptKeywords.checked) {
+        const allSuggested = [
+            ...(pendingOptimizations.missingKeywords || []),
+            ...(pendingOptimizations.suggestedKeywords || [])
+        ].filter(Boolean);
+        
+        if (!state.skills) state.skills = [];
+        let addedCount = 0;
+        allSuggested.forEach(kw => {
+            if (!state.skills.includes(kw)) {
+                state.skills.push(kw);
+                addedCount++;
+            }
+        });
+        if (addedCount > 0) {
+            appliedCount++;
+        }
+    }
+    
     if (appliedCount > 0) {
         saveState();
         renderExperienceList();
         renderProjectsList();
+        if (window.renderSkillsTags) {
+            window.renderSkillsTags();
+        }
         renderResumePreview();
+        if (window.calculateJDMatch) {
+            window.calculateJDMatch();
+        }
         
         showToast(`Applied ${appliedCount} AI optimizations successfully!`);
         closeATSModal();
