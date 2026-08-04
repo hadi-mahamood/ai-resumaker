@@ -3517,6 +3517,7 @@ textarea {
         background: #0d101a !important;
         display: flex !important;
         flex-direction: row !important;
+        flex-wrap: nowrap !important;
         align-items: center !important;
         justify-content: flex-start !important;
         padding: 0 12px !important;
@@ -3528,6 +3529,15 @@ textarea {
     }
     .toolbar::-webkit-scrollbar {
         display: none !important;
+    }
+    
+    .toolbar .middle-group {
+        order: unset !important;
+        width: auto !important;
+        max-width: none !important;
+        margin-top: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
     }
     
     .toolbar-group {
