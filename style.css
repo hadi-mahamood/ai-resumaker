@@ -3402,6 +3402,7 @@ textarea {
     .ats-modal {
         padding: 0 !important;
         align-items: flex-end !important;
+        z-index: 100000 !important;
     }
     
     .ats-modal-card {
