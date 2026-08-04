@@ -2253,6 +2253,7 @@ window.toggleATSSimulator = function() {
     
     atsSimulatorActive = !atsSimulatorActive;
     if (atsSimulatorActive) {
+        document.body.classList.add("ats-simulator-active");
         toggleBtn.classList.add("active");
         toggleBtn.style.background = "var(--primary-color)";
         toggleBtn.style.color = "white";
@@ -2263,6 +2264,7 @@ window.toggleATSSimulator = function() {
         
         window.runATSSimulation();
     } else {
+        document.body.classList.remove("ats-simulator-active");
         toggleBtn.classList.remove("active");
         toggleBtn.style.background = "";
         toggleBtn.style.color = "";
