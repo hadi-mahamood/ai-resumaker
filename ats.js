@@ -963,15 +963,20 @@ Expected Output Format:
         try {
             const resultText = await window.callGeminiOptimizerAPI(apiKey, promptText);
             let cleaned = resultText.trim();
-            if (cleaned.startsWith("```json")) {
-                cleaned = cleaned.substring(7);
-            } else if (cleaned.startsWith("```")) {
-                cleaned = cleaned.substring(3);
+            const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                cleaned = jsonMatch[0];
+            } else {
+                if (cleaned.startsWith("```json")) {
+                    cleaned = cleaned.substring(7);
+                } else if (cleaned.startsWith("```")) {
+                    cleaned = cleaned.substring(3);
+                }
+                if (cleaned.endsWith("```")) {
+                    cleaned = cleaned.substring(0, cleaned.length - 3);
+                }
+                cleaned = cleaned.trim();
             }
-            if (cleaned.endsWith("```")) {
-                cleaned = cleaned.substring(0, cleaned.length - 3);
-            }
-            cleaned = cleaned.trim();
             
             const parsed = JSON.parse(cleaned);
             
@@ -1233,28 +1238,133 @@ window.renderRevisions = function(original, optimized) {
     }
 };
 
+window.findOptimizedProperty = function(obj, keysArray) {
+    if (!obj) return null;
+    for (const key of keysArray) {
+        if (obj[key] !== undefined && obj[key] !== null) {
+            return obj[key];
+        }
+    }
+    const lowerKeys = keysArray.map(k => k.toLowerCase());
+    for (const k in obj) {
+        const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+        for (const targetKey of lowerKeys) {
+            const cleanTarget = targetKey.replace(/[^a-z0-9]/g, '');
+            if (cleanK === cleanTarget) {
+                return obj[k];
+            }
+        }
+    }
+    return null;
+};
+
+window.renderRevisions = function(original, optimized) {
+    const list = document.getElementById("ats-revisions-list");
+    if (!list) return;
+    
+    list.innerHTML = "";
+    
+    const optimizedSummary = window.findOptimizedProperty(optimized, ["optimizedSummary", "summary", "profile", "about", "bio"]);
+    const optimizedExperience = window.findOptimizedProperty(optimized, ["optimizedExperience", "experience", "experiences", "workExperience", "work_experience"]);
+    const optimizedProjects = window.findOptimizedProperty(optimized, ["optimizedProjects", "projects", "project", "personalProjects", "personal_projects"]);
+    const missingKeywords = window.findOptimizedProperty(optimized, ["missingKeywords", "missing_keywords", "missingKeyword"]);
+    const suggestedKeywords = window.findOptimizedProperty(optimized, ["suggestedKeywords", "suggested_keywords", "suggestedKeyword"]);
+
+    if (original.summary || optimizedSummary) {
+        list.innerHTML += window.createRevisionCard(
+            "summary",
+            "Professional Summary",
+            original.summary || "No summary provided.",
+            optimizedSummary
+        );
+    }
+    
+    const allSuggested = [
+        ...(missingKeywords || []),
+        ...(suggestedKeywords || [])
+    ].filter(Boolean);
+    
+    const currentSkills = original.skills || [];
+    const newKeywords = allSuggested.filter(kw => !currentSkills.includes(kw));
+    
+    if (newKeywords.length > 0) {
+        const originalText = currentSkills.join(", ") || "No skills listed.";
+        const optimizedText = [...currentSkills, ...newKeywords].join(", ");
+        list.innerHTML += window.createRevisionCard(
+            "keywords",
+            "Suggested Skills & Keywords",
+            originalText,
+            optimizedText
+        );
+    }
+    
+    if (original.experience && optimizedExperience) {
+        original.experience.forEach((exp, index) => {
+            const optExp = optimizedExperience.find(o => o.id === exp.id) ||
+                           optimizedExperience.find(o => String(o.id).replace(/[^0-9]/g, '') === String(exp.id).replace(/[^0-9]/g, '')) ||
+                           optimizedExperience[index];
+            if (optExp) {
+                const descVal = optExp.desc || optExp.description || optExp.bullets || optExp.text;
+                if (descVal) {
+                    list.innerHTML += window.createRevisionCard(
+                        `exp-${exp.id}`,
+                        `Experience: ${exp.role} at ${exp.company}`,
+                        exp.desc || "",
+                        descVal
+                    );
+                }
+            }
+        });
+    }
+    
+    if (original.projects && optimizedProjects) {
+        original.projects.forEach((proj, index) => {
+            const optProj = optimizedProjects.find(o => o.id === proj.id) ||
+                            optimizedProjects.find(o => String(o.id).replace(/[^0-9]/g, '') === String(proj.id).replace(/[^0-9]/g, '')) ||
+                            optimizedProjects[index];
+            if (optProj) {
+                const descVal = optProj.desc || optProj.description || optProj.bullets || optProj.text;
+                if (descVal) {
+                    list.innerHTML += window.createRevisionCard(
+                        `proj-${proj.id}`,
+                        `Project: ${proj.title}`,
+                        proj.desc || "",
+                        descVal
+                    );
+                }
+            }
+        });
+    }
+};
+
 window.applyAllAIOptimizations = function() {
     if (!pendingOptimizations) return;
     
     let appliedCount = 0;
     
+    const optimizedSummary = window.findOptimizedProperty(pendingOptimizations, ["optimizedSummary", "summary", "profile", "about", "bio"]);
+    const optimizedExperience = window.findOptimizedProperty(pendingOptimizations, ["optimizedExperience", "experience", "experiences", "workExperience", "work_experience"]);
+    const optimizedProjects = window.findOptimizedProperty(pendingOptimizations, ["optimizedProjects", "projects", "project", "personalProjects", "personal_projects"]);
+    const missingKeywords = window.findOptimizedProperty(pendingOptimizations, ["missingKeywords", "missing_keywords", "missingKeyword"]);
+    const suggestedKeywords = window.findOptimizedProperty(pendingOptimizations, ["suggestedKeywords", "suggested_keywords", "suggestedKeyword"]);
+
     // Summary
     const acceptSummary = document.getElementById("accept-check-summary");
-    if (acceptSummary && acceptSummary.checked) {
-        state.summary = pendingOptimizations.optimizedSummary;
+    if (acceptSummary && acceptSummary.checked && optimizedSummary) {
+        state.summary = optimizedSummary;
         const summaryInput = document.getElementById("input-summary");
         if (summaryInput) summaryInput.value = state.summary;
         appliedCount++;
     }
     
     // Experience
-    if (state.experience && pendingOptimizations.optimizedExperience) {
+    if (state.experience && optimizedExperience) {
         state.experience.forEach((exp, index) => {
             const acceptExp = document.getElementById(`accept-check-exp-${exp.id}`);
             if (acceptExp && acceptExp.checked) {
-                const optExp = pendingOptimizations.optimizedExperience.find(o => o.id === exp.id) ||
-                               pendingOptimizations.optimizedExperience.find(o => String(o.id).replace(/[^0-9]/g, '') === String(exp.id).replace(/[^0-9]/g, '')) ||
-                               pendingOptimizations.optimizedExperience[index];
+                const optExp = optimizedExperience.find(o => o.id === exp.id) ||
+                               optimizedExperience.find(o => String(o.id).replace(/[^0-9]/g, '') === String(exp.id).replace(/[^0-9]/g, '')) ||
+                               optimizedExperience[index];
                 if (optExp) {
                     const descVal = optExp.desc || optExp.description || optExp.bullets || optExp.text;
                     if (descVal) {
@@ -1267,13 +1377,13 @@ window.applyAllAIOptimizations = function() {
     }
     
     // Projects
-    if (state.projects && pendingOptimizations.optimizedProjects) {
+    if (state.projects && optimizedProjects) {
         state.projects.forEach((proj, index) => {
             const acceptProj = document.getElementById(`accept-check-proj-${proj.id}`);
             if (acceptProj && acceptProj.checked) {
-                const optProj = pendingOptimizations.optimizedProjects.find(o => o.id === proj.id) ||
-                                pendingOptimizations.optimizedProjects.find(o => String(o.id).replace(/[^0-9]/g, '') === String(proj.id).replace(/[^0-9]/g, '')) ||
-                                pendingOptimizations.optimizedProjects[index];
+                const optProj = optimizedProjects.find(o => o.id === proj.id) ||
+                                optimizedProjects.find(o => String(o.id).replace(/[^0-9]/g, '') === String(proj.id).replace(/[^0-9]/g, '')) ||
+                                optimizedProjects[index];
                 if (optProj) {
                     const descVal = optProj.desc || optProj.description || optProj.bullets || optProj.text;
                     if (descVal) {
@@ -1289,8 +1399,8 @@ window.applyAllAIOptimizations = function() {
     const acceptKeywords = document.getElementById("accept-check-keywords");
     if (acceptKeywords && acceptKeywords.checked) {
         const allSuggested = [
-            ...(pendingOptimizations.missingKeywords || []),
-            ...(pendingOptimizations.suggestedKeywords || [])
+            ...(missingKeywords || []),
+            ...(suggestedKeywords || [])
         ].filter(Boolean);
         
         if (!state.skills) state.skills = [];
