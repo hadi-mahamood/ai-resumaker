@@ -412,6 +412,51 @@ const ATSAuditor = {
             }
         }
 
+        // 8. Dynamic Brand Alignment (Color Theme Suggestion)
+        const jobTitle = (resumeData.targetJob || resumeData.title || "").toLowerCase();
+        let recommendedTheme = "cobalt";
+        let recommendedThemeLabel = "Midnight Neon (Cobalt)";
+        let themeReason = "established corporate fields requiring trust, structure, and professional authority";
+        
+        if (jobTitle.includes("finance") || jobTitle.includes("bank") || jobTitle.includes("law") || jobTitle.includes("attorney") || jobTitle.includes("consultant") || jobTitle.includes("advisor") || jobTitle.includes("accountant") || jobTitle.includes("exec") || jobTitle.includes("director")) {
+            recommendedTheme = "cobalt";
+            recommendedThemeLabel = "Midnight Neon (Cobalt)";
+            themeReason = "established corporate fields requiring trust, structure, and professional authority";
+        } else if (jobTitle.includes("green") || jobTitle.includes("eco") || jobTitle.includes("env") || jobTitle.includes("forest") || jobTitle.includes("mint") || jobTitle.includes("bio") || jobTitle.includes("medi") || jobTitle.includes("doctor") || jobTitle.includes("nurse") || jobTitle.includes("health")) {
+            recommendedTheme = "emerald";
+            recommendedThemeLabel = "Forest Mint (Emerald)";
+            themeReason = "health, sustainability, medical care, and wellness industries denoting growth and restoration";
+        } else if (jobTitle.includes("creat") || jobTitle.includes("design") || jobTitle.includes("art") || jobTitle.includes("ux") || jobTitle.includes("ui") || jobTitle.includes("product") || jobTitle.includes("market") || jobTitle.includes("brand") || jobTitle.includes("adv")) {
+            recommendedTheme = "amethyst";
+            recommendedThemeLabel = "Cyberpunk Orchid (Amethyst)";
+            themeReason = "creative tech, designs, branding, and marketing domains requiring visual novelty and innovation";
+        } else if (jobTitle.includes("sale") || jobTitle.includes("customer") || jobTitle.includes("relat") || jobTitle.includes("deal") || jobTitle.includes("growth") || jobTitle.includes("startup") || jobTitle.includes("entre")) {
+            recommendedTheme = "amber";
+            recommendedThemeLabel = "Sunset Flare (Amber)";
+            themeReason = "high-energy, client-facing sales, or startup roles denoting drive, warmth, and vitality";
+        } else if (jobTitle.includes("teal") || jobTitle.includes("aurora") || jobTitle.includes("tech") || jobTitle.includes("software") || jobTitle.includes("cloud") || jobTitle.includes("ops") || jobTitle.includes("dev")) {
+            recommendedTheme = "aurora";
+            recommendedThemeLabel = "Nordic Aurora (Teal)";
+            themeReason = "cloud, operations, and modern tech environments requiring a clean, futuristic balance";
+        } else if (jobTitle.includes("luxury") || jobTitle.includes("fash") || jobTitle.includes("gold") || jobTitle.includes("hotel") || jobTitle.includes("hospi") || jobTitle.includes("vip") || jobTitle.includes("service")) {
+            recommendedTheme = "champagne";
+            recommendedThemeLabel = "Rose Gold Champagne";
+            themeReason = "premium hospitality, luxury branding, VIP services, or executive fashion requiring elegance";
+        }
+
+        const activeTheme = localStorage.getItem("resumake_theme_accent") || "cobalt";
+        if (activeTheme === recommendedTheme) {
+            suggestions.push({
+                type: "success",
+                text: `Brand Color Alignment: Your selected color theme matches the recommended palette for ${resumeData.targetJob || "your role"} (${recommendedThemeLabel})!`
+            });
+        } else {
+            suggestions.push({
+                type: "warning",
+                text: `Brand Color Alignment: A "${recommendedThemeLabel}" theme is suggested for "${resumeData.targetJob || "your role"}" (${themeReason}). <a href="javascript:void(0)" onclick="window.setThemeAccent('${recommendedTheme}'); window.calculateJDMatch(); showToast('Applied theme: ${recommendedThemeLabel}!');" style="color:var(--primary); font-weight:600; text-decoration:underline; margin-left:4px;">Apply Theme</a>`
+            });
+        }
+
         // Cap score at 100 and floor at 0
         score = Math.max(0, Math.min(100, score));
 
