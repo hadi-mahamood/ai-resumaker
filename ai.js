@@ -538,3 +538,5 @@ document.addEventListener("DOMContentLoaded", () => {
         AIService.initWebGPUEngine();
     }
 });
+
+window.AIService = AIService;
