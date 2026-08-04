@@ -12,6 +12,16 @@ import {
 } from "./templates/regional.js";
 import { formatMultiline } from "./templates/utils.js";
 import { renderDiffHTML } from "./templates/diff.js";
+import {
+    openInterviewPracticeModal,
+    closeInterviewPracticeModal,
+    generateInterviewQuestions,
+    loadFallbackInterviewQuestions,
+    renderInterviewDashboard,
+    getFeedbackMarkup,
+    evaluateInterviewAnswer,
+    loadFallbackEvaluation
+} from "./practice.js";
 
 // Debounce helper to prevent rapid main-thread blocks during fast typing
 function debounce(func, wait) {
@@ -1467,6 +1477,16 @@ window.switchTemplate = switchTemplate;
 window.toggleSidebar = toggleSidebar;
 window.exportPDF = exportPDF;
 window.copyCoverLetter = copyCoverLetter;
+
+window.openInterviewPracticeModal = openInterviewPracticeModal;
+window.closeInterviewPracticeModal = closeInterviewPracticeModal;
+window.generateInterviewQuestions = generateInterviewQuestions;
+window.loadFallbackInterviewQuestions = loadFallbackInterviewQuestions;
+window.renderInterviewDashboard = renderInterviewDashboard;
+window.getFeedbackMarkup = getFeedbackMarkup;
+window.evaluateInterviewAnswer = evaluateInterviewAnswer;
+window.loadFallbackEvaluation = loadFallbackEvaluation;
+
 window.updateStateObject = function(newData) {
     if (!newData) return;
     Object.keys(state).forEach(key => delete state[key]);
