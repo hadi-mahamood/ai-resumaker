@@ -2247,6 +2247,7 @@ window.toggleATSSimulator = function() {
     const toggleBtn = document.getElementById("ats-sim-toggle-btn");
     const scaler = document.getElementById("resume-sheet-scaler");
     const display = document.getElementById("ats-simulator-display");
+    const suggestionsCard = document.getElementById("ats-suggestions-card");
     
     if (!toggleBtn || !scaler || !display) return;
     
@@ -2257,6 +2258,7 @@ window.toggleATSSimulator = function() {
         toggleBtn.style.color = "white";
         
         scaler.style.display = "none";
+        if (suggestionsCard) suggestionsCard.style.display = "none";
         display.style.display = "flex";
         
         window.runATSSimulation();
@@ -2266,6 +2268,7 @@ window.toggleATSSimulator = function() {
         toggleBtn.style.color = "";
         
         scaler.style.display = "flex";
+        if (suggestionsCard) suggestionsCard.style.display = "block";
         display.style.display = "none";
     }
 };

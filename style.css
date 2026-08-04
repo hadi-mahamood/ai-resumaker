@@ -3536,6 +3536,9 @@ textarea {
     
     .preview-workspace {
         flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
         overflow-y: auto !important;
         padding: 12px !important;
         margin-top: 0 !important;
