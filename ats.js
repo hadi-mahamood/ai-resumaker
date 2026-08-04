@@ -1463,12 +1463,12 @@ window.applyAllAIOptimizations = function() {
     
     if (appliedCount > 0) {
         saveState();
-        renderExperienceList();
-        renderProjectsList();
+        if (window.renderExperienceList) window.renderExperienceList();
+        if (window.renderProjectsList) window.renderProjectsList();
         if (window.renderSkillsTags) {
             window.renderSkillsTags();
         }
-        renderResumePreview();
+        if (window.renderResumePreview) window.renderResumePreview();
         if (window.calculateJDMatch) {
             window.calculateJDMatch();
         }
