@@ -288,7 +288,7 @@ function autoSave() {
             saveDot.classList.remove("saving");
             if (saveStatus) saveStatus.innerHTML = '<span class="save-dot"></span> Saved Locally';
         }
-    }, 500);
+    }, 2000);
 }
 
 // Toast Alert Manager

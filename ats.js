@@ -1494,8 +1494,10 @@ window.toggleATSSuggestionsPanel = function() {
     panelExpanded = !panelExpanded;
     if (panelExpanded) {
         card.classList.remove("collapsed");
+        window.syncATSSuggestionsPanel();
     } else {
         card.classList.add("collapsed");
+        window.renderSuggestionsList();
     }
 };
 
@@ -1748,11 +1750,33 @@ window.renderSuggestionsList = function() {
     
     if (!listContainer) return;
     
-    listContainer.innerHTML = "";
-    if (trackerPotentialList) trackerPotentialList.innerHTML = "";
-    
     let pendingCount = 0;
     let potentialScoreIncrease = 0;
+    
+    atsSuggestionsList.forEach(s => {
+        const isCompleted = completedSuggestions[s.id];
+        if (!isCompleted) {
+            pendingCount++;
+            potentialScoreIncrease += s.points;
+        }
+    });
+    
+    if (countBadge) countBadge.innerText = `${pendingCount} Pending Suggestions`;
+    
+    const report = ATSAuditor.audit(state);
+    if (potScoreBox) {
+        potScoreBox.innerText = report.score + potentialScoreIncrease;
+    }
+    
+    // Core performance optimization: if collapsed, skip diff DOM compiling!
+    if (!panelExpanded) {
+        listContainer.innerHTML = `<div style="text-align: center; padding: 12px; font-size: 0.72rem; color: var(--text-secondary);">Suggestions panel is collapsed. Click to expand.</div>`;
+        if (trackerPotentialList) trackerPotentialList.innerHTML = "";
+        return;
+    }
+    
+    listContainer.innerHTML = "";
+    if (trackerPotentialList) trackerPotentialList.innerHTML = "";
     
     const sorted = [...atsSuggestionsList].sort((a, b) => {
         const aComp = completedSuggestions[a.id] ? 1 : 0;
@@ -1825,7 +1849,6 @@ window.renderSuggestionsList = function() {
     
     if (countBadge) countBadge.innerText = `${pendingCount} Pending Suggestions`;
     
-    const report = ATSAuditor.audit(state);
     if (potScoreBox) {
         potScoreBox.innerText = report.score + potentialScoreIncrease;
     }
