@@ -2552,50 +2552,53 @@ window.previewCoverLetterTheme = function() {
     
     let headerHtml = "";
     
+    let contacts = [];
+    if (email) contacts.push(`<span><i class="fa-solid fa-envelope"></i> ${email}</span>`);
+    if (phone) contacts.push(`<span><i class="fa-solid fa-phone"></i> ${phone}</span>`);
+    if (address) contacts.push(`<span><i class="fa-solid fa-location-dot"></i> ${address}</span>`);
+    if (website) contacts.push(`<span><i class="fa-solid fa-globe"></i> ${website}</span>`);
+    
+    let contactBar = contacts.length > 0 ? `<div class="resume-contact-bar">${contacts.join(' | ')}</div>` : '';
+
     if (state.activeTemplate === "modern" || state.activeTemplate === "executive") {
         headerHtml = `
-            <div class="resume-header">
-                <h1 class="name-preview">${name}</h1>
-                <div class="title-preview">${title}</div>
-                <div class="contact-preview">
-                    <span><i class="fa-solid fa-envelope"></i> ${email}</span>
-                    <span><i class="fa-solid fa-phone"></i> ${phone}</span>
-                    <span><i class="fa-solid fa-location-dot"></i> ${address}</span>
-                    ${linkedin ? `<span><i class="fa-brands fa-linkedin"></i> ${linkedin}</span>` : ''}
-                </div>
-            </div>
+            <header class="resume-header">
+                <h1 class="resume-name">${name}</h1>
+                <div class="resume-title">${title}</div>
+                ${contactBar}
+            </header>
         `;
     } else if (state.activeTemplate === "us" || state.activeTemplate === "classic") {
         headerHtml = `
-            <div class="resume-header" style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px;">
-                <h1 style="font-size: 20px; font-weight: bold; text-transform: uppercase; margin-bottom: 4px;">${name}</h1>
-                <div style="font-size: 11px; margin-bottom: 4px; font-weight: 600;">${title}</div>
-                <div style="font-size: 10px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <header class="resume-header" style="text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 20px;">
+                <h1 class="resume-name" style="font-size: 20px; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; color: var(--primary);">${name}</h1>
+                <div class="resume-title" style="font-size: 11px; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">${title}</div>
+                <div class="resume-contact-bar" style="font-size: 10px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; color: var(--text-secondary);">
                     <span>${email}</span> | <span>${phone}</span> | <span>${address}</span>
-                    ${linkedin ? `| <span>${linkedin}</span>` : ''}
+                    ${website ? `| <span>${website}</span>` : ''}
                 </div>
-            </div>
+            </header>
         `;
     } else {
         headerHtml = `
-            <div class="resume-header" style="border-bottom: 1.5px solid var(--border-color); padding-bottom: 10px; margin-bottom: 16px;">
-                <h1 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 2px;">${name}</h1>
-                <div style="font-size: 0.9rem; color: var(--primary-color); font-weight: 600; margin-bottom: 6px;">${title}</div>
-                <div style="display: flex; gap: 12px; font-size: 0.75rem; color: #475569; flex-wrap: wrap;">
+            <header class="resume-header" style="border-bottom: 1.5px solid var(--border-color); padding-bottom: 10px; margin-bottom: 16px;">
+                <h1 class="resume-name" style="font-size: 1.6rem; font-weight: 700; margin-bottom: 2px; color: var(--primary);">${name}</h1>
+                <div class="resume-title" style="font-size: 0.9rem; color: var(--primary); font-weight: 600; margin-bottom: 6px;">${title}</div>
+                <div class="resume-contact-bar" style="display: flex; gap: 12px; font-size: 0.75rem; color: var(--text-secondary); flex-wrap: wrap;">
                     <span>${email}</span>
                     <span>${phone}</span>
                     <span>${address}</span>
                 </div>
-            </div>
+            </header>
         `;
     }
     
     const paragraphs = clText.split("\n\n").map(p => p.trim()).filter(Boolean);
-    const bodyHtml = paragraphs.map(p => `<p style="font-size: 0.82rem; line-height: 1.5; margin-bottom: 12px; color: #334155; text-align: left;">${p}</p>`).join('');
+    const bodyHtml = paragraphs.map(p => `<p style="font-size: 0.86rem; line-height: 1.6; margin-bottom: 16px; color: #1e293b; text-align: justify; font-family: inherit;">${p}</p>`).join('');
     
     sheet.innerHTML = `
         ${headerHtml}
-        <div class="cover-letter-content-body" style="padding: 20px 0; text-align: left;">
+        <div class="cover-letter-content-body" style="padding: 10px 0; text-align: left; font-family: inherit;">
             ${bodyHtml}
         </div>
     `;
