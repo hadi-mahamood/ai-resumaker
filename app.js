@@ -1242,6 +1242,17 @@ function exportPDF() {
 function toggleSettingsPanel() {
     const panel = document.getElementById("settings-panel");
     const btn = document.getElementById("settings-toggle-btn");
+    if (!panel || !btn) return;
+    
+    // On mobile viewports, make sure we switch to the Edit tab first
+    if (window.switchMobileTab) {
+        window.switchMobileTab("edit");
+    }
+    const sidebar = document.querySelector(".sidebar");
+    if (sidebar && sidebar.style.left && sidebar.style.left.startsWith("-")) {
+        if (window.toggleSidebar) window.toggleSidebar();
+    }
+    
     panel.classList.toggle("open");
     btn.classList.toggle("active");
 }

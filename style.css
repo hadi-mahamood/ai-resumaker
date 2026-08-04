@@ -1132,6 +1132,7 @@ textarea {
     .ai-panel {
         width: 100% !important;
         right: -100% !important;
+        z-index: 100000 !important;
     }
     .ai-panel.open {
         right: 0 !important;
