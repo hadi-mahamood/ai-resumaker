@@ -3555,6 +3555,19 @@ textarea {
         padding-bottom: 80px !important;
     }
     
+    .ats-simulator-display {
+        border-radius: 0 !important;
+        border: none !important;
+        padding: 16px 12px !important;
+        margin: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        flex: 1 !important;
+        box-shadow: none !important;
+    }
+    
     /* Toggle edit vs preview display */
     body.mobile-view-edit .preview-workspace {
         display: none !important;
