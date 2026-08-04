@@ -190,11 +190,11 @@ const AIService = {
         const cached = this.getCache(cacheKey);
         if (cached) return await this.simulateStreaming(cached, chunkCallback);
 
-        let prompt = `Rewrite this job description for a "${jobTitle}" role using strong action verbs, quantify achievements where possible, and optimize it for ATS systems.`;
+        let prompt = `You are a professional ATS resume writer. Rewrite this job description for a "${jobTitle}" role using strong, active industry-specific action verbs (e.g. "Spearheaded", "Architected", "Engineered", "Optimized"), quantify business achievements (like conversion rates, speed improvements, cost savings) where possible, and format it to easily clear ATS parsers.`;
         if (weaveKeywords && weaveKeywords.trim()) {
             prompt += ` Make sure to explicitly weave in the following key tools/skills naturally: ${weaveKeywords.trim()}.`;
         }
-        prompt += ` Output ONLY the rewritten paragraphs as bullet points:\n\n${text}`;
+        prompt += ` Output ONLY the rewritten paragraphs as clean, professional bullet points starting with a bullet character (•) and ending with a terminal period. Do not output introduction, concluding texts, markdown codeblocks, or extra symbols:\n\n${text}`;
         
         let result;
         if (this.activeProvider === "webgpu") {
@@ -248,8 +248,19 @@ const AIService = {
             return await this.simulateStreaming(cached, onChunk);
         }
 
-        let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 3).join(', ') : "Software Engineering";
-        const prompt = `Write a highly professional and compelling cover letter. Candidate Name: ${name}. Target Role: ${role}. Skills: ${skills}. Experience Summary: ${JSON.stringify(resumeData.experience || [])}. Output ONLY the letter text with greetings and signature. No markdown comments or brackets:`;
+        let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 5).join(', ') : "Software Engineering";
+        const prompt = `You are an expert executive recruiter. Write a highly compelling, professional, and personalized cover letter.
+Candidate Name: ${name}.
+Target Role: ${role}.
+Key Candidate Skills: ${skills}.
+Experience History: ${JSON.stringify(resumeData.experience || [])}.
+
+Structure requirements:
+1. Start with the date and a professional hiring manager greeting.
+2. In the opening, express enthusiasm for the role and candidate's matching background.
+3. In the body paragraphs, highlight 2-3 specific accomplishments from their experience history that demonstrate leadership and problem-solving, aligning them with the target role and key skills.
+4. Conclude with a strong call to action and a professional sign-off ("Sincerely, ${name}").
+5. Output ONLY the plain text letter contents. Do not include markdown headers, blockquotes, brackets, or code block markers.`;
         
         let result;
         if (this.activeProvider === "webgpu") {
