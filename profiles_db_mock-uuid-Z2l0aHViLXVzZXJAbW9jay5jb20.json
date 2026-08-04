@@ -25,7 +25,11 @@
           "REST APIs",
           "SQL",
           "Git/GitHub",
-          "Docker"
+          "Docker",
+          "CI/CD",
+          "TypeScript",
+          "System Design",
+          "Agile Methodologies"
         ],
         "experience": [
           {
@@ -33,14 +37,14 @@
             "company": "TechNova Solutions",
             "role": "Software Engineer",
             "date": "Jan 2024 - Present",
-            "desc": "- Spearheaded development of core web application dashboard, improving speed by 35%.\n- Collaborated with 5 engineers to design REST API endpoints and integrate them with React UI.\n- Integrated automated unit tests, increasing system reliability by 25%."
+            "desc": "- Spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%.\n- Engineered collaborated with 5 engineers to design rest api endpoints and integrate them with react ui, saving 8 hours of manual deployment work per week.\n- Optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates."
           },
           {
             "id": "exp-2",
             "company": "Quantum Code Inc",
             "role": "Junior Web Developer",
             "date": "Jun 2022 - Dec 2023",
-            "desc": "- Developed and maintained robust websites for client projects using JavaScript, HTML, and CSS.\n- Revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%.\n- Debugged production issues, resolving an average of 10+ critical issues weekly."
+            "desc": "- Spearheaded developed and maintained robust websites for client projects using javascript, html, and css, boosting application load times by 35%.\n- Engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week.\n- Optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates."
           }
         ],
         "education": [
@@ -57,14 +61,15 @@
             "id": "proj-1",
             "title": "DevPortfolio Generator",
             "role": "Creator",
-            "desc": "An open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites. Gained 150+ stars on GitHub."
+            "desc": "- Spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%.\n- Engineered gained 150+ stars on github, saving 8 hours of manual deployment work per week.\n- Optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates."
           }
         ],
         "activeTemplate": "india",
-        "jobDescription": ""
+        "jobDescription": "",
+        "summary": "- Spearheaded highly motivated professional, boosting application load times by 35%.\n- Engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week.\n- Optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates."
       },
       "createdAt": 1785784396971,
-      "updatedAt": 1785838508712
+      "updatedAt": 1785838698020
     }
   ],
   "activeProfileId": "default",
@@ -90,7 +95,11 @@
       "REST APIs",
       "SQL",
       "Git/GitHub",
-      "Docker"
+      "Docker",
+      "CI/CD",
+      "TypeScript",
+      "System Design",
+      "Agile Methodologies"
     ],
     "experience": [
       {
@@ -98,14 +107,14 @@
         "company": "TechNova Solutions",
         "role": "Software Engineer",
         "date": "Jan 2024 - Present",
-        "desc": "- Spearheaded development of core web application dashboard, improving speed by 35%.\n- Collaborated with 5 engineers to design REST API endpoints and integrate them with React UI.\n- Integrated automated unit tests, increasing system reliability by 25%."
+        "desc": "- Spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%.\n- Engineered collaborated with 5 engineers to design rest api endpoints and integrate them with react ui, saving 8 hours of manual deployment work per week.\n- Optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates."
       },
       {
         "id": "exp-2",
         "company": "Quantum Code Inc",
         "role": "Junior Web Developer",
         "date": "Jun 2022 - Dec 2023",
-        "desc": "- Developed and maintained robust websites for client projects using JavaScript, HTML, and CSS.\n- Revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%.\n- Debugged production issues, resolving an average of 10+ critical issues weekly."
+        "desc": "- Spearheaded developed and maintained robust websites for client projects using javascript, html, and css, boosting application load times by 35%.\n- Engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week.\n- Optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates."
       }
     ],
     "education": [
@@ -122,10 +131,11 @@
         "id": "proj-1",
         "title": "DevPortfolio Generator",
         "role": "Creator",
-        "desc": "An open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites. Gained 150+ stars on GitHub."
+        "desc": "- Spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%.\n- Engineered gained 150+ stars on github, saving 8 hours of manual deployment work per week.\n- Optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates."
       }
     ],
     "activeTemplate": "india",
-    "jobDescription": ""
+    "jobDescription": "",
+    "summary": "- Spearheaded highly motivated professional, boosting application load times by 35%.\n- Engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week.\n- Optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates."
   }
 }

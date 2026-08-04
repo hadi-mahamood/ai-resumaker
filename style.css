@@ -1770,7 +1770,13 @@ textarea {
 
 .ats-tab-panel {
     display: none;
-    height: 100%;
+    min-height: 100%;
+}
+
+.ats-dashboard-grid,
+.ats-jd-layout,
+.ats-optimizer-layout {
+    padding-bottom: 60px;
 }
 
 .ats-tab-panel.active {
