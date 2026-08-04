@@ -331,13 +331,13 @@ body {
 
 /* Accordion Component */
 /* Accordion Section Color System */
-#sec-target { --section-color: #818cf8; }
-#sec-personal { --section-color: #38bdf8; }
-#sec-regional { --section-color: #0d9488; }
-#sec-experience { --section-color: #10b981; }
-#sec-education { --section-color: #f97316; }
-#sec-skills { --section-color: #a78bfa; }
-#sec-projects { --section-color: #ec4899; }
+#sec-target { --section-color: var(--primary); }
+#sec-personal { --section-color: var(--primary); }
+#sec-regional { --section-color: var(--primary); }
+#sec-experience { --section-color: var(--primary); }
+#sec-education { --section-color: var(--primary); }
+#sec-skills { --section-color: var(--primary); }
+#sec-projects { --section-color: var(--primary); }
 
 .accordion-item {
     border: 1px solid var(--border-color);
@@ -392,7 +392,12 @@ body {
 .accordion-title i {
     font-size: 1.1rem;
     color: var(--section-color);
+    opacity: 0.6;
     transition: var(--transition-fast);
+}
+
+.accordion-item.active .accordion-title i {
+    opacity: 1;
 }
 
 .accordion-arrow {
@@ -3806,87 +3811,5 @@ body.light-theme [data-tooltip]::after {
     border-color: rgba(15, 23, 42, 0.08);
     color: #0f172a;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-/* Ambient Shifting Orbs Background Glow Engine */
-.ambient-orbs-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-.ambient-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(140px);
-    opacity: 0.14;
-    mix-blend-mode: plus-lighter;
-    transition: background-color var(--transition-slow);
-}
-
-body.light-theme .ambient-orb {
-    opacity: 0.06;
-    mix-blend-mode: normal;
-}
-
-.orb-1 {
-    width: 500px;
-    height: 500px;
-    background: var(--primary);
-    top: -10%;
-    left: -10%;
-    animation: floatOrb1 25s infinite alternate ease-in-out;
-}
-
-.orb-2 {
-    width: 600px;
-    height: 600px;
-    background: var(--accent);
-    bottom: -15%;
-    right: -10%;
-    animation: floatOrb2 30s infinite alternate ease-in-out;
-}
-
-.orb-3 {
-    width: 400px;
-    height: 400px;
-    background: var(--secondary, #3b82f6);
-    top: 40%;
-    left: 50%;
-    animation: floatOrb3 20s infinite alternate ease-in-out;
-}
-
-@keyframes floatOrb1 {
-    0% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(100px, 80px) scale(1.15); }
-    100% { transform: translate(-50px, 150px) scale(0.9); }
-}
-
-@keyframes floatOrb2 {
-    0% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(-120px, -60px) scale(0.85); }
-    100% { transform: translate(60px, -150px) scale(1.1); }
-}
-
-@keyframes floatOrb3 {
-    0% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(-80px, 100px) scale(1.2); }
-    100% { transform: translate(120px, -50px) scale(0.8); }
-}
-
-/* Magic Sparks Pulse Micro-animation */
-.logo-icon i {
-    animation: magicPulse 3s infinite ease-in-out;
-}
-
-@keyframes magicPulse {
-    0% { transform: rotate(0deg) scale(1); filter: drop-shadow(0 0 2px var(--primary)); }
-    50% { transform: rotate(15deg) scale(1.15); filter: drop-shadow(0 0 8px var(--primary)); }
-    100% { transform: rotate(0deg) scale(1); filter: drop-shadow(0 0 2px var(--primary)); }
 }
 
