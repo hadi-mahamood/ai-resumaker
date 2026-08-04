@@ -3396,6 +3396,52 @@ textarea {
     .preview-workspace {
         padding: 12px !important;
     }
+    
+    /* Full-Screen Mobile Modals */
+    .ats-modal {
+        padding: 0 !important;
+        align-items: flex-end !important;
+    }
+    
+    .ats-modal-card {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        transform: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    .ats-modal-body {
+        padding: 16px 12px !important;
+        overflow-y: auto !important;
+    }
+    
+    .ats-opt-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+    
+    .revision-card-body {
+        grid-template-columns: 1fr !important;
+        padding: 12px !important;
+    }
+    
+    /* Bottom-anchored Selector Dropdown on Mobile */
+    .custom-dropdown-menu {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 64px !important;
+        left: 12px !important;
+        right: 12px !important;
+        width: calc(100vw - 24px) !important;
+        max-height: 280px !important;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5) !important;
+        border-radius: 16px !important;
+    }
 }
 
 /* ==========================================

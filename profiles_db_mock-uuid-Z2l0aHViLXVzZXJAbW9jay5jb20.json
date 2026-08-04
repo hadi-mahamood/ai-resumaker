@@ -4,8 +4,8 @@
       "id": "default",
       "name": "Default Profile",
       "resumeData": {
-        "targetJob": "Software Developer",
-        "targetCountry": "US",
+        "targetJob": "cloud engineering",
+        "targetCountry": "IN",
         "name": "Alex Mercer",
         "title": "Full Stack Software Engineer",
         "email": "alex.mercer@dev.io",
@@ -37,14 +37,14 @@
             "company": "TechNova Solutions",
             "role": "Software Engineer",
             "date": "Jan 2024 - Present",
-            "desc": "- Spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%.\n- Engineered collaborated with 5 engineers to design rest api endpoints and integrate them with react ui, saving 8 hours of manual deployment work per week.\n- Optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates."
+            "desc": "- Spearheaded spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered collaborated with 5 engineers to design rest api endpoints and integrate them with react ui, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
           },
           {
             "id": "exp-2",
             "company": "Quantum Code Inc",
             "role": "Junior Web Developer",
             "date": "Jun 2022 - Dec 2023",
-            "desc": "- Spearheaded developed and maintained robust websites for client projects using javascript, html, and css, boosting application load times by 35%.\n- Engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week.\n- Optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates."
+            "desc": "- Spearheaded spearheaded developed and maintained robust websites for client projects using javascript, html, and css, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
           }
         ],
         "education": [
@@ -61,21 +61,21 @@
             "id": "proj-1",
             "title": "DevPortfolio Generator",
             "role": "Creator",
-            "desc": "- Spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%.\n- Engineered gained 150+ stars on github, saving 8 hours of manual deployment work per week.\n- Optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates."
+            "desc": "- Spearheaded spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered gained 150+ stars on github, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
           }
         ],
         "activeTemplate": "india",
         "jobDescription": "",
-        "summary": "- Spearheaded highly motivated professional, boosting application load times by 35%.\n- Engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week.\n- Optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates."
+        "summary": "- Spearheaded spearheaded highly motivated professional, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
       },
       "createdAt": 1785784396971,
-      "updatedAt": 1785839542417
+      "updatedAt": 1785842152810
     }
   ],
   "activeProfileId": "default",
   "resumeData": {
-    "targetJob": "Software Developer",
-    "targetCountry": "US",
+    "targetJob": "cloud engineering",
+    "targetCountry": "IN",
     "name": "Alex Mercer",
     "title": "Full Stack Software Engineer",
     "email": "alex.mercer@dev.io",
@@ -107,14 +107,14 @@
         "company": "TechNova Solutions",
         "role": "Software Engineer",
         "date": "Jan 2024 - Present",
-        "desc": "- Spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%.\n- Engineered collaborated with 5 engineers to design rest api endpoints and integrate them with react ui, saving 8 hours of manual deployment work per week.\n- Optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates."
+        "desc": "- Spearheaded spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered collaborated with 5 engineers to design rest api endpoints and integrate them with react ui, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
       },
       {
         "id": "exp-2",
         "company": "Quantum Code Inc",
         "role": "Junior Web Developer",
         "date": "Jun 2022 - Dec 2023",
-        "desc": "- Spearheaded developed and maintained robust websites for client projects using javascript, html, and css, boosting application load times by 35%.\n- Engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week.\n- Optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates."
+        "desc": "- Spearheaded spearheaded developed and maintained robust websites for client projects using javascript, html, and css, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
       }
     ],
     "education": [
@@ -131,11 +131,11 @@
         "id": "proj-1",
         "title": "DevPortfolio Generator",
         "role": "Creator",
-        "desc": "- Spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%.\n- Engineered gained 150+ stars on github, saving 8 hours of manual deployment work per week.\n- Optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates."
+        "desc": "- Spearheaded spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered gained 150+ stars on github, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
       }
     ],
     "activeTemplate": "india",
     "jobDescription": "",
-    "summary": "- Spearheaded highly motivated professional, boosting application load times by 35%.\n- Engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week.\n- Optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates."
+    "summary": "- Spearheaded spearheaded highly motivated professional, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
   }
 }
