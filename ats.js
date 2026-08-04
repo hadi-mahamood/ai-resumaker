@@ -1176,29 +1176,39 @@ window.renderRevisions = function(original, optimized) {
     }
     
     if (original.experience && optimized.optimizedExperience) {
-        original.experience.forEach(exp => {
-            const optExp = optimized.optimizedExperience.find(o => o.id === exp.id);
+        original.experience.forEach((exp, index) => {
+            const optExp = optimized.optimizedExperience.find(o => o.id === exp.id) ||
+                           optimized.optimizedExperience.find(o => String(o.id).replace(/[^0-9]/g, '') === String(exp.id).replace(/[^0-9]/g, '')) ||
+                           optimized.optimizedExperience[index];
             if (optExp) {
-                list.innerHTML += window.createRevisionCard(
-                    `exp-${exp.id}`,
-                    `Experience: ${exp.role} at ${exp.company}`,
-                    exp.desc || "",
-                    optExp.desc
-                );
+                const descVal = optExp.desc || optExp.description || optExp.bullets || optExp.text;
+                if (descVal) {
+                    list.innerHTML += window.createRevisionCard(
+                        `exp-${exp.id}`,
+                        `Experience: ${exp.role} at ${exp.company}`,
+                        exp.desc || "",
+                        descVal
+                    );
+                }
             }
         });
     }
     
     if (original.projects && optimized.optimizedProjects) {
-        original.projects.forEach(proj => {
-            const optProj = optimized.optimizedProjects.find(o => o.id === proj.id);
+        original.projects.forEach((proj, index) => {
+            const optProj = optimized.optimizedProjects.find(o => o.id === proj.id) ||
+                            optimized.optimizedProjects.find(o => String(o.id).replace(/[^0-9]/g, '') === String(proj.id).replace(/[^0-9]/g, '')) ||
+                            optimized.optimizedProjects[index];
             if (optProj) {
-                list.innerHTML += window.createRevisionCard(
-                    `proj-${proj.id}`,
-                    `Project: ${proj.title}`,
-                    proj.desc || "",
-                    optProj.desc
-                );
+                const descVal = optProj.desc || optProj.description || optProj.bullets || optProj.text;
+                if (descVal) {
+                    list.innerHTML += window.createRevisionCard(
+                        `proj-${proj.id}`,
+                        `Project: ${proj.title}`,
+                        proj.desc || "",
+                        descVal
+                    );
+                }
             }
         });
     }
@@ -1220,13 +1230,18 @@ window.applyAllAIOptimizations = function() {
     
     // Experience
     if (state.experience && pendingOptimizations.optimizedExperience) {
-        state.experience.forEach(exp => {
+        state.experience.forEach((exp, index) => {
             const acceptExp = document.getElementById(`accept-check-exp-${exp.id}`);
             if (acceptExp && acceptExp.checked) {
-                const optExp = pendingOptimizations.optimizedExperience.find(o => o.id === exp.id);
+                const optExp = pendingOptimizations.optimizedExperience.find(o => o.id === exp.id) ||
+                               pendingOptimizations.optimizedExperience.find(o => String(o.id).replace(/[^0-9]/g, '') === String(exp.id).replace(/[^0-9]/g, '')) ||
+                               pendingOptimizations.optimizedExperience[index];
                 if (optExp) {
-                    exp.desc = optExp.desc;
-                    appliedCount++;
+                    const descVal = optExp.desc || optExp.description || optExp.bullets || optExp.text;
+                    if (descVal) {
+                        exp.desc = descVal;
+                        appliedCount++;
+                    }
                 }
             }
         });
@@ -1234,13 +1249,18 @@ window.applyAllAIOptimizations = function() {
     
     // Projects
     if (state.projects && pendingOptimizations.optimizedProjects) {
-        state.projects.forEach(proj => {
+        state.projects.forEach((proj, index) => {
             const acceptProj = document.getElementById(`accept-check-proj-${proj.id}`);
             if (acceptProj && acceptProj.checked) {
-                const optProj = pendingOptimizations.optimizedProjects.find(o => o.id === proj.id);
+                const optProj = pendingOptimizations.optimizedProjects.find(o => o.id === proj.id) ||
+                                pendingOptimizations.optimizedProjects.find(o => String(o.id).replace(/[^0-9]/g, '') === String(proj.id).replace(/[^0-9]/g, '')) ||
+                                pendingOptimizations.optimizedProjects[index];
                 if (optProj) {
-                    proj.desc = optProj.desc;
-                    appliedCount++;
+                    const descVal = optProj.desc || optProj.description || optProj.bullets || optProj.text;
+                    if (descVal) {
+                        proj.desc = descVal;
+                        appliedCount++;
+                    }
                 }
             }
         });
