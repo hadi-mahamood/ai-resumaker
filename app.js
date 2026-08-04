@@ -678,6 +678,20 @@ function renderResumePreview() {
     makePreviewSheetEditable();
 }
 
+function setNestedValue(obj, path, value) {
+    const parts = path.split(".");
+    let current = obj;
+    for (let i = 0; i < parts.length - 1; i++) {
+        const part = parts[i];
+        if (current[part] === undefined) {
+            current[part] = isNaN(parts[i + 1]) ? {} : [];
+        }
+        current = current[part];
+    }
+    const lastPart = parts[parts.length - 1];
+    current[lastPart] = value;
+}
+
 function makePreviewSheetEditable() {
     const sheet = document.getElementById("resume-sheet");
     if (!sheet) return;
@@ -745,6 +759,81 @@ function makePreviewSheetEditable() {
 
         parent.replaceChild(span, node);
     });
+
+    // Helper to find and tag item sections
+    function tagItemFields(item, arrayName, index) {
+        // 1. Title (Role for Exp, Institution for Edu, Title for Proj)
+        const titleEl = item.querySelector(".item-title");
+        if (titleEl) {
+            let fieldName = "role";
+            if (arrayName === "education") fieldName = "institution";
+            if (arrayName === "projects") fieldName = "title";
+            
+            titleEl.setAttribute("contenteditable", "true");
+            titleEl.setAttribute("data-path", `${arrayName}.${index}.${fieldName}`);
+            titleEl.style.outline = "none";
+        }
+
+        // 2. Subtitle (Company for Exp, Degree for Edu, Role for Proj)
+        const subtitleEl = item.querySelector(".item-subtitle");
+        if (subtitleEl) {
+            let fieldName = "company";
+            if (arrayName === "education") fieldName = "degree";
+            if (arrayName === "projects") fieldName = "role";
+
+            subtitleEl.setAttribute("contenteditable", "true");
+            subtitleEl.setAttribute("data-path", `${arrayName}.${index}.${fieldName}`);
+            subtitleEl.style.outline = "none";
+        }
+
+        // 3. Date
+        const dateEl = item.querySelector(".item-date");
+        if (dateEl) {
+            dateEl.setAttribute("contenteditable", "true");
+            dateEl.setAttribute("data-path", `${arrayName}.${index}.date`);
+            dateEl.style.outline = "none";
+        }
+
+        // 4. Description
+        const descEl = item.querySelector(".item-desc");
+        if (descEl) {
+            descEl.setAttribute("contenteditable", "true");
+            descEl.setAttribute("data-path", `${arrayName}.${index}.desc`);
+            descEl.style.outline = "none";
+        }
+    }
+
+    // 3. Tag resume sections (Experience, Education, Projects, Skills) dynamically
+    const sections = sheet.querySelectorAll(".resume-section");
+    sections.forEach(sec => {
+        const titleEl = sec.querySelector(".resume-section-title");
+        if (!titleEl) return;
+        const titleText = titleEl.innerText.toLowerCase();
+
+        if (titleText.includes("experienc") || titleText.includes("work") || titleText.includes("employ") || titleText.includes("experia")) {
+            const items = sec.querySelectorAll(".experience-item");
+            items.forEach((item, index) => {
+                tagItemFields(item, "experience", index);
+            });
+        } else if (titleText.includes("educat") || titleText.includes("academic") || titleText.includes("educa")) {
+            const items = sec.querySelectorAll(".experience-item, .project-item");
+            items.forEach((item, index) => {
+                tagItemFields(item, "education", index);
+            });
+        } else if (titleText.includes("project") || titleText.includes("proyect")) {
+            const items = sec.querySelectorAll(".project-item, .experience-item");
+            items.forEach((item, index) => {
+                tagItemFields(item, "projects", index);
+            });
+        } else if (titleText.includes("skill") || titleText.includes("competenc") || titleText.includes("habilidad") || titleText.includes("expertise")) {
+            const badges = sec.querySelectorAll(".skill-badge-preview");
+            badges.forEach((badge, index) => {
+                badge.setAttribute("contenteditable", "true");
+                badge.setAttribute("data-path", `skills.${index}`);
+                badge.style.outline = "none";
+            });
+        }
+    });
 }
 
 function bindInlineEditEvents() {
@@ -757,16 +846,54 @@ function bindInlineEditEvents() {
         const path = target.getAttribute("data-path");
         if (!path) return;
 
+        // Use innerText to preserve line breaks in desc textarea elements
         const val = target.innerText;
-        state[path] = val;
+        setNestedValue(state, path, val);
 
-        let inputId = `input-${path}`;
-        if (path === "visaStatus") inputId = "input-visa";
-        if (path === "maritalStatus") inputId = "input-marital";
+        // Update single-field sidebar elements dynamically
+        if (path.indexOf(".") === -1) {
+            let inputId = `input-${path}`;
+            if (path === "visaStatus") inputId = "input-visa";
+            if (path === "maritalStatus") inputId = "input-marital";
 
-        const inputEl = document.getElementById(inputId);
-        if (inputEl) {
-            inputEl.value = val;
+            const inputEl = document.getElementById(inputId);
+            if (inputEl) {
+                inputEl.value = val;
+            }
+        } else {
+            // It's an array element (e.g. experience.0.company or skills.2)
+            const parts = path.split(".");
+            const arrayName = parts[0];
+            const index = parseInt(parts[1]);
+            const fieldName = parts[2];
+
+            if (arrayName === "skills") {
+                // Find matching skill tag input in the sidebar
+                const skillInputs = document.querySelectorAll("#skills-tags-container .skill-tag input");
+                if (skillInputs[index]) {
+                    skillInputs[index].value = val;
+                }
+            } else {
+                // Find list item ID from state
+                const item = state[arrayName] ? state[arrayName][index] : null;
+                if (item && item.id) {
+                    let prefix = "";
+                    if (arrayName === "experience") prefix = "exp-";
+                    if (arrayName === "education") prefix = "edu-";
+                    if (arrayName === "projects") prefix = "proj-";
+
+                    let inputId = "";
+                    if (arrayName === "projects") {
+                        // Projects do not have prefixed IDs, synchronized fully on blur
+                    } else {
+                        inputId = `${prefix}${fieldName}-${item.id}`;
+                        const inputEl = document.getElementById(inputId);
+                        if (inputEl) {
+                            inputEl.value = val;
+                        }
+                    }
+                }
+            }
         }
 
         // Save progress to local storage and queue cloud sync
@@ -779,6 +906,16 @@ function bindInlineEditEvents() {
     sheet.addEventListener("blur", (e) => {
         const target = e.target;
         if (target.getAttribute("data-path")) {
+            // Rebuild sidebar list cards to ensure inputs match the updated array state
+            const path = target.getAttribute("data-path");
+            if (path.indexOf(".") !== -1) {
+                const arrayName = path.split(".")[0];
+                if (arrayName === "experience") renderExperienceList();
+                if (arrayName === "education") renderEducationList();
+                if (arrayName === "projects") renderProjectsList();
+                if (arrayName === "skills") renderSkillsTags();
+            }
+
             if (window.debouncedRenderPreview) {
                 window.debouncedRenderPreview();
             } else {
