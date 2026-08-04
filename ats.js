@@ -2274,6 +2274,11 @@ window.toggleATSSimulator = function() {
 };
 
 window.focusSidebarInput = function(inputId, sectionId) {
+    // On mobile viewports, switch to Edit Form tab first
+    if (window.switchMobileTab) {
+        window.switchMobileTab("edit");
+    }
+
     // If sidebar is collapsed on mobile viewports, slide it open!
     const sidebar = document.querySelector(".sidebar");
     if (sidebar && sidebar.style.left && sidebar.style.left.startsWith("-")) {
