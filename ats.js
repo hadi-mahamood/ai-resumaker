@@ -534,7 +534,7 @@ window.calculateJDMatch = function() {
     }
 };
 
-window.injectKeyword = function(kw) {
+window.addSkillDirectly = function(kw) {
     if (!state.skills) state.skills = [];
     if (!state.skills.includes(kw)) {
         state.skills.push(kw);
@@ -545,6 +545,80 @@ window.injectKeyword = function(kw) {
         showToast(`Added skill: "${kw}"!`);
     } else {
         showToast("Skill is already listed!");
+    }
+};
+
+window.injectKeyword = function(kw) {
+    // Check if user has any experiences
+    if (!state.experience || state.experience.length === 0) {
+        // Fallback: just add to skills if no experiences exist
+        window.addSkillDirectly(kw);
+        return;
+    }
+
+    // Create a glassy selection overlay
+    const overlay = document.createElement("div");
+    overlay.id = "keyword-weave-overlay";
+    overlay.style = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(10,11,16,0.85); backdrop-filter:blur(8px); display:flex; justify-content:center; align-items:center; z-index:100000; transition: opacity 0.3s ease;";
+    
+    let expOptions = state.experience.map(exp => `
+        <button class="btn btn-outline" style="justify-content:flex-start; text-align:left; width:100%; font-size:0.8rem; margin-bottom:8px; padding:10px; height:auto; color:white; background:rgba(255,255,255,0.02); border:1px solid var(--border-color); cursor:pointer;" onclick="window.handleWeaveChoice('${kw.replace(/'/g, "\\'")}', '${exp.id}')">
+            <i class="fa-solid fa-briefcase" style="color:var(--primary); margin-right:8px;"></i>
+            <span style="display:flex; flex-direction:column; gap:2px;">
+                <strong>${exp.role || "Role"}</strong>
+                <span style="font-size:0.7rem; color:var(--text-secondary);">${exp.company || "Company"}</span>
+            </span>
+        </button>
+    `).join('');
+
+    overlay.innerHTML = `
+        <div class="ats-modal-card" style="max-width:450px; height:auto; padding:24px; display:flex; flex-direction:column; gap:16px; box-shadow:var(--shadow-lg); background:#121420; border:1px solid var(--border-color); border-radius:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:12px;">
+                <h3 style="font-size:1.05rem; color:white; font-weight:600; margin:0; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary);"></i> Integrate Keyword: "${kw}"</h3>
+                <button onclick="document.getElementById('keyword-weave-overlay').remove()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4; margin:0;">
+                How would you like to add <strong>${kw}</strong> to your resume?
+            </p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="btn btn-primary" style="justify-content:center; width:100%; padding:10px; font-weight:600;" onclick="window.handleWeaveChoice('${kw.replace(/'/g, "\\'")}', 'skills')">
+                    <i class="fa-solid fa-brain" style="margin-right:6px;"></i> Add to Skills list (Direct)
+                </button>
+                <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:700; margin:10px 0 2px 0; text-align:center; position:relative;">
+                    <span style="background:#121420; padding:0 8px; position:relative; z-index:1;">Or weave into experience</span>
+                    <div style="position:absolute; top:50%; left:0; width:100%; height:1px; background:var(--border-color); z-index:0;"></div>
+                </div>
+                <div style="max-height:180px; overflow-y:auto; padding-right:4px; display:flex; flex-direction:column; gap:6px;">
+                    ${expOptions}
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+};
+
+window.handleWeaveChoice = function(kw, choice) {
+    const overlay = document.getElementById("keyword-weave-overlay");
+    if (overlay) overlay.remove();
+
+    if (choice === "skills") {
+        window.addSkillDirectly(kw);
+    } else {
+        // Close ATS modal if open
+        const atsModal = document.getElementById("ats-modal");
+        if (atsModal) atsModal.classList.remove("open");
+
+        // Open AI Bullet Optimization for selected experience
+        if (window.openAIEngine) {
+            window.openAIEngine(choice);
+        }
+
+        // Pre-fill keywords to weave field
+        const kwInput = document.getElementById("ai-rewrite-keywords");
+        if (kwInput) {
+            kwInput.value = kw;
+        }
     }
 };
 

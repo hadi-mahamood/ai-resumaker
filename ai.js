@@ -176,21 +176,34 @@ const AIService = {
     /**
      * AI Work Experience Rewriter
      */
-    async rewriteExperience(text, jobTitle, onChunk) {
-        const cacheKey = `rewrite_${btoa(unescape(encodeURIComponent(jobTitle + "_" + text))).slice(0, 100)}`;
-        const cached = this.getCache(cacheKey);
-        if (cached) return await this.simulateStreaming(cached, onChunk);
+    async rewriteExperience(text, jobTitle, keywords = "", onChunk = null) {
+        let weaveKeywords = "";
+        let chunkCallback = onChunk;
+        if (typeof keywords === "function") {
+            chunkCallback = keywords;
+            weaveKeywords = "";
+        } else {
+            weaveKeywords = keywords;
+        }
 
-        const prompt = `Rewrite this job description for a "${jobTitle}" role using strong action verbs, quantify achievements where possible, and optimize it for ATS systems. Output ONLY the rewritten paragraphs as bullet points:\n\n${text}`;
+        const cacheKey = `rewrite_${btoa(unescape(encodeURIComponent(jobTitle + "_" + weaveKeywords + "_" + text))).slice(0, 100)}`;
+        const cached = this.getCache(cacheKey);
+        if (cached) return await this.simulateStreaming(cached, chunkCallback);
+
+        let prompt = `Rewrite this job description for a "${jobTitle}" role using strong action verbs, quantify achievements where possible, and optimize it for ATS systems.`;
+        if (weaveKeywords && weaveKeywords.trim()) {
+            prompt += ` Make sure to explicitly weave in the following key tools/skills naturally: ${weaveKeywords.trim()}.`;
+        }
+        prompt += ` Output ONLY the rewritten paragraphs as bullet points:\n\n${text}`;
         
         let result;
         if (this.activeProvider === "webgpu") {
-            result = await this.callWebGPULLM(prompt, onChunk);
+            result = await this.callWebGPULLM(prompt, chunkCallback);
         } else if (this.activeProvider === "gemini") {
-            result = await this.callGeminiAPI(prompt, onChunk);
+            result = await this.callGeminiAPI(prompt, chunkCallback);
         } else {
             const mock = this.getOfflineRewriteMock(text);
-            result = await this.simulateStreaming(mock, onChunk);
+            result = await this.simulateStreaming(mock, chunkCallback);
         }
         
         this.setCache(cacheKey, result);

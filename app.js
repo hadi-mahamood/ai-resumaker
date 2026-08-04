@@ -1040,7 +1040,12 @@ function openAIEngine(expId) {
                 <textarea id="ai-rewrite-input" style="min-height:100px;">${exp.desc || ""}</textarea>
             </div>
             
-            <button class="btn btn-primary" style="justify-content:center; margin-top: 4px;" onclick="runAIEperienceRewrite('${expId}')">
+            <div class="form-group" style="margin-top: 8px;">
+                <label>Keywords to Weave (Optional)</label>
+                <input type="text" id="ai-rewrite-keywords" placeholder="e.g. Docker, REST APIs" style="background: rgba(0,0,0,0.3); border:1px solid var(--border-color); color:white; border-radius:4px; padding:6px 10px; font-size:0.8rem; outline:none; width:100%;">
+            </div>
+            
+            <button class="btn btn-primary" style="justify-content:center; margin-top: 8px;" onclick="runAIEperienceRewrite('${expId}')">
                 <i class="fa-solid fa-wand-magic"></i> Generate Optimization
             </button>
         </div>
@@ -1063,6 +1068,7 @@ function openAIEngine(expId) {
 
 async function runAIEperienceRewrite(expId) {
     const textInput = document.getElementById("ai-rewrite-input").value;
+    const keywordsVal = document.getElementById("ai-rewrite-keywords") ? document.getElementById("ai-rewrite-keywords").value : "";
     const resultCard = document.getElementById("ai-rewrite-result-card");
     const resultBox = document.getElementById("ai-rewrite-result");
     const diffBox = document.getElementById("ai-rewrite-diff");
@@ -1075,7 +1081,7 @@ async function runAIEperienceRewrite(expId) {
     }
 
     // Call AIService with streaming support for real-time typing effect
-    const optimized = await AIService.rewriteExperience(textInput, state.targetJob, (chunkText) => {
+    const optimized = await AIService.rewriteExperience(textInput, state.targetJob, keywordsVal, (chunkText) => {
         resultBox.className = "ai-result-box";
         resultBox.innerText = chunkText;
         if (diffBox) {
@@ -1862,3 +1868,51 @@ setTimeout(() => {
         }
     }
 }, 200);
+
+// Backup & Restore Profile Data (JSON Export/Import)
+window.exportProfileBackup = function() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    const filename = `resumake_backup_${(state.name || "profile").toLowerCase().replace(/\s+/g, "_")}.json`;
+    downloadAnchor.setAttribute("download", filename);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    showToast("Profile backup downloaded successfully!", "success");
+};
+
+window.importProfileBackup = function(input) {
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedState = JSON.parse(e.target.result);
+            if (!importedState.name && !importedState.experience && !importedState.skills) {
+                throw new Error("Invalid format. Missing resume fields.");
+            }
+            // Update state
+            window.updateStateObject(importedState);
+            // Save state locally & sync
+            if (window.saveState) {
+                window.saveState();
+            }
+            // Update sidebar values
+            setFormFields();
+            // Re-render list elements in sidebar
+            renderExperienceList();
+            renderEducationList();
+            renderProjectsList();
+            renderSkillsTags();
+            // Re-render A4 sheet preview
+            renderResumePreview();
+            showToast("Profile backup restored successfully!", "success");
+        } catch (err) {
+            alert("Error importing profile: " + err.message);
+        }
+    };
+    reader.readAsText(file);
+    // Reset input value to allow re-upload of same file
+    input.value = "";
+};

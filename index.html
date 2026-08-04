@@ -105,6 +105,16 @@
                                 <span class="theme-bubble" data-theme="champagne" onclick="window.setThemeAccent('champagne')" style="background: linear-gradient(135deg, #fb7185, #f59e0b);" title="Rose Gold Champagne"></span>
                             </div>
                         </div>
+                        
+                        <!-- Profile Backup (JSON) -->
+                        <div style="border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 12px; margin-top: 12px;">
+                            <h4 style="font-size:0.8rem; text-transform:uppercase; margin-bottom:8px; color:#a5b4fc;"><i class="fa-solid fa-file-export"></i> Backup & Restore</h4>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn btn-outline" onclick="window.exportProfileBackup()" style="flex:1; font-size:0.72rem; justify-content:center; padding:6px 10px; height: 32px;"><i class="fa-solid fa-download"></i> Export JSON</button>
+                                <button class="btn btn-outline" onclick="document.getElementById('import-backup-file').click()" style="flex:1; font-size:0.72rem; justify-content:center; padding:6px 10px; height: 32px;"><i class="fa-solid fa-upload"></i> Import JSON</button>
+                                <input type="file" id="import-backup-file" onchange="window.importProfileBackup(this)" style="display:none;" accept=".json">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
