@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=17.0">
+    <link rel="stylesheet" href="style.css?v=18.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase Client JS SDK -->
@@ -458,6 +458,13 @@
                         </label>
                     </div>
 
+                    <!-- Live Preview Zoom Controller -->
+                    <div class="zoom-controller" data-tooltip="Adjust preview scaling level">
+                        <button class="zoom-btn" onclick="window.adjustPreviewZoom(-10)" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                        <span id="zoom-percent-badge" onclick="window.resetPreviewZoom()" title="Click to reset zoom">100%</span>
+                        <button class="zoom-btn" onclick="window.adjustPreviewZoom(10)" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+
                     <button class="btn btn-primary btn-pill" onclick="exportPDF()" data-tooltip="Export clean A4 PDF file">
                         <i class="fa-solid fa-file-pdf"></i> <span>PDF</span>
                     </button>
@@ -849,8 +856,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=17.0"></script>
-    <script src="ats.js?v=17.0"></script>
-    <script type="module" src="app.js?v=17.0"></script>
+    <script src="ai.js?v=18.0"></script>
+    <script src="ats.js?v=18.0"></script>
+    <script type="module" src="app.js?v=18.0"></script>
 </body>
 </html>

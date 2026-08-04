@@ -1325,6 +1325,8 @@ function updateSidebarBadges() {
     if (badgeProj) badgeProj.innerText = state.projects ? state.projects.length : 0;
 }
 
+window.previewZoom = 100;
+
 function resizeResumePreview() {
     const workspace = document.querySelector(".preview-workspace");
     const scaler = document.getElementById("resume-sheet-scaler");
@@ -1334,9 +1336,12 @@ function resizeResumePreview() {
     const pad = parseFloat(window.getComputedStyle(workspace).paddingLeft) * 2;
     const workspaceWidth = workspace.clientWidth - pad;
     const sheetWidth = 794;
+    
+    const zoomFactor = (window.previewZoom || 100) / 100;
 
     if (workspaceWidth < sheetWidth) {
-        const scale = workspaceWidth / sheetWidth;
+        const autoScale = workspaceWidth / sheetWidth;
+        const scale = autoScale * zoomFactor;
         sheet.style.transform = `scale(${scale})`;
         sheet.style.transformOrigin = "top center";
         const scaledHeight = sheet.offsetHeight * scale;
@@ -1345,14 +1350,30 @@ function resizeResumePreview() {
         scaler.style.width = "100%";
         scaler.style.justifyContent = "center";
     } else {
-        sheet.style.transform = "none";
+        const scale = zoomFactor;
+        sheet.style.transform = scale === 1 ? "none" : `scale(${scale})`;
         sheet.style.transformOrigin = "top center";
-        scaler.style.height = "auto";
-        sheet.style.marginBottom = "0px";
-        scaler.style.width = "794px";
+        const scaledHeight = sheet.offsetHeight * scale;
+        scaler.style.height = scale === 1 ? "auto" : `${scaledHeight}px`;
+        sheet.style.marginBottom = scale === 1 ? "0px" : `${-sheet.offsetHeight * (1 - scale)}px`;
+        scaler.style.width = scale === 1 ? "794px" : "100%";
         scaler.style.justifyContent = "center";
     }
 }
+
+window.adjustPreviewZoom = function(amount) {
+    window.previewZoom = Math.max(50, Math.min(150, window.previewZoom + amount));
+    const badge = document.getElementById("zoom-percent-badge");
+    if (badge) badge.innerText = `${window.previewZoom}%`;
+    resizeResumePreview();
+};
+
+window.resetPreviewZoom = function() {
+    window.previewZoom = 100;
+    const badge = document.getElementById("zoom-percent-badge");
+    if (badge) badge.innerText = "100%";
+    resizeResumePreview();
+};
 
 function toggleSidebar() {
     const sidebar = document.querySelector(".sidebar");
