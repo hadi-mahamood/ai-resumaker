@@ -1443,6 +1443,10 @@ window.updateStateObject = function(newData) {
 
 window.toggleSettingsPanel = toggleSettingsPanel;
 window.saveApiKey = saveApiKey;
+window.renderExperienceList = renderExperienceList;
+window.renderProjectsList = renderProjectsList;
+window.renderSkillsTags = renderSkillsTags;
+window.renderEducationList = renderEducationList;
 window.closeATSModal = closeATSModal;
 window.openATSModal = openATSModal;
 window.openAIEngine = openAIEngine;
