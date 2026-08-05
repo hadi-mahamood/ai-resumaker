@@ -53,16 +53,58 @@ const AIService = {
             "Cultivated", "Maximize", "Decreased", "Standardized", "Transformed"
         ],
         
-        metrics: [
-            "boosting application load times by 35%",
-            "saving 8 hours of manual deployment work per week",
-            "resulting in a 42% reduction in production crash rates",
-            "increasing customer conversion rate by 18% in the first quarter",
-            "reducing server infrastructure costs by 22%",
-            "increasing team productivity by 15% through workflow automation",
-            "delivering the project 2 weeks ahead of schedule",
-            "improving test coverage from 45% to 88%"
-        ],
+        metrics: {
+            "software": [
+                "boosting application load times by 35%",
+                "saving 8 hours of manual deployment work per week",
+                "resulting in a 42% reduction in production crash rates",
+                "improving test coverage from 45% to 88%",
+                "reducing server infrastructure costs by 22%"
+            ],
+            "web": [
+                "boosting application load times by 35%",
+                "increasing customer conversion rate by 18% in the first quarter",
+                "reducing page weight by 45% for faster responsive scaling",
+                "enhancing web accessibility index score to 98%"
+            ],
+            "data": [
+                "improving query search optimization speed by 40%",
+                "increasing predictive model accuracy to 94%",
+                "accelerating data pipeline ingestion rates by 50%",
+                "delivering automated dashboards that saved 5 hours of manual analysis daily"
+            ],
+            "design": [
+                "improving user onboarding conversion rate by 28%",
+                "reducing user task completion times by 22%",
+                "enhancing design system consistency across 12 product panels",
+                "boosting customer satisfaction (CSAT) score by 15%"
+            ],
+            "product": [
+                "delivering the product roadmap milestone 2 weeks ahead of schedule",
+                "increasing active monthly user engagement by 18%",
+                "improving product onboarding metrics by 30%",
+                "reducing feature delivery cycle times by 14%"
+            ],
+            "marketing": [
+                "increasing customer conversion rate by 18% in the first quarter",
+                "boosting organic search engine traffic by 45%",
+                "maximizing campaign click-through rates (CTR) by 2.4x",
+                "improving lead acquisition cost efficiency by 30%"
+            ],
+            "science": [
+                "improving culture testing and analysis accuracy by 25%",
+                "reducing sample processing turnaround times by 30%",
+                "enhancing laboratory safety compliance index score to 100%",
+                "accelerating critical diagnosis validation speed by 15%",
+                "identifying and documenting 150+ complex microbial culture strings"
+            ],
+            "generic": [
+                "increasing team productivity by 15% through workflow automation",
+                "delivering the target milestone 2 weeks ahead of schedule",
+                "saving 8 hours of manual tracking work per week",
+                "improving cross-department collaboration times by 20%"
+            ]
+        },
         
         coverLetters: {
             opening: [
@@ -114,19 +156,32 @@ const AIService = {
         let usedVerbs = new Set();
         let usedMetrics = new Set();
 
+        const categoryMetrics = this.knowledgeBase.metrics[category] || this.knowledgeBase.metrics["generic"];
+
         for (let i = 0; i < Math.min(3, Math.max(3, lines.length)); i++) {
             let line = lines[i] || `maintaining and developing modern ${categorySkills[i % categorySkills.length] || "software"} applications`;
             let verb = this.knowledgeBase.verbs.find(v => !usedVerbs.has(v)) || this.knowledgeBase.verbs[Math.floor(Math.random() * this.knowledgeBase.verbs.length)];
             usedVerbs.add(verb);
             
-            let metric = this.knowledgeBase.metrics.find(m => !usedMetrics.has(m)) || this.knowledgeBase.metrics[Math.floor(Math.random() * this.knowledgeBase.metrics.length)];
+            let metric = categoryMetrics.find(m => !usedMetrics.has(m)) || categoryMetrics[Math.floor(Math.random() * categoryMetrics.length)];
             usedMetrics.add(metric);
 
             let cleanLine = line
+                .replace(/^(\d+\s+(months?|years?|weeks?|days?)\s+(of\s+)?(experience\s+)?(worked\s+)?(as\s+a?)?)\s*/i, '')
+                .replace(/^(worked\s+as\s+a?|working\s+as\s+a?|role\s+as\s+a?|position\s+as\s+a?|employed\s+as\s+a?|acted\s+as\s+a?)\s*/i, '')
                 .replace(/^(I was|responsible for|helped to|worked on|developed|designed|managed|made|created|did)\s+/i, '')
                 .replace(/^(maintaining|developing|building|coding|creating|managing|leading|writing|implementing|designing|testing|deploying|supporting|tuning|integrating|engineering)\s+(and\s+(maintaining|developing|building|coding|creating|managing|leading|writing|implementing|designing|testing|deploying|supporting|tuning|integrating|engineering)\s+)?/i, '')
                 .replace(/^\-/, '')
                 .trim();
+            
+            cleanLine = cleanLine.replace(/^(microbiologist|developer|engineer|analyst|designer|manager|owner|consultant|assistant|doctor|specialist|officer|administrator|scientist)\s+(in|at)\s+/i, (match, title, prep) => {
+                let noun = "operations";
+                if (title.endsWith("developer") || title.endsWith("engineer")) noun = "development";
+                if (title.endsWith("designer")) noun = "design";
+                if (title.endsWith("analyst")) noun = "analysis";
+                if (title.endsWith("manager") || title.endsWith("owner")) noun = "management";
+                return `${noun} ${prep} `;
+            });
             
             if (cleanLine.length < 3) {
                 cleanLine = `${categorySkills[i % categorySkills.length] || "system"} assets`;
