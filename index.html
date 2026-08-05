@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=38.0">
+    <link rel="stylesheet" href="style.css?v=39.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase Client JS SDK -->
@@ -296,22 +296,63 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="input-nationality">Nationality</label>
-                                    <input type="text" id="input-nationality" placeholder="e.g. Indian">
+                                    <input type="text" id="input-nationality" list="nationality-suggestions" placeholder="e.g. Indian">
+                                    <datalist id="nationality-suggestions">
+                                        <option value="Indian"></option>
+                                        <option value="Emirati"></option>
+                                        <option value="Saudi"></option>
+                                        <option value="Omani"></option>
+                                        <option value="Qatari"></option>
+                                        <option value="Kuwaiti"></option>
+                                        <option value="Bahraini"></option>
+                                        <option value="American"></option>
+                                        <option value="British"></option>
+                                        <option value="Canadian"></option>
+                                        <option value="Australian"></option>
+                                        <option value="Singaporean"></option>
+                                    </datalist>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="input-visa">Visa / Residency Status</label>
-                                    <input type="text" id="input-visa" placeholder="e.g. Golden Visa / Employment">
+                                    <input type="text" id="input-visa" list="visa-suggestions" placeholder="e.g. Golden Visa / Employment">
+                                    <datalist id="visa-suggestions">
+                                        <option value="Citizen"></option>
+                                        <option value="Employment Visa"></option>
+                                        <option value="Employment Visa (GCC Eligible)"></option>
+                                        <option value="Golden Visa"></option>
+                                        <option value="Student Visa"></option>
+                                        <option value="Residency Visa"></option>
+                                        <option value="Tourist Visa"></option>
+                                        <option value="No Visa Required"></option>
+                                    </datalist>
                                 </div>
                                 <div class="form-group">
                                     <label for="input-marital">Marital Status / Gender</label>
-                                    <input type="text" id="input-marital" placeholder="e.g. Single / Male">
+                                    <input type="text" id="input-marital" list="marital-suggestions" placeholder="e.g. Single / Male">
+                                    <datalist id="marital-suggestions">
+                                        <option value="Single / Male"></option>
+                                        <option value="Single / Female"></option>
+                                        <option value="Married / Male"></option>
+                                        <option value="Married / Female"></option>
+                                        <option value="Single"></option>
+                                        <option value="Married"></option>
+                                    </datalist>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="input-languages">Languages (Comma separated)</label>
-                                <input type="text" id="input-languages" placeholder="e.g. English (Fluent), Hindi (Native)">
+                                <input type="text" id="input-languages" list="languages-suggestions" placeholder="e.g. English (Fluent), Hindi (Native)">
+                                <datalist id="languages-suggestions">
+                                    <option value="English (Fluent), Hindi (Native)"></option>
+                                    <option value="English (Native), Hindi (Native), Arabic (Basic)"></option>
+                                    <option value="English (Native), Malayalam (Native)"></option>
+                                    <option value="English (Fluent), Arabic (Professional)"></option>
+                                    <option value="English (Fluent), Spanish (Basic)"></option>
+                                    <option value="English (Native), French (Fluent)"></option>
+                                    <option value="English (Native), German (Fluent)"></option>
+                                </datalist>
                             </div>
                         </div>
                     </div>
@@ -902,8 +943,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=38.0"></script>
-    <script src="ats.js?v=38.0"></script>
-    <script type="module" src="app.js?v=38.0"></script>
+    <script src="ai.js?v=39.0"></script>
+    <script src="ats.js?v=39.0"></script>
+    <script type="module" src="app.js?v=39.0"></script>
 </body>
 </html>
