@@ -204,7 +204,7 @@ const AIService = {
     },
 
     // Helper to generate offline experience rewrites without recursion
-    getOfflineRewriteMock(text, jobTitle = "Software Engineer") {
+    getOfflineRewriteMock(text, jobTitle = "Software Engineer", keywords = "") {
         const category = this.detectCategory(jobTitle);
         const categorySkills = this.knowledgeBase.skills[category] || this.knowledgeBase.skills["generic"];
         const categoryMetrics = this.knowledgeBase.metrics[category] || this.knowledgeBase.metrics["generic"];
@@ -212,12 +212,18 @@ const AIService = {
         const cleanText = (text || "").toLowerCase();
         
         // Find entities in the user text to weave in dynamically (like company name or location)
-        let hospitalMatch = text.match(/(in|at|for)\s+([A-Z0-9][a-zA-Z0-9\s]+Hospital|[A-Z][a-zA-Z\s]+diagnostics?|[A-Z][a-zA-Z\s]+Clinic|[A-Z][a-zA-Z0-9\s]+(Inc|LLC|Corp|Holdings|Group|Company|Technologies|Solutions|Ltd|University))/i);
+        let hospitalMatch = text.match(/(in|at|for)\s+([a-zA-Z0-9\s]+(hospital|diagnostics?|clinic|inc|llc|corp|holdings|group|company|technologies|solutions|ltd|university|labs?|laborator(y|ies)|medical\s+center))/i);
         let placeName = hospitalMatch ? hospitalMatch[0].trim() : "";
         if (!placeName) {
-            let matchAt = text.match(/(in|at|for)\s+([A-Z][a-zA-Z0-9\s]{3,30})/);
+            let matchAt = text.match(/(in|at|for)\s+([a-zA-Z0-9\s]{3,30})/);
             placeName = matchAt ? matchAt[0].trim() : "";
         }
+        
+        // Process keywords to weave dynamically
+        const kwList = (keywords || "").split(',').map(k => k.trim()).filter(Boolean);
+        const tech1 = kwList[0] || categorySkills[0] || "React";
+        const tech2 = kwList[1] || categorySkills[1] || "Node.js";
+        const tech3 = kwList[2] || categorySkills[2] || "SQL";
         
         // Let's create tailored outputs based on category AND parsed text!
         let templates = [];
@@ -225,75 +231,72 @@ const AIService = {
         if (category === "science" || category === "healthcare") {
             const facility = placeName || "clinical facility";
             templates = [
-                `Spearheaded culture testing, clinical analysis, and diagnostic procedures ${facility}, improving analysis accuracy by 25%.`,
-                `Engineered strict quality control benchmarks and laboratory safety guidelines, reducing diagnostic processing turnaround times by 30%.`,
-                `Optimized scientific documentation for 150+ microbial and bacteriological cultures, ensuring 100% regulatory safety compliance.`
+                `Spearheaded culture testing, clinical analysis, and diagnostic procedures utilizing ${tech1} ${facility}, improving analysis accuracy by 25%.`,
+                `Engineered strict quality control benchmarks and laboratory safety guidelines for ${tech2}, reducing diagnostic processing turnaround times by 30%.`,
+                `Optimized scientific documentation and standard operating procedures for 150+ microbial and bacteriological cultures using ${tech3}, ensuring 100% regulatory safety compliance.`
             ];
         } else if (category === "software" || category === "web" || category === "data") {
             const org = placeName || "development teams";
-            const tech1 = categorySkills[0] || "React";
-            const tech2 = categorySkills[1] || "Node.js";
-            const tech3 = categorySkills[2] || "SQL";
             templates = [
-                `Spearheaded design and end-to-end integration of ${tech1}-based application modules ${org}, boosting load performance by 35%.`,
+                `Spearheaded design and end-to-end integration of scalable application modules using ${tech1} ${org}, boosting load performance by 35%.`,
                 `Engineered robust system architectures and automated deployment pipelines using ${tech2}, saving 8 hours of manual weekly cycles.`,
-                `Optimized database query configurations and ${tech3} schemas, resulting in a 42% reduction in production downtime.`
+                `Optimized database query configurations and index tuning for ${tech3} schemas, resulting in a 42% reduction in production downtime.`
             ];
         } else if (category === "finance") {
             const org = placeName || "finance departments";
             templates = [
-                `Spearheaded comprehensive financial auditing and budget forecast reviews ${org}, improving forecasting accuracy metrics by 15%.`,
-                `Engineered structured financial models and Excel cost trackers, identifying cost-saving opportunities of $50K annually.`,
-                `Optimized general ledger audits and asset accounts, reconciling discrepancies to achieve 99.8% balance sheet accuracy.`
+                `Spearheaded comprehensive financial auditing and budget forecast reviews utilizing ${tech1} ${org}, improving forecasting accuracy metrics by 15%.`,
+                `Engineered structured financial models and Excel cost trackers for ${tech2}, identifying cost-saving opportunities of $50K annually.`,
+                `Optimized general ledger audits and asset accounts using ${tech3}, reconciling discrepancies to achieve 99.8% balance sheet accuracy.`
             ];
         } else if (category === "sales" || category === "marketing") {
             const org = placeName || "regional sales channels";
             templates = [
-                `Spearheaded client expansion initiatives and promotional campaigns ${org}, boosting lead conversion ratios by 24%.`,
-                `Engineered and executed digital marketing campaigns using CRM tools, maximizing campaign click-through rates (CTR) by 2.4x.`,
-                `Optimized customer onboarding funnels, securing 12 new high-value client contracts and increasing retention by 15%.`
+                `Spearheaded client expansion initiatives and promotional campaigns leveraging ${tech1} ${org}, boosting lead conversion ratios by 24%.`,
+                `Engineered and executed digital marketing campaigns using CRM tools like ${tech2}, maximizing campaign click-through rates (CTR) by 2.4x.`,
+                `Optimized customer onboarding funnels for ${tech3}, securing 12 new high-value client contracts and increasing retention by 15%.`
             ];
         } else if (category === "support") {
             const org = placeName || "customer service teams";
             templates = [
-                `Spearheaded customer query troubleshooting and support tickets ${org}, resolving queries to boost CSAT ratings to 96%.`,
-                `Engineered SLA response protocols and support queues using ticketing systems (Zendesk), reducing ticket resolution times by 30%.`,
-                `Optimized escalations and client communication logs, reducing escalation rates by 12% through first-contact resolution.`
+                `Spearheaded customer query troubleshooting and support tickets utilizing ${tech1} ${org}, resolving queries to boost CSAT ratings to 96%.`,
+                `Engineered SLA response protocols and support queues using ticketing systems like ${tech2}, reducing ticket resolution times by 30%.`,
+                `Optimized escalations and client communication logs for ${tech3}, reducing escalation rates by 12% through first-contact resolution.`
             ];
         } else if (category === "legal") {
             const org = placeName || "legal counsel teams";
             templates = [
-                `Spearheaded thorough legal research, case file reviews, and document auditing ${org}, reducing review turnaround times by 25%.`,
-                `Engineered regulatory compliance policies and draft agreement reviews, mitigating legal risk exposure metrics by 35%.`,
-                `Optimized vendor agreement negotiations and contract workflows, managing a caseload of 40+ active files with 100% deadlines met.`
+                `Spearheaded thorough legal research, case file reviews, and document auditing using ${tech1} ${org}, reducing review turnaround times by 25%.`,
+                `Engineered regulatory compliance policies and draft agreement reviews for ${tech2}, mitigating legal risk exposure metrics by 35%.`,
+                `Optimized vendor agreement negotiations and contract workflows for ${tech3}, managing a caseload of 40+ active files with 100% deadlines met.`
             ];
         } else if (category === "education") {
             const org = placeName || "instructional departments";
             templates = [
-                `Spearheaded student curriculum design, lesson planning, and interactive lectures ${org}, improving student test scores by 14%.`,
-                `Engineered innovative instructional methodologies and educational technology integrations, enhancing classroom participation by 25%.`,
-                `Optimized parent communication lines and student evaluations, achieving a 98% positive satisfaction rating on feedback surveys.`
+                `Spearheaded student curriculum design, lesson planning, and interactive lectures utilizing ${tech1} ${org}, improving student test scores by 14%.`,
+                `Engineered innovative instructional methodologies and educational technology integrations for ${tech2}, enhancing classroom participation by 25%.`,
+                `Optimized parent communication lines and student evaluations using ${tech3}, achieving a 98% positive satisfaction rating on feedback surveys.`
             ];
         } else if (category === "hr") {
             const org = placeName || "talent acquisition groups";
             templates = [
-                `Spearheaded talent acquisition cycles and candidate sourcing pipelines ${org}, reducing average time-to-hire by 18%.`,
-                `Engineered comprehensive employee onboarding manuals and training guidelines, improving onboarding satisfaction to 95%.`,
-                `Optimized performance evaluation frameworks and employee relations initiatives, reducing voluntary staff turnover by 12%.`
+                `Spearheaded talent acquisition cycles and candidate sourcing pipelines utilizing ${tech1} ${org}, reducing average time-to-hire by 18%.`,
+                `Engineered comprehensive employee onboarding manuals and training guidelines for ${tech2}, improving onboarding satisfaction to 95%.`,
+                `Optimized performance evaluation frameworks and employee relations initiatives for ${tech3}, reducing voluntary staff turnover by 12%.`
             ];
         } else if (category === "writing") {
             const org = placeName || "editorial publications";
             templates = [
-                `Spearheaded content creation and search engine optimization (SEO) copywriting ${org}, boosting site organic traffic by 40%.`,
-                `Engineered brand copy strategies and social media marketing plans, increasing overall reader engagement metrics by 35%.`,
-                `Optimized publication editing workflows and copy reviews, delivering 20+ articles ahead of strict editorial deadlines.`
+                `Spearheaded content creation and search engine optimization (SEO) copywriting using ${tech1} ${org}, boosting site organic traffic by 40%.`,
+                `Engineered brand copy strategies and social media marketing plans for ${tech2}, increasing overall reader engagement metrics by 35%.`,
+                `Optimized publication editing workflows and copy reviews for ${tech3}, delivering 20+ articles ahead of strict editorial deadlines.`
             ];
         } else {
             const org = placeName || "corporate operations";
             templates = [
-                `Spearheaded operations and team leadership initiatives ${org}, increasing productivity by 15% through workflow automation.`,
-                `Engineered cross-department communication protocols and trackers, saving 8 hours of manual tracking work per week.`,
-                `Optimized project resource allocation strategies, delivering critical deliverables 2 weeks ahead of schedule.`
+                `Spearheaded operations and team leadership initiatives leveraging ${tech1} ${org}, increasing productivity by 15% through workflow automation.`,
+                `Engineered cross-department communication protocols and trackers using ${tech2}, saving 8 hours of manual tracking work per week.`,
+                `Optimized project resource allocation strategies for ${tech3}, delivering critical deliverables 2 weeks ahead of schedule.`
             ];
         }
         
@@ -439,7 +442,7 @@ const AIService = {
         } else if (this.activeProvider === "gemini") {
             result = await this.callGeminiAPI(prompt, chunkCallback, text, jobTitle);
         } else {
-            const mock = this.getOfflineRewriteMock(text, jobTitle);
+            const mock = this.getOfflineRewriteMock(text, jobTitle, weaveKeywords);
             result = await this.simulateStreaming(mock, chunkCallback);
         }
         
@@ -672,7 +675,12 @@ Structure requirements:
         
         if (p.includes("rewrite")) {
             const textToRewrite = originalText || "Sample description";
-            res = this.getOfflineRewriteMock(textToRewrite, activeJob);
+            let kw = "";
+            let kwMatch = prompt.match(/weave in the following key tools\/skills naturally:\s*([^.]+)/i);
+            if (kwMatch) {
+                kw = kwMatch[1].trim();
+            }
+            res = this.getOfflineRewriteMock(textToRewrite, activeJob, kw);
         } else if (p.includes("cover letter")) {
             if (activeState) {
                 res = this.getOfflineCoverLetterMock(activeState);
