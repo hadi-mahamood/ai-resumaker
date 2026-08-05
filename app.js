@@ -241,15 +241,25 @@ const LOCATION_PRESETS = [
     { name: "Birmingham, United Kingdom", prefix: "+44" },
     { name: "Dubai, United Arab Emirates", prefix: "+971" },
     { name: "Abu Dhabi, United Arab Emirates", prefix: "+971" },
+    { name: "Riyadh, Saudi Arabia", prefix: "+966" },
+    { name: "Jeddah, Saudi Arabia", prefix: "+966" },
+    { name: "Muscat, Oman", prefix: "+968" },
+    { name: "Doha, Qatar", prefix: "+974" },
+    { name: "Kuwait City, Kuwait", prefix: "+965" },
+    { name: "Manama, Bahrain", prefix: "+973" },
     { name: "Singapore, SG", prefix: "+65" },
     { name: "Berlin, Germany", prefix: "+49" },
     { name: "Munich, Germany", prefix: "+49" },
     { name: "Frankfurt, Germany", prefix: "+49" },
+    { name: "Paris, France", prefix: "+33" },
     { name: "Toronto, ON, Canada", prefix: "+1" },
     { name: "Vancouver, BC, Canada", prefix: "+1" },
     { name: "Montreal, QC, Canada", prefix: "+1" },
     { name: "Sydney, NSW, Australia", prefix: "+61" },
-    { name: "Melbourne, VIC, Australia", prefix: "+61" }
+    { name: "Melbourne, VIC, Australia", prefix: "+61" },
+    { name: "Karachi, Pakistan", prefix: "+92" },
+    { name: "Dhaka, Bangladesh", prefix: "+880" },
+    { name: "Manila, Philippines", prefix: "+63" }
 ];
 
 // Bind standard text input keyup events to auto-save and update preview
@@ -386,9 +396,18 @@ function bindInputEvents() {
                 { code: "+1", label: "+1 (USA / Canada)" },
                 { code: "+44", label: "+44 (United Kingdom)" },
                 { code: "+971", label: "+971 (UAE)" },
+                { code: "+966", label: "+966 (Saudi Arabia)" },
+                { code: "+968", label: "+968 (Oman)" },
+                { code: "+974", label: "+974 (Qatar)" },
+                { code: "+965", label: "+965 (Kuwait)" },
+                { code: "+973", label: "+973 (Bahrain)" },
                 { code: "+65", label: "+65 (Singapore)" },
                 { code: "+49", label: "+49 (Germany)" },
-                { code: "+61", label: "+61 (Australia)" }
+                { code: "+61", label: "+61 (Australia)" },
+                { code: "+33", label: "+33 (France)" },
+                { code: "+92", label: "+92 (Pakistan)" },
+                { code: "+880", label: "+880 (Bangladesh)" },
+                { code: "+63", label: "+63 (Philippines)" }
             ];
             
             const sorted = [...PHONE_CODE_SUGGESTIONS].sort((a, b) => {
@@ -412,9 +431,18 @@ function bindInputEvents() {
                     "+1": "Seattle, WA, USA",
                     "+44": "London, United Kingdom",
                     "+971": "Dubai, United Arab Emirates",
+                    "+966": "Riyadh, Saudi Arabia",
+                    "+968": "Muscat, Oman",
+                    "+974": "Doha, Qatar",
+                    "+965": "Kuwait City, Kuwait",
+                    "+973": "Manama, Bahrain",
                     "+65": "Singapore, SG",
                     "+49": "Berlin, Germany",
-                    "+61": "Sydney, NSW, Australia"
+                    "+61": "Sydney, NSW, Australia",
+                    "+33": "Paris, France",
+                    "+92": "Karachi, Pakistan",
+                    "+880": "Dhaka, Bangladesh",
+                    "+63": "Manila, Philippines"
                 };
                 
                 for (let prefix in DEFAULT_CITIES) {
