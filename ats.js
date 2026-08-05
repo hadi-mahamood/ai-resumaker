@@ -1151,16 +1151,32 @@ window.mockLocalOptimization = function(resumeState) {
             const jobTitle = (state.targetJob || "").toLowerCase();
             if (jobTitle.includes("software") || jobTitle.includes("developer") || jobTitle.includes("engineer") || jobTitle.includes("backend") || jobTitle.includes("full stack")) {
                 category = (jobTitle.includes("web") || jobTitle.includes("frontend")) ? "web" : "software";
-            } else if (jobTitle.includes("bio") || jobTitle.includes("micro") || jobTitle.includes("chem") || jobTitle.includes("medical") || jobTitle.includes("clinical") || jobTitle.includes("science") || jobTitle.includes("lab")) {
+            } else if (jobTitle.includes("bio") || jobTitle.includes("micro") || jobTitle.includes("chem") || jobTitle.includes("medical") || jobTitle.includes("clinical") || jobTitle.includes("science") || jobTitle.includes("lab") || jobTitle.includes("doctor") || jobTitle.includes("physician") || jobTitle.includes("therapist")) {
                 category = "science";
             } else if (jobTitle.includes("data") || jobTitle.includes("analyst") || jobTitle.includes("science") || jobTitle.includes("ml") || jobTitle.includes("ai")) {
                 category = "data";
-            } else if (jobTitle.includes("design") || jobTitle.includes("ux") || jobTitle.includes("ui") || jobTitle.includes("product designer")) {
+            } else if (jobTitle.includes("design") || jobTitle.includes("ux") || jobTitle.includes("ui") || jobTitle.includes("artist") || jobTitle.includes("illustrator") || jobTitle.includes("product designer")) {
                 category = "design";
-            } else if (jobTitle.includes("product") || jobTitle.includes("manager") || jobTitle.includes("owner")) {
+            } else if (jobTitle.includes("product") || jobTitle.includes("manager") || jobTitle.includes("owner") || jobTitle.includes("scrum") || jobTitle.includes("agile")) {
                 category = "product";
-            } else if (jobTitle.includes("market") || jobTitle.includes("growth") || jobTitle.includes("seo")) {
+            } else if (jobTitle.includes("market") || jobTitle.includes("growth") || jobTitle.includes("seo") || jobTitle.includes("brand")) {
                 category = "marketing";
+            } else if (jobTitle.includes("finance") || jobTitle.includes("accounting") || jobTitle.includes("accountant") || jobTitle.includes("audit") || jobTitle.includes("tax") || jobTitle.includes("budget")) {
+                category = "finance";
+            } else if (jobTitle.includes("sales") || jobTitle.includes("sell") || jobTitle.includes("representative") || jobTitle.includes("business development") || jobTitle.includes("account manager")) {
+                category = "sales";
+            } else if (jobTitle.includes("support") || jobTitle.includes("customer") || jobTitle.includes("service") || jobTitle.includes("help") || jobTitle.includes("ticket") || jobTitle.includes("client relations")) {
+                category = "support";
+            } else if (jobTitle.includes("nurse") || jobTitle.includes("healthcare") || jobTitle.includes("patient") || jobTitle.includes("clinic") || jobTitle.includes("care")) {
+                category = "healthcare";
+            } else if (jobTitle.includes("legal") || jobTitle.includes("law") || jobTitle.includes("contract") || jobTitle.includes("attorney") || jobTitle.includes("paralegal") || jobTitle.includes("compliance")) {
+                category = "legal";
+            } else if (jobTitle.includes("teacher") || jobTitle.includes("education") || jobTitle.includes("school") || jobTitle.includes("professor") || jobTitle.includes("instructor") || jobTitle.includes("train")) {
+                category = "education";
+            } else if (jobTitle.includes("hr") || jobTitle.includes("human resources") || jobTitle.includes("recruit") || jobTitle.includes("talent") || jobTitle.includes("onboard")) {
+                category = "hr";
+            } else if (jobTitle.includes("write") || jobTitle.includes("content") || jobTitle.includes("edit") || jobTitle.includes("copywriter") || jobTitle.includes("journal")) {
+                category = "writing";
             }
             
             const metricsPool = {
@@ -1201,6 +1217,54 @@ window.mockLocalOptimization = function(resumeState) {
                     "enhancing laboratory safety compliance index score to 100%",
                     "accelerating critical diagnosis validation speed by 15%"
                 ],
+                "finance": [
+                    "improving budget forecasting accuracy by 15%",
+                    "identifying cost-saving opportunities of $50K annually",
+                    "reducing audit processing cycles by 20%",
+                    "reconciling account discrepancies to achieve 99.8% balance accuracy"
+                ],
+                "sales": [
+                    "boosting regional sales revenue by 24%",
+                    "increasing customer retention rate by 15%",
+                    "securing 12 new high-value client contracts in the fiscal year",
+                    "shortening lead-to-close pipeline cycle times by 18%"
+                ],
+                "support": [
+                    "improving customer satisfaction (CSAT) rating to 96%",
+                    "reducing average ticket resolution time by 30%",
+                    "maintaining SLA response compliance at 99.5%",
+                    "reducing escalation rates by 12% through first-contact resolution"
+                ],
+                "healthcare": [
+                    "improving patient satisfaction scores by 22%",
+                    "reducing medication administration errors to 0%",
+                    "optimizing patient intake processing speed by 15%",
+                    "conducting 200+ clinical assessments with 100% compliance record"
+                ],
+                "legal": [
+                    "reducing contract review turnaround times by 25%",
+                    "mitigating legal risk metrics by 35% through compliance audits",
+                    "managing a caseload of 40+ active files with 100% filing deadlines met",
+                    "drafting 50+ vendor agreement protocols with zero breach disputes"
+                ],
+                "education": [
+                    "improving student test scores by an average of 14%",
+                    "enhancing classroom participation rates by 25%",
+                    "designing 12 comprehensive curriculum standards adopted school-wide",
+                    "achieving a 98% positive review rating from parent-teacher surveys"
+                ],
+                "hr": [
+                    "reducing time-to-hire by 18% through optimized sourcing strategies",
+                    "improving employee onboarding satisfaction score to 95%",
+                    "reducing voluntary staff turnover rates by 12%",
+                    "coordinating 50+ recruitment cycles across 8 department heads"
+                ],
+                "writing": [
+                    "increasing reader engagement metrics by 35%",
+                    "boosting website organic traffic by 40% through targeted keywords",
+                    "producing 20+ high-quality publications ahead of tight editorial deadlines",
+                    "enhancing brand copy conversion rate by 15%"
+                ],
                 "generic": [
                     "increasing team productivity by 15% through workflow automation",
                     "delivering the target milestone 2 weeks ahead of schedule",
@@ -1226,12 +1290,17 @@ window.mockLocalOptimization = function(resumeState) {
                     .replace(/^(maintaining|developing|building|coding|creating|managing|leading|writing|implementing|designing|testing|deploying|supporting|tuning|integrating|engineering)\s+(and\s+(maintaining|developing|building|coding|creating|managing|leading|writing|implementing|designing|testing|deploying|supporting|tuning|integrating|engineering)\s+)?/i, '')
                     .trim();
                 
-                cleaned = cleaned.replace(/^(microbiologist|developer|engineer|analyst|designer|manager|owner|consultant|assistant|doctor|specialist|officer|administrator|scientist)\s+(in|at)\s+/i, (match, title, prep) => {
+                cleaned = cleaned.replace(/^(microbiologist|developer|engineer|analyst|designer|manager|owner|consultant|assistant|doctor|specialist|officer|administrator|scientist|teacher|professor|nurse|accountant|writer|editor|representative|agent|attorney|lawyer|practitioner|therapist|recruiter)\s+(in|at)\s+/i, (match, title, prep) => {
                     let noun = "operations";
+                    title = title.toLowerCase();
                     if (title.endsWith("developer") || title.endsWith("engineer")) noun = "development";
                     if (title.endsWith("designer")) noun = "design";
                     if (title.endsWith("analyst")) noun = "analysis";
                     if (title.endsWith("manager") || title.endsWith("owner")) noun = "management";
+                    if (title.endsWith("writer") || title.endsWith("editor")) noun = "editorial projects";
+                    if (title.endsWith("teacher") || title.endsWith("professor")) noun = "instructional operations";
+                    if (title.endsWith("accountant")) noun = "accounting operations";
+                    if (title.endsWith("attorney") || title.endsWith("lawyer")) noun = "legal counsel";
                     return `${noun} ${prep} `;
                 });
                 

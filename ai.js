@@ -44,6 +44,14 @@ const AIService = {
             "product": ["Product Roadmap", "User Personas", "Agile/Scrum", "Market Research", "Jira/Confluence", "Data Analytics", "A/B Testing", "Stakeholder Management", "Product Lifecycle", "Strategic Planning", "Leadership"],
             "marketing": ["SEO/SEM", "Google Analytics", "Content Strategy", "Copywriting", "Social Media Marketing", "Email Campaigns", "A/B Testing", "Brand Management", "Market Analysis", "CRM Tools (HubSpot)", "Creativity"],
             "science": ["Laboratory Techniques", "Data Analysis", "Quality Control", "Research & Development", "Scientific Writing", "Regulatory Compliance", "Safety Standards", "Critical Thinking", "Troubleshooting", "Equipment Calibration", "Detail Oriented", "Experimental Design"],
+            "finance": ["Financial Analysis", "Budgeting", "Forecasting", "Accounting Principles", "Tax Compliance", "Risk Management", "Auditing", "Financial Modeling", "Reporting", "Excel Proficiency", "Detail Oriented"],
+            "sales": ["Lead Generation", "Client Relations", "Negotiation", "CRM Tools (Salesforce)", "Sales Strategy", "Market Expansion", "Closing Techniques", "Key Account Management", "Communication", "Persuasiveness"],
+            "support": ["Customer Support", "Troubleshooting", "Conflict Resolution", "Ticketing Systems (Zendesk)", "Technical Support", "Communication", "SLA Management", "Product Knowledge", "Empathy", "Patience"],
+            "healthcare": ["Patient Care", "Clinical Diagnostics", "Medical Records", "Healthcare Standards", "Treatment Planning", "CPR/First Aid", "Empathy", "Triage", "Collaboration", "Medical Ethics"],
+            "legal": ["Legal Research", "Contract Drafting", "Case Management", "Regulatory Compliance", "Document Review", "Litigation Support", "Analytical Thinking", "Negotiation", "Attention to Detail"],
+            "education": ["Curriculum Design", "Classroom Management", "Lesson Planning", "Student Assessment", "Instructional Technology", "Parent Communication", "Mentorship", "Public Speaking", "Patience"],
+            "hr": ["Talent Acquisition", "Employee Relations", "Onboarding Policies", "HR Policies", "Performance Management", "ATS Software", "Conflict Resolution", "HR Metrics", "Interpersonal Skills"],
+            "writing": ["Content Creation", "SEO Copywriting", "Editing & Proofreading", "Social Media Strategy", "Research", "Content Management Systems (CMS)", "Creative Writing", "Communication", "Storytelling"],
             "generic": ["Project Management", "Team Leadership", "Strategic Planning", "Communication", "Problem Solving", "Time Management", "Critical Thinking", "Adaptability", "Collaboration", "Customer Relations"]
         },
         
@@ -98,6 +106,54 @@ const AIService = {
                 "accelerating critical diagnosis validation speed by 15%",
                 "identifying and documenting 150+ complex microbial culture strings"
             ],
+            "finance": [
+                "improving budget forecasting accuracy by 15%",
+                "identifying cost-saving opportunities of $50K annually",
+                "reducing audit processing cycles by 20%",
+                "reconciling account discrepancies to achieve 99.8% balance accuracy"
+            ],
+            "sales": [
+                "boosting regional sales revenue by 24%",
+                "increasing customer retention rate by 15%",
+                "securing 12 new high-value client contracts in the fiscal year",
+                "shortening lead-to-close pipeline cycle times by 18%"
+            ],
+            "support": [
+                "improving customer satisfaction (CSAT) rating to 96%",
+                "reducing average ticket resolution time by 30%",
+                "maintaining SLA response compliance at 99.5%",
+                "reducing escalation rates by 12% through first-contact resolution"
+            ],
+            "healthcare": [
+                "improving patient satisfaction scores by 22%",
+                "reducing medication administration errors to 0%",
+                "optimizing patient intake processing speed by 15%",
+                "conducting 200+ clinical assessments with 100% compliance record"
+            ],
+            "legal": [
+                "reducing contract review turnaround times by 25%",
+                "mitigating legal risk metrics by 35% through compliance audits",
+                "managing a caseload of 40+ active files with 100% filing deadlines met",
+                "drafting 50+ vendor agreement protocols with zero breach disputes"
+            ],
+            "education": [
+                "improving student test scores by an average of 14%",
+                "enhancing classroom participation rates by 25%",
+                "designing 12 comprehensive curriculum standards adopted school-wide",
+                "achieving a 98% positive review rating from parent-teacher surveys"
+            ],
+            "hr": [
+                "reducing time-to-hire by 18% through optimized sourcing strategies",
+                "improving employee onboarding satisfaction score to 95%",
+                "reducing voluntary staff turnover rates by 12%",
+                "coordinating 50+ recruitment cycles across 8 department heads"
+            ],
+            "writing": [
+                "increasing reader engagement metrics by 35%",
+                "boosting website organic traffic by 40% through targeted keywords",
+                "producing 20+ high-quality publications ahead of tight editorial deadlines",
+                "enhancing brand copy conversion rate by 15%"
+            ],
             "generic": [
                 "increasing team productivity by 15% through workflow automation",
                 "delivering the target milestone 2 weeks ahead of schedule",
@@ -131,11 +187,19 @@ const AIService = {
             if (title.includes("web") || title.includes("frontend")) return "web";
             return "software";
         }
-        if (title.includes("bio") || title.includes("micro") || title.includes("chem") || title.includes("medical") || title.includes("clinical") || title.includes("science") || title.includes("lab")) return "science";
+        if (title.includes("bio") || title.includes("micro") || title.includes("chem") || title.includes("medical") || title.includes("clinical") || title.includes("science") || title.includes("lab") || title.includes("doctor") || title.includes("physician") || title.includes("therapist")) return "science";
         if (title.includes("data") || title.includes("analyst") || title.includes("science") || title.includes("ml") || title.includes("ai")) return "data";
-        if (title.includes("design") || title.includes("ux") || title.includes("ui") || title.includes("product designer")) return "design";
-        if (title.includes("product") || title.includes("manager") || title.includes("owner")) return "product";
-        if (title.includes("market") || title.includes("growth") || title.includes("seo")) return "marketing";
+        if (title.includes("design") || title.includes("ux") || title.includes("ui") || title.includes("artist") || title.includes("illustrator") || title.includes("product designer")) return "design";
+        if (title.includes("product") || title.includes("manager") || title.includes("owner") || title.includes("scrum") || title.includes("agile")) return "product";
+        if (title.includes("market") || title.includes("growth") || title.includes("seo") || title.includes("brand")) return "marketing";
+        if (title.includes("finance") || title.includes("accounting") || title.includes("accountant") || title.includes("audit") || title.includes("tax") || title.includes("budget")) return "finance";
+        if (title.includes("sales") || title.includes("sell") || title.includes("representative") || title.includes("business development") || title.includes("account manager")) return "sales";
+        if (title.includes("support") || title.includes("customer") || title.includes("service") || title.includes("help") || title.includes("ticket") || title.includes("client relations")) return "support";
+        if (title.includes("nurse") || title.includes("healthcare") || title.includes("patient") || title.includes("clinic") || title.includes("care")) return "healthcare";
+        if (title.includes("legal") || title.includes("law") || title.includes("contract") || title.includes("attorney") || title.includes("paralegal") || title.includes("compliance")) return "legal";
+        if (title.includes("teacher") || title.includes("education") || title.includes("school") || title.includes("professor") || title.includes("instructor") || title.includes("train")) return "education";
+        if (title.includes("hr") || title.includes("human resources") || title.includes("recruit") || title.includes("talent") || title.includes("onboard")) return "hr";
+        if (title.includes("write") || title.includes("content") || title.includes("edit") || title.includes("copywriter") || title.includes("journal")) return "writing";
         return "generic";
     },
 
@@ -174,12 +238,17 @@ const AIService = {
                 .replace(/^\-/, '')
                 .trim();
             
-            cleanLine = cleanLine.replace(/^(microbiologist|developer|engineer|analyst|designer|manager|owner|consultant|assistant|doctor|specialist|officer|administrator|scientist)\s+(in|at)\s+/i, (match, title, prep) => {
+            cleanLine = cleanLine.replace(/^(microbiologist|developer|engineer|analyst|designer|manager|owner|consultant|assistant|doctor|specialist|officer|administrator|scientist|teacher|professor|nurse|accountant|writer|editor|representative|agent|attorney|lawyer|practitioner|therapist|recruiter)\s+(in|at)\s+/i, (match, title, prep) => {
                 let noun = "operations";
+                title = title.toLowerCase();
                 if (title.endsWith("developer") || title.endsWith("engineer")) noun = "development";
                 if (title.endsWith("designer")) noun = "design";
                 if (title.endsWith("analyst")) noun = "analysis";
                 if (title.endsWith("manager") || title.endsWith("owner")) noun = "management";
+                if (title.endsWith("writer") || title.endsWith("editor")) noun = "editorial projects";
+                if (title.endsWith("teacher") || title.endsWith("professor")) noun = "instructional operations";
+                if (title.endsWith("accountant")) noun = "accounting operations";
+                if (title.endsWith("attorney") || title.endsWith("lawyer")) noun = "legal counsel";
                 return `${noun} ${prep} `;
             });
             

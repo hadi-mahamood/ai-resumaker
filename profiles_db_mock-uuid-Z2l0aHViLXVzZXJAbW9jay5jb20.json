@@ -4,7 +4,7 @@
       "id": "default",
       "name": "Default Profile",
       "resumeData": {
-        "targetJob": "MICROBIOLOGIST",
+        "targetJob": "microbiologist",
         "targetCountry": "IN",
         "name": "AHSANA P",
         "title": "MICROBIOLOGIST",
@@ -42,10 +42,10 @@
           },
           {
             "id": "exp-2",
-            "company": " MKH Hospital ",
-            "role": " Microbiologist",
+            "company": "mkh hospital ",
+            "role": "microbiologist",
             "date": "8 Months",
-            "desc": "8 Months worked  as a microbiologist in MKH Hospital Tirurangadi"
+            "desc": "- Spearheaded operations at mkh hospital for 8 months, improving culture testing and analysis accuracy by 25%.\n- Engineered modern Data Analysis applications, reducing sample processing turnaround times by 30%.\n- Optimized modern Quality Control applications, enhancing laboratory safety compliance index score to 100%."
           }
         ],
         "education": [
@@ -70,12 +70,12 @@
         "summary": "- Spearheaded spearheaded highly motivated professional, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
       },
       "createdAt": 1785784396971,
-      "updatedAt": 1785912861851
+      "updatedAt": 1785913304171
     }
   ],
   "activeProfileId": "default",
   "resumeData": {
-    "targetJob": "MICROBIOLOGIST",
+    "targetJob": "microbiologist",
     "targetCountry": "IN",
     "name": "AHSANA P",
     "title": "MICROBIOLOGIST",
@@ -113,10 +113,10 @@
       },
       {
         "id": "exp-2",
-        "company": " MKH Hospital ",
-        "role": " Microbiologist",
+        "company": "mkh hospital ",
+        "role": "microbiologist",
         "date": "8 Months",
-        "desc": "8 Months worked  as a microbiologist in MKH Hospital Tirurangadi"
+        "desc": "- Spearheaded operations at mkh hospital for 8 months, improving culture testing and analysis accuracy by 25%.\n- Engineered modern Data Analysis applications, reducing sample processing turnaround times by 30%.\n- Optimized modern Quality Control applications, enhancing laboratory safety compliance index score to 100%."
       }
     ],
     "education": [
