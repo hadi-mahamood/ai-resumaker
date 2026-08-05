@@ -81,20 +81,39 @@ const ATSAuditor = {
         "data": ["data", "analyst", "sql", "python", "pandas", "visualization", "machine learning", "tableau", "statistics", "database", "analytics"],
         "design": ["design", "ui", "ux", "figma", "wireframe", "prototype", "user research", "interface", "adobe", "layout", "visual"],
         "product": ["product", "manager", "roadmap", "agile", "scrum", "analytics", "jira", "lifecycle", "strategy", "metrics", "requirements"],
-        "marketing": ["marketing", "seo", "sem", "analytics", "content", "campaign", "conversion", "google analytics", "brand", "social media", "crm"]
+        "marketing": ["marketing", "seo", "sem", "analytics", "content", "campaign", "conversion", "google analytics", "brand", "social media", "crm"],
+        "science": ["laboratory", "research", "experiment", "analysis", "data", "quality control", "compliance", "safety", "protocol", "documentation", "culture", "testing"],
+        "finance": ["accounting", "finance", "audit", "budget", "ledger", "reconciliation", "tax", "forecast", "compliance", "report", "excel", "sheets"],
+        "sales": ["sales", "revenue", "deal", "client", "customer", "pipeline", "b2b", "negotiation", "relationship", "growth", "crm", "funnel"],
+        "support": ["support", "customer", "service", "ticket", "sla", "resolution", "csat", "troubleshoot", "client", "communication", "helpdesk"],
+        "healthcare": ["patient", "clinical", "nursing", "medical", "treatment", "safety", "documentation", "healthcare", "care", "compliance", "charts"],
+        "legal": ["legal", "contract", "compliance", "agreement", "research", "attorney", "policy", "litigation", "risk", "negotiation", "audit"],
+        "education": ["curriculum", "instruction", "student", "classroom", "lesson plan", "education", "training", "assessment", "learning", "pedagogy", "grading"],
+        "hr": ["hr", "recruitment", "talent", "employee", "onboarding", "performance", "training", "relations", "compliance", "sourcing", "payroll"],
+        "writing": ["content", "seo", "writing", "editing", "copywriting", "publishing", "editorial", "blog", "portfolio", "documentation", "copy"],
+        "generic": ["management", "leadership", "organization", "project", "strategy", "collaboration", "communication", "planning", "operations", "execution", "planning"]
     },
 
     detectCategory(title) {
         if (!title) return "generic";
         title = title.toLowerCase();
-        if (title.includes("software") || title.includes("developer") || title.includes("engineer")) {
+        if (title.includes("software") || title.includes("developer") || title.includes("engineer") || title.includes("backend") || title.includes("full stack")) {
             if (title.includes("web") || title.includes("frontend")) return "web";
             return "software";
         }
-        if (title.includes("data") || title.includes("analyst") || title.includes("science")) return "data";
-        if (title.includes("design") || title.includes("ux") || title.includes("ui")) return "design";
-        if (title.includes("product") || title.includes("manager")) return "product";
-        if (title.includes("market") || title.includes("seo")) return "marketing";
+        if (title.includes("bio") || title.includes("micro") || title.includes("chem") || title.includes("medical") || title.includes("clinical") || title.includes("science") || title.includes("lab") || title.includes("doctor") || title.includes("physician") || title.includes("therapist")) return "science";
+        if (title.includes("data") || title.includes("analyst") || title.includes("science") || title.includes("ml") || title.includes("ai")) return "data";
+        if (title.includes("design") || title.includes("ux") || title.includes("ui") || title.includes("artist") || title.includes("illustrator") || title.includes("product designer")) return "design";
+        if (title.includes("product") || title.includes("manager") || title.includes("owner") || title.includes("scrum") || title.includes("agile")) return "product";
+        if (title.includes("market") || title.includes("growth") || title.includes("seo") || title.includes("brand")) return "marketing";
+        if (title.includes("finance") || title.includes("accounting") || title.includes("accountant") || title.includes("audit") || title.includes("tax") || title.includes("budget")) return "finance";
+        if (title.includes("sales") || title.includes("sell") || title.includes("representative") || title.includes("business development") || title.includes("account manager")) return "sales";
+        if (title.includes("support") || title.includes("customer") || title.includes("service") || title.includes("help") || title.includes("ticket") || title.includes("client relations")) return "support";
+        if (title.includes("nurse") || title.includes("healthcare") || title.includes("patient") || title.includes("clinic") || title.includes("care")) return "healthcare";
+        if (title.includes("legal") || title.includes("law") || title.includes("contract") || title.includes("attorney") || title.includes("paralegal") || title.includes("compliance")) return "legal";
+        if (title.includes("teacher") || title.includes("education") || title.includes("school") || title.includes("professor") || title.includes("instructor") || title.includes("train")) return "education";
+        if (title.includes("hr") || title.includes("human resources") || title.includes("recruit") || title.includes("talent") || title.includes("onboard")) return "hr";
+        if (title.includes("write") || title.includes("content") || title.includes("edit") || title.includes("copywriter") || title.includes("journal")) return "writing";
         return "generic";
     },
 

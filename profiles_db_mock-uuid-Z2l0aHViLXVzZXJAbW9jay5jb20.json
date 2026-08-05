@@ -17,14 +17,21 @@
         "visaStatus": "",
         "maritalStatus": "Married / Female",
         "languages": "English, Malyalam, Tamil, Hindi",
-        "skills": [],
+        "skills": [
+          "Laboratory Techniques",
+          "Quality Control",
+          "Research & Development",
+          "Equipment Calibration",
+          "Safety Standards",
+          "Regulatory Compliance"
+        ],
         "experience": [
           {
             "id": "exp-1",
             "company": "mkh hospital",
             "role": "microbiologist",
             "date": " April 2020 - March 2022",
-            "desc": "- Spearheaded laboratory research at mkh hospital, improving culture testing and analysis accuracy by 25%.\n- Engineered strict quality control benchmarks and laboratory safety guidelines, reducing diagnostic processing turnaround times by 30%.\n- Optimized scientific documentation for 150+ microbial and bacteriological cultures, ensuring 100% regulatory safety compliance."
+            "desc": "- Spearheaded laboratory research at mkh hospital, improving culture testing and analysis accuracy by 25%, improving culture testing and analysis accuracy by 25%.\n- Engineered engineered strict quality control benchmarks and laboratory safety guidelines, reducing diagnostic processing turnaround times by 30%, reducing sample processing turnaround times by 30%.\n- Optimized optimized scientific documentation for 150+ microbial and bacteriological cultures, ensuring 100% regulatory safety compliance, enhancing laboratory safety compliance index score to 100%."
           },
           {
             "id": "exp-2",
@@ -56,7 +63,7 @@
         "summary": "- Spearheaded spearheaded highly motivated professional, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
       },
       "createdAt": 1785784396971,
-      "updatedAt": 1785916072178
+      "updatedAt": 1785916374613
     }
   ],
   "activeProfileId": "default",
@@ -74,14 +81,21 @@
     "visaStatus": "",
     "maritalStatus": "Married / Female",
     "languages": "English, Malyalam, Tamil, Hindi",
-    "skills": [],
+    "skills": [
+      "Laboratory Techniques",
+      "Quality Control",
+      "Research & Development",
+      "Equipment Calibration",
+      "Safety Standards",
+      "Regulatory Compliance"
+    ],
     "experience": [
       {
         "id": "exp-1",
         "company": "mkh hospital",
         "role": "microbiologist",
         "date": " April 2020 - March 2022",
-        "desc": "- Spearheaded laboratory research at mkh hospital, improving culture testing and analysis accuracy by 25%.\n- Engineered strict quality control benchmarks and laboratory safety guidelines, reducing diagnostic processing turnaround times by 30%.\n- Optimized scientific documentation for 150+ microbial and bacteriological cultures, ensuring 100% regulatory safety compliance."
+        "desc": "- Spearheaded laboratory research at mkh hospital, improving culture testing and analysis accuracy by 25%, improving culture testing and analysis accuracy by 25%.\n- Engineered engineered strict quality control benchmarks and laboratory safety guidelines, reducing diagnostic processing turnaround times by 30%, reducing sample processing turnaround times by 30%.\n- Optimized optimized scientific documentation for 150+ microbial and bacteriological cultures, ensuring 100% regulatory safety compliance, enhancing laboratory safety compliance index score to 100%."
       },
       {
         "id": "exp-2",
