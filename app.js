@@ -274,6 +274,7 @@ function bindInputEvents() {
         if (el) {
             el.addEventListener("input", (e) => {
                 state[item.key] = e.target.value;
+                updateSidebarBadges();
                 autoSave();
                 debouncedRenderPreview();
             });
@@ -337,6 +338,7 @@ function bindInputEvents() {
                 if (!currentPhone) {
                     phoneInput.value = matchedPreset.prefix + " ";
                     state.phone = phoneInput.value;
+                    updateSidebarBadges();
                     autoSave();
                     debouncedRenderPreview();
                 } else {
@@ -345,6 +347,7 @@ function bindInputEvents() {
                     if (digits.length === 10 && !currentPhone.startsWith("+") && !currentPhone.startsWith("0")) {
                         phoneInput.value = matchedPreset.prefix + " " + currentPhone;
                         state.phone = phoneInput.value;
+                        updateSidebarBadges();
                         autoSave();
                         debouncedRenderPreview();
                         showToast(`Formatted phone number with country prefix ${matchedPreset.prefix}!`);
@@ -418,6 +421,7 @@ function bindInputEvents() {
                     if (phoneVal === prefix || phoneVal === prefix + " ") {
                         locInput.value = DEFAULT_CITIES[prefix];
                         state.location = locInput.value;
+                        updateSidebarBadges();
                         autoSave();
                         debouncedRenderPreview();
                         showToast(`Set default location to ${DEFAULT_CITIES[prefix]} based on phone code!`);
@@ -438,6 +442,7 @@ function bindInputEvents() {
                 state.skills.push(val);
                 skillInput.value = "";
                 renderSkillsTags();
+                updateSidebarBadges();
                 autoSave();
                 renderResumePreview();
                 showToast("Skill added successfully!");
@@ -584,6 +589,7 @@ function renderSkillsTags() {
 function removeSkill(index) {
     state.skills.splice(index, 1);
     renderSkillsTags();
+    updateSidebarBadges();
     autoSave();
     renderResumePreview();
 }
@@ -685,6 +691,7 @@ function addExperience() {
     };
     state.experience.push(newExp);
     renderExperienceList();
+    updateSidebarBadges();
     autoSave();
     renderResumePreview();
 }
@@ -701,6 +708,7 @@ function updateExperience(id, field, value) {
 function deleteExperience(id) {
     state.experience = state.experience.filter(e => e.id !== id);
     renderExperienceList();
+    updateSidebarBadges();
     autoSave();
     renderResumePreview();
 }
@@ -751,6 +759,7 @@ function addEducation() {
     };
     state.education.push(newEdu);
     renderEducationList();
+    updateSidebarBadges();
     autoSave();
     renderResumePreview();
 }
@@ -767,6 +776,7 @@ function updateEducation(id, field, value) {
 function deleteEducation(id) {
     state.education = state.education.filter(e => e.id !== id);
     renderEducationList();
+    updateSidebarBadges();
     autoSave();
     renderResumePreview();
 }
@@ -812,6 +822,7 @@ function addProject() {
     };
     state.projects.push(newProj);
     renderProjectsList();
+    updateSidebarBadges();
     autoSave();
     renderResumePreview();
 }
@@ -828,6 +839,7 @@ function updateProject(id, field, value) {
 function deleteProject(id) {
     state.projects = state.projects.filter(p => p.id !== id);
     renderProjectsList();
+    updateSidebarBadges();
     autoSave();
     renderResumePreview();
 }
@@ -1529,7 +1541,7 @@ function updateSidebarBadges() {
     // 0. Target role details progress
     const badgeTarget = document.getElementById("badge-target");
     if (badgeTarget) {
-        const val = state.title || "";
+        const val = state.targetJob || "";
         const targetFilled = val.trim().length > 0;
         badgeTarget.innerText = targetFilled ? "100%" : "0%";
         if (targetFilled) {
@@ -1539,8 +1551,8 @@ function updateSidebarBadges() {
         }
     }
 
-    // 1. Personal details progress
-    const personalFields = [state.name, state.title, state.email, state.phone, state.location];
+    // 1. Personal details progress (including website/portfolio input)
+    const personalFields = [state.name, state.title, state.email, state.phone, state.location, state.website];
     const personalFilled = personalFields.filter(f => f && f.trim().length > 0).length;
     const personalPct = Math.round((personalFilled / personalFields.length) * 100);
     const badgePersonal = document.getElementById("badge-personal");
