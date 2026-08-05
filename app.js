@@ -217,6 +217,41 @@ function setFormFields() {
     }
 }
 
+const LOCATION_PRESETS = [
+    { name: "Malappuram, Kerala, India", prefix: "+91" },
+    { name: "Tirurangadi, Kerala, India", prefix: "+91" },
+    { name: "Kochi, Kerala, India", prefix: "+91" },
+    { name: "Kozhikode, Kerala, India", prefix: "+91" },
+    { name: "Trivandrum, Kerala, India", prefix: "+91" },
+    { name: "Bangalore, Karnataka, India", prefix: "+91" },
+    { name: "Chennai, Tamil Nadu, India", prefix: "+91" },
+    { name: "Mumbai, Maharashtra, India", prefix: "+91" },
+    { name: "Delhi, NCR, India", prefix: "+91" },
+    { name: "Hyderabad, Telangana, India", prefix: "+91" },
+    { name: "Pune, Maharashtra, India", prefix: "+91" },
+    { name: "Seattle, WA, USA", prefix: "+1" },
+    { name: "San Francisco, CA, USA", prefix: "+1" },
+    { name: "New York, NY, USA", prefix: "+1" },
+    { name: "Austin, TX, USA", prefix: "+1" },
+    { name: "Boston, MA, USA", prefix: "+1" },
+    { name: "Chicago, IL, USA", prefix: "+1" },
+    { name: "Los Angeles, CA, USA", prefix: "+1" },
+    { name: "London, United Kingdom", prefix: "+44" },
+    { name: "Manchester, United Kingdom", prefix: "+44" },
+    { name: "Birmingham, United Kingdom", prefix: "+44" },
+    { name: "Dubai, United Arab Emirates", prefix: "+971" },
+    { name: "Abu Dhabi, United Arab Emirates", prefix: "+971" },
+    { name: "Singapore, SG", prefix: "+65" },
+    { name: "Berlin, Germany", prefix: "+49" },
+    { name: "Munich, Germany", prefix: "+49" },
+    { name: "Frankfurt, Germany", prefix: "+49" },
+    { name: "Toronto, ON, Canada", prefix: "+1" },
+    { name: "Vancouver, BC, Canada", prefix: "+1" },
+    { name: "Montreal, QC, Canada", prefix: "+1" },
+    { name: "Sydney, NSW, Australia", prefix: "+61" },
+    { name: "Melbourne, VIC, Australia", prefix: "+61" }
+];
+
 // Bind standard text input keyup events to auto-save and update preview
 function bindInputEvents() {
     const textInputs = [
@@ -244,6 +279,80 @@ function bindInputEvents() {
             });
         }
     });
+
+    // Create datalist elements dynamically for Location Suggestions
+    let datalist = document.getElementById("location-suggestions");
+    if (!datalist) {
+        datalist = document.createElement("datalist");
+        datalist.id = "location-suggestions";
+        document.body.appendChild(datalist);
+    }
+    
+    const locInput = document.getElementById("input-location");
+    const phoneInput = document.getElementById("input-phone");
+    
+    if (locInput) {
+        locInput.setAttribute("list", "location-suggestions");
+        
+        const populateLocationSuggestions = () => {
+            const phoneVal = (phoneInput ? phoneInput.value.trim() : "");
+            let matchedPrefix = "";
+            
+            // Check country prefix typed by user
+            if (phoneVal.startsWith("+")) {
+                for (let preset of LOCATION_PRESETS) {
+                    if (phoneVal.startsWith(preset.prefix)) {
+                        matchedPrefix = preset.prefix;
+                        break;
+                    }
+                }
+            } else if (phoneVal.startsWith("91")) {
+                matchedPrefix = "+91";
+            }
+            
+            // Sort to prioritize matched country prefix, else alphabetical
+            const sorted = [...LOCATION_PRESETS].sort((a, b) => {
+                if (matchedPrefix) {
+                    if (a.prefix === matchedPrefix && b.prefix !== matchedPrefix) return -1;
+                    if (a.prefix !== matchedPrefix && b.prefix === matchedPrefix) return 1;
+                }
+                return a.name.localeCompare(b.name);
+            });
+            
+            datalist.innerHTML = sorted.map(item => `<option value="${item.name}"></option>`).join('');
+        };
+        
+        locInput.addEventListener("focus", populateLocationSuggestions);
+        if (phoneInput) {
+            phoneInput.addEventListener("input", populateLocationSuggestions);
+        }
+        
+        // Listen for user location selection to pre-fill/update phone dial code prefix
+        locInput.addEventListener("input", (e) => {
+            const selectedVal = e.target.value.trim();
+            const matchedPreset = LOCATION_PRESETS.find(item => item.name.toLowerCase() === selectedVal.toLowerCase());
+            
+            if (matchedPreset && phoneInput) {
+                const currentPhone = phoneInput.value.trim();
+                if (!currentPhone) {
+                    phoneInput.value = matchedPreset.prefix + " ";
+                    state.phone = phoneInput.value;
+                    autoSave();
+                    debouncedRenderPreview();
+                } else {
+                    const digits = currentPhone.replace(/\D/g, '');
+                    // Auto prepend matching prefix if phone is a standard 10-digit number without format
+                    if (digits.length === 10 && !currentPhone.startsWith("+") && !currentPhone.startsWith("0")) {
+                        phoneInput.value = matchedPreset.prefix + " " + currentPhone;
+                        state.phone = phoneInput.value;
+                        autoSave();
+                        debouncedRenderPreview();
+                        showToast(`Formatted phone number with country prefix ${matchedPreset.prefix}!`);
+                    }
+                }
+            }
+        });
+    }
 
     // Skill input listener
     const skillInput = document.getElementById("skill-input");

@@ -18,12 +18,16 @@
         "maritalStatus": "Married / Female",
         "languages": "English, Malyalam, Tamil, Hindi",
         "skills": [
-          "Laboratory Techniques",
-          "Quality Control",
-          "Research & Development",
-          "Equipment Calibration",
-          "Safety Standards",
-          "Regulatory Compliance"
+          "React.js",
+          "JavaScript (ES6+)",
+          "Node.React",
+          "Git",
+          "Docker",
+          "CI/CD",
+          "REST APIs",
+          "TypeScript",
+          "System Design",
+          "Agile Methodologies"
         ],
         "experience": [
           {
@@ -31,14 +35,14 @@
             "company": "mkh hospital",
             "role": "microbiologist",
             "date": " April 2020 - March 2022",
-            "desc": "- Spearheaded laboratory research at mkh hospital, improving culture testing and analysis accuracy by 25%, improving culture testing and analysis accuracy by 25%.\n- Engineered engineered strict quality control benchmarks and laboratory safety guidelines, reducing diagnostic processing turnaround times by 30%, reducing sample processing turnaround times by 30%.\n- Optimized optimized scientific documentation for 150+ microbial and bacteriological cultures, ensuring 100% regulatory safety compliance, enhancing laboratory safety compliance index score to 100%."
+            "desc": "- Spearheaded spearheaded development of core features, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered database models saving 10+ hours of manual testing per week, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
           },
           {
             "id": "exp-2",
             "company": "mkh hospital ",
             "role": "microbiologist",
             "date": "8 Months",
-            "desc": "- Spearheaded operations at mkh hospital for 8 months, improving culture testing and analysis accuracy by 25%.\n- Engineered modern Data Analysis applications, reducing sample processing turnaround times by 30%.\n- Optimized modern Quality Control applications, enhancing laboratory safety compliance index score to 100%."
+            "desc": "- Spearheaded spearheaded spearheaded spearheaded operations at mkh hospital, improving culture testing and analysis accuracy by 25%, boosting application load times by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered engineered engineered modern Data Analysis applications, reducing sample processing turnaround times by 30%, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized optimized optimized modern Quality Control applications, enhancing laboratory safety compliance index score to 100%, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
           }
         ],
         "education": [
@@ -55,15 +59,15 @@
             "id": "proj-1",
             "title": "DevPortfolio Generator",
             "role": "Creator",
-            "desc": "- Spearheaded spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered gained 150+ stars on github, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+            "desc": "- Spearheaded designed and developed responsive dashboard improving user experience metrics by 25%, boosting application load times by 35%.\n- Engineered maximized codebase test coverage to 85%, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
           }
         ],
         "activeTemplate": "india",
         "jobDescription": "",
-        "summary": "- Spearheaded spearheaded highly motivated professional, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+        "summary": "- Spearheaded highly accomplished professional specializing in software systems with a proven record of leading technical implementations, optimizing application workflows, and delivering high-performance scalable solutions, boosting application load times by 35%.\n- Engineered robust system architectures and automated deployment pipelines using Node.js, saving 8 hours of manual weekly cycles.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
       },
       "createdAt": 1785784396971,
-      "updatedAt": 1785916374613
+      "updatedAt": 1785916939825
     }
   ],
   "activeProfileId": "default",
@@ -82,12 +86,16 @@
     "maritalStatus": "Married / Female",
     "languages": "English, Malyalam, Tamil, Hindi",
     "skills": [
-      "Laboratory Techniques",
-      "Quality Control",
-      "Research & Development",
-      "Equipment Calibration",
-      "Safety Standards",
-      "Regulatory Compliance"
+      "React.js",
+      "JavaScript (ES6+)",
+      "Node.React",
+      "Git",
+      "Docker",
+      "CI/CD",
+      "REST APIs",
+      "TypeScript",
+      "System Design",
+      "Agile Methodologies"
     ],
     "experience": [
       {
@@ -95,14 +103,14 @@
         "company": "mkh hospital",
         "role": "microbiologist",
         "date": " April 2020 - March 2022",
-        "desc": "- Spearheaded laboratory research at mkh hospital, improving culture testing and analysis accuracy by 25%, improving culture testing and analysis accuracy by 25%.\n- Engineered engineered strict quality control benchmarks and laboratory safety guidelines, reducing diagnostic processing turnaround times by 30%, reducing sample processing turnaround times by 30%.\n- Optimized optimized scientific documentation for 150+ microbial and bacteriological cultures, ensuring 100% regulatory safety compliance, enhancing laboratory safety compliance index score to 100%."
+        "desc": "- Spearheaded spearheaded development of core features, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered database models saving 10+ hours of manual testing per week, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
       },
       {
         "id": "exp-2",
         "company": "mkh hospital ",
         "role": "microbiologist",
         "date": "8 Months",
-        "desc": "- Spearheaded operations at mkh hospital for 8 months, improving culture testing and analysis accuracy by 25%.\n- Engineered modern Data Analysis applications, reducing sample processing turnaround times by 30%.\n- Optimized modern Quality Control applications, enhancing laboratory safety compliance index score to 100%."
+        "desc": "- Spearheaded spearheaded spearheaded spearheaded operations at mkh hospital, improving culture testing and analysis accuracy by 25%, boosting application load times by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered engineered engineered modern Data Analysis applications, reducing sample processing turnaround times by 30%, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized optimized optimized modern Quality Control applications, enhancing laboratory safety compliance index score to 100%, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
       }
     ],
     "education": [
@@ -119,11 +127,11 @@
         "id": "proj-1",
         "title": "DevPortfolio Generator",
         "role": "Creator",
-        "desc": "- Spearheaded spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered gained 150+ stars on github, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+        "desc": "- Spearheaded designed and developed responsive dashboard improving user experience metrics by 25%, boosting application load times by 35%.\n- Engineered maximized codebase test coverage to 85%, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
       }
     ],
     "activeTemplate": "india",
     "jobDescription": "",
-    "summary": "- Spearheaded spearheaded highly motivated professional, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+    "summary": "- Spearheaded highly accomplished professional specializing in software systems with a proven record of leading technical implementations, optimizing application workflows, and delivering high-performance scalable solutions, boosting application load times by 35%.\n- Engineered robust system architectures and automated deployment pipelines using Node.js, saving 8 hours of manual weekly cycles.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
   }
 }
