@@ -1207,7 +1207,7 @@ function openAISkills() {
         <div id="ai-skills-result-card" class="ai-card" style="display:none;">
             <div class="ai-card-title"><i class="fa-solid fa-tags"></i> Recommended Additions</div>
             <p style="font-size: 0.78rem; color: var(--text-muted);">Click skills to add them to your resume:</p>
-            <div class="skills-list-preview" id="ai-skills-suggestions-list" style="margin: 8px 0; gap:8px;"></div>
+            <div class="ai-skills-list" id="ai-skills-suggestions-list"></div>
             <button class="ai-btn ai-btn-outline" style="width:100%" onclick="closeAIPanel()">Done</button>
         </div>
     `;
@@ -1218,33 +1218,28 @@ async function runAISkillsSuggestion() {
     const container = document.getElementById("ai-skills-suggestions-list");
     
     resultCard.style.display = "flex";
-    container.className = "skills-list-preview loading";
+    container.className = "ai-skills-list loading";
     container.innerHTML = '<div class="ai-spinner" style="margin:20px auto;"></div>';
 
     const suggestions = await AIService.suggestSkills(state.skills, state.targetJob);
     
-    container.className = "skills-list-preview";
+    container.className = "ai-skills-list";
     container.innerHTML = "";
     
     const items = suggestions.split(',').map(s => s.trim()).filter(s => s.length > 0);
     items.forEach(skill => {
         const span = document.createElement("span");
-        span.className = "skill-badge-preview";
-        span.style.cursor = "pointer";
-        span.style.background = "rgba(99,102,241,0.15)";
-        span.style.color = "#a5b4fc";
-        span.style.border = "1px solid rgba(99,102,241,0.3)";
-        span.style.transition = "transform 0.2s";
+        span.className = "ai-skill-badge";
         
-        span.innerHTML = `<i class="fa-solid fa-plus" style="font-size:0.6rem; margin-right:4px;"></i> ${skill}`;
+        span.innerHTML = `<i class="fa-solid fa-plus" style="font-size:0.65rem; margin-right:6px;"></i>${skill}`;
         span.onclick = () => {
             if (!state.skills.includes(skill)) {
                 state.skills.push(skill);
                 renderSkillsTags();
                 autoSave();
                 renderResumePreview();
-                span.style.opacity = "0.4";
-                span.style.pointerEvents = "none";
+                span.classList.add("added");
+                span.innerHTML = `<i class="fa-solid fa-check" style="font-size:0.65rem; margin-right:6px;"></i>${skill}`;
                 showToast(`Added ${skill}!`);
             }
         };

@@ -4078,3 +4078,67 @@ body.light-theme .ai-bullet-item:hover {
     color: var(--primary-dark) !important;
 }
 
+/* AI Skills suggestions drawer styling */
+.ai-skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0;
+    width: 100%;
+}
+
+.ai-skill-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(99, 102, 241, 0.12);
+    color: #c7d2fe;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-skill-badge:hover {
+    background: rgba(99, 102, 241, 0.25) !important;
+    border-color: rgba(99, 102, 241, 0.6) !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+body.light-theme .ai-skill-badge {
+    background: rgba(99, 102, 241, 0.06);
+    color: #3b82f6;
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+body.light-theme .ai-skill-badge:hover {
+    background: rgba(99, 102, 241, 0.12) !important;
+    border-color: #3b82f6 !important;
+    color: #1d4ed8 !important;
+}
+
+.ai-skill-badge:active {
+    transform: translateY(0);
+}
+
+.ai-skill-badge.added {
+    opacity: 0.6;
+    background: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    color: #34d399 !important;
+    pointer-events: none;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+body.light-theme .ai-skill-badge.added {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    color: #059669 !important;
+}
+
