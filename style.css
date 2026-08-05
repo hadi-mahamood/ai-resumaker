@@ -653,6 +653,26 @@ textarea {
     display: flex;
     align-items: center;
     gap: 6px;
+    cursor: text;
+    user-select: none;
+    transition: all var(--transition-fast);
+}
+
+.tag:hover {
+    background: rgba(99, 102, 241, 0.25);
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+.tag-edit-input {
+    border: none !important;
+    background: transparent !important;
+    color: inherit !important;
+    font-size: inherit !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    font-family: inherit !important;
 }
 
 .tag-remove {

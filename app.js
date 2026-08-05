@@ -346,16 +346,60 @@ function renderSkillsTags() {
     // Clear old tags
     container.querySelectorAll('.tag').forEach(t => t.remove());
 
-    state.skills.forEach(skill => {
+    state.skills.forEach((skill, index) => {
         const tag = document.createElement("div");
         tag.className = "tag";
-        tag.innerHTML = `${skill} <span class="tag-remove" onclick="removeSkill('${skill}')">&times;</span>`;
+        tag.title = "Double-click to edit";
+        tag.innerHTML = `<span class="tag-text">${skill}</span> <span class="tag-remove" onclick="removeSkill(${index})">&times;</span>`;
+        
+        tag.addEventListener("dblclick", (e) => {
+            if (e.target.classList.contains("tag-remove")) return;
+            
+            const textSpan = tag.querySelector(".tag-text");
+            if (!textSpan) return;
+            
+            const originalVal = textSpan.innerText;
+            const inputField = document.createElement("input");
+            inputField.type = "text";
+            inputField.value = originalVal;
+            inputField.className = "tag-edit-input";
+            inputField.style.width = `${Math.max(60, originalVal.length * 8)}px`;
+            
+            tag.replaceChild(inputField, textSpan);
+            inputField.focus();
+            
+            let saved = false;
+            const saveEdit = () => {
+                if (saved) return;
+                saved = true;
+                const newVal = inputField.value.trim();
+                if (newVal && newVal !== originalVal) {
+                    state.skills[index] = newVal;
+                    autoSave();
+                    renderResumePreview();
+                }
+                renderSkillsTags();
+            };
+            
+            inputField.addEventListener("keydown", (ev) => {
+                if (ev.key === "Enter") {
+                    ev.preventDefault();
+                    saveEdit();
+                } else if (ev.key === "Escape") {
+                    saved = true;
+                    renderSkillsTags();
+                }
+            });
+            
+            inputField.addEventListener("blur", saveEdit);
+        });
+        
         container.insertBefore(tag, input);
     });
 }
 
-function removeSkill(skill) {
-    state.skills = state.skills.filter(s => s !== skill);
+function removeSkill(index) {
+    state.skills.splice(index, 1);
     renderSkillsTags();
     autoSave();
     renderResumePreview();
@@ -1564,6 +1608,7 @@ window.renderResumePreview = renderResumePreview;
 window.resizeResumePreview = resizeResumePreview;
 window.showToast = showToast;
 window.autoSave = autoSave;
+window.removeSkill = removeSkill;
 window.toggleAccordion = toggleAccordion;
 window.expandAllAccordions = expandAllAccordions;
 window.collapseAllAccordions = collapseAllAccordions;
