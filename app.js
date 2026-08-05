@@ -400,6 +400,32 @@ function bindInputEvents() {
         };
         
         phoneInput.addEventListener("focus", populatePhoneSuggestions);
+        
+        phoneInput.addEventListener("input", (e) => {
+            const phoneVal = e.target.value.trim();
+            if (locInput && !locInput.value.trim()) {
+                const DEFAULT_CITIES = {
+                    "+91": "Malappuram, Kerala, India",
+                    "+1": "Seattle, WA, USA",
+                    "+44": "London, United Kingdom",
+                    "+971": "Dubai, United Arab Emirates",
+                    "+65": "Singapore, SG",
+                    "+49": "Berlin, Germany",
+                    "+61": "Sydney, NSW, Australia"
+                };
+                
+                for (let prefix in DEFAULT_CITIES) {
+                    if (phoneVal === prefix || phoneVal === prefix + " ") {
+                        locInput.value = DEFAULT_CITIES[prefix];
+                        state.location = locInput.value;
+                        autoSave();
+                        debouncedRenderPreview();
+                        showToast(`Set default location to ${DEFAULT_CITIES[prefix]} based on phone code!`);
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     // Skill input listener
