@@ -354,6 +354,54 @@ function bindInputEvents() {
         });
     }
 
+    // Create datalist elements dynamically for Phone Suggestions
+    let phoneDatalist = document.getElementById("phone-suggestions");
+    if (!phoneDatalist) {
+        phoneDatalist = document.createElement("datalist");
+        phoneDatalist.id = "phone-suggestions";
+        document.body.appendChild(phoneDatalist);
+    }
+    
+    if (phoneInput) {
+        phoneInput.setAttribute("list", "phone-suggestions");
+        
+        const populatePhoneSuggestions = () => {
+            const locVal = (locInput ? locInput.value.trim().toLowerCase() : "");
+            let matchedPrefix = "";
+            if (locVal) {
+                const matchedPreset = LOCATION_PRESETS.find(item => 
+                    locVal.includes(item.name.toLowerCase()) || 
+                    item.name.toLowerCase().includes(locVal)
+                );
+                if (matchedPreset) {
+                    matchedPrefix = matchedPreset.prefix;
+                }
+            }
+            
+            const PHONE_CODE_SUGGESTIONS = [
+                { code: "+91", label: "+91 (India)" },
+                { code: "+1", label: "+1 (USA / Canada)" },
+                { code: "+44", label: "+44 (United Kingdom)" },
+                { code: "+971", label: "+971 (UAE)" },
+                { code: "+65", label: "+65 (Singapore)" },
+                { code: "+49", label: "+49 (Germany)" },
+                { code: "+61", label: "+61 (Australia)" }
+            ];
+            
+            const sorted = [...PHONE_CODE_SUGGESTIONS].sort((a, b) => {
+                if (matchedPrefix) {
+                    if (a.code === matchedPrefix && b.code !== matchedPrefix) return -1;
+                    if (a.code !== matchedPrefix && b.code === matchedPrefix) return 1;
+                }
+                return 0;
+            });
+            
+            phoneDatalist.innerHTML = sorted.map(item => `<option value="${item.code}">${item.label}</option>`).join('');
+        };
+        
+        phoneInput.addEventListener("focus", populatePhoneSuggestions);
+    }
+
     // Skill input listener
     const skillInput = document.getElementById("skill-input");
     skillInput.addEventListener("keydown", (e) => {
