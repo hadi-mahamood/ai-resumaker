@@ -1272,48 +1272,10 @@ window.mockLocalOptimization = function(resumeState) {
                 ]
             };
             
-            const activeMetrics = metricsPool[category] || metricsPool["generic"];
-            const verbs = ["Spearheaded", "Engineered", "Optimized", "Architected", "Orchestrated"];
-            
-            let lines = (exp.desc || "").split(/[.\n]+/).map(l => l.trim().replace(/^[-•*]/, '').trim()).filter(l => l.length > 5);
-            let rewritten = [];
-            
-            for (let i = 0; i < Math.max(2, lines.length); i++) {
-                let line = lines[i] || `engineering and deploying modern ${state.targetJob || "software"} components`;
-                let verb = verbs[i % verbs.length];
-                let metric = activeMetrics[i % activeMetrics.length];
-                
-                let cleaned = line
-                    .replace(/^(\d+\s+(months?|years?|weeks?|days?)\s+(of\s+)?(experience\s+)?(worked\s+)?(as\s+a?)?)\s*/i, '')
-                    .replace(/^(worked\s+as\s+a?|working\s+as\s+a?|role\s+as\s+a?|position\s+as\s+a?|employed\s+as\s+a?|acted\s+as\s+a?)\s*/i, '')
-                    .replace(/^(I was|responsible for|helped to|worked on|developed|designed|managed|made|created|did)\s+/i, '')
-                    .replace(/^(maintaining|developing|building|coding|creating|managing|leading|writing|implementing|designing|testing|deploying|supporting|tuning|integrating|engineering)\s+(and\s+(maintaining|developing|building|coding|creating|managing|leading|writing|implementing|designing|testing|deploying|supporting|tuning|integrating|engineering)\s+)?/i, '')
-                    .trim();
-                
-                cleaned = cleaned.replace(/^(microbiologist|developer|engineer|analyst|designer|manager|owner|consultant|assistant|doctor|specialist|officer|administrator|scientist|teacher|professor|nurse|accountant|writer|editor|representative|agent|attorney|lawyer|practitioner|therapist|recruiter)\s+(in|at)\s+/i, (match, title, prep) => {
-                    let noun = "operations";
-                    title = title.toLowerCase();
-                    if (title.endsWith("developer") || title.endsWith("engineer")) noun = "development";
-                    if (title.endsWith("designer")) noun = "design";
-                    if (title.endsWith("analyst")) noun = "analysis";
-                    if (title.endsWith("manager") || title.endsWith("owner")) noun = "management";
-                    if (title.endsWith("writer") || title.endsWith("editor")) noun = "editorial projects";
-                    if (title.endsWith("teacher") || title.endsWith("professor")) noun = "instructional operations";
-                    if (title.endsWith("accountant")) noun = "accounting operations";
-                    if (title.endsWith("attorney") || title.endsWith("lawyer")) noun = "legal counsel";
-                    return `${noun} ${prep} `;
-                });
-                
-                if (cleaned.length < 3) {
-                    cleaned = `${state.targetJob || "system"} components`;
-                }
-                
-                cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
-                rewritten.push(`- ${verb} ${cleaned.charAt(0).toLowerCase() + cleaned.slice(1).replace(/[\.]+$/, '')}, ${metric}.`);
-            }
+            const rewrittenDesc = AIService.getOfflineRewriteMock(exp.desc || "", state.targetJob || "");
             optimized.optimizedExperience.push({
                 id: exp.id,
-                desc: rewritten.join("\n")
+                desc: rewrittenDesc
             });
         });
     }

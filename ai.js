@@ -207,29 +207,119 @@ const AIService = {
     getOfflineRewriteMock(text, jobTitle = "Software Engineer") {
         const category = this.detectCategory(jobTitle);
         const categorySkills = this.knowledgeBase.skills[category] || this.knowledgeBase.skills["generic"];
+        const categoryMetrics = this.knowledgeBase.metrics[category] || this.knowledgeBase.metrics["generic"];
         
-        if (!text || text.trim().length < 10) {
-            const skill1 = categorySkills[0] || "core features";
-            const skill2 = categorySkills[1] || "scalable systems";
-            const skill3 = categorySkills[2] || "performance modules";
-            return `- Spearheaded design and integration of ${skill1} modules, boosting application load times by 35%.\n- Collaborated with engineering leads to deploy ${skill2} architectures.\n- Optimized codebase configurations and ${skill3} pipelines, reducing system latency by 25%.`;
+        const cleanText = (text || "").toLowerCase();
+        
+        // Find entities in the user text to weave in dynamically (like company name or location)
+        let hospitalMatch = text.match(/(in|at|for)\s+([A-Z0-9][a-zA-Z0-9\s]+Hospital|[A-Z][a-zA-Z\s]+diagnostics?|[A-Z][a-zA-Z\s]+Clinic|[A-Z][a-zA-Z0-9\s]+(Inc|LLC|Corp|Holdings|Group|Company|Technologies|Solutions|Ltd|University))/i);
+        let placeName = hospitalMatch ? hospitalMatch[0].trim() : "";
+        if (!placeName) {
+            let matchAt = text.match(/(in|at|for)\s+([A-Z][a-zA-Z0-9\s]{3,30})/);
+            placeName = matchAt ? matchAt[0].trim() : "";
         }
-
+        
+        // Let's create tailored outputs based on category AND parsed text!
+        let templates = [];
+        
+        if (category === "science" || category === "healthcare") {
+            const facility = placeName || "clinical facility";
+            templates = [
+                `Spearheaded culture testing, clinical analysis, and diagnostic procedures ${facility}, improving analysis accuracy by 25%.`,
+                `Engineered strict quality control benchmarks and laboratory safety guidelines, reducing diagnostic processing turnaround times by 30%.`,
+                `Optimized scientific documentation for 150+ microbial and bacteriological cultures, ensuring 100% regulatory safety compliance.`
+            ];
+        } else if (category === "software" || category === "web" || category === "data") {
+            const org = placeName || "development teams";
+            const tech1 = categorySkills[0] || "React";
+            const tech2 = categorySkills[1] || "Node.js";
+            const tech3 = categorySkills[2] || "SQL";
+            templates = [
+                `Spearheaded design and end-to-end integration of ${tech1}-based application modules ${org}, boosting load performance by 35%.`,
+                `Engineered robust system architectures and automated deployment pipelines using ${tech2}, saving 8 hours of manual weekly cycles.`,
+                `Optimized database query configurations and ${tech3} schemas, resulting in a 42% reduction in production downtime.`
+            ];
+        } else if (category === "finance") {
+            const org = placeName || "finance departments";
+            templates = [
+                `Spearheaded comprehensive financial auditing and budget forecast reviews ${org}, improving forecasting accuracy metrics by 15%.`,
+                `Engineered structured financial models and Excel cost trackers, identifying cost-saving opportunities of $50K annually.`,
+                `Optimized general ledger audits and asset accounts, reconciling discrepancies to achieve 99.8% balance sheet accuracy.`
+            ];
+        } else if (category === "sales" || category === "marketing") {
+            const org = placeName || "regional sales channels";
+            templates = [
+                `Spearheaded client expansion initiatives and promotional campaigns ${org}, boosting lead conversion ratios by 24%.`,
+                `Engineered and executed digital marketing campaigns using CRM tools, maximizing campaign click-through rates (CTR) by 2.4x.`,
+                `Optimized customer onboarding funnels, securing 12 new high-value client contracts and increasing retention by 15%.`
+            ];
+        } else if (category === "support") {
+            const org = placeName || "customer service teams";
+            templates = [
+                `Spearheaded customer query troubleshooting and support tickets ${org}, resolving queries to boost CSAT ratings to 96%.`,
+                `Engineered SLA response protocols and support queues using ticketing systems (Zendesk), reducing ticket resolution times by 30%.`,
+                `Optimized escalations and client communication logs, reducing escalation rates by 12% through first-contact resolution.`
+            ];
+        } else if (category === "legal") {
+            const org = placeName || "legal counsel teams";
+            templates = [
+                `Spearheaded thorough legal research, case file reviews, and document auditing ${org}, reducing review turnaround times by 25%.`,
+                `Engineered regulatory compliance policies and draft agreement reviews, mitigating legal risk exposure metrics by 35%.`,
+                `Optimized vendor agreement negotiations and contract workflows, managing a caseload of 40+ active files with 100% deadlines met.`
+            ];
+        } else if (category === "education") {
+            const org = placeName || "instructional departments";
+            templates = [
+                `Spearheaded student curriculum design, lesson planning, and interactive lectures ${org}, improving student test scores by 14%.`,
+                `Engineered innovative instructional methodologies and educational technology integrations, enhancing classroom participation by 25%.`,
+                `Optimized parent communication lines and student evaluations, achieving a 98% positive satisfaction rating on feedback surveys.`
+            ];
+        } else if (category === "hr") {
+            const org = placeName || "talent acquisition groups";
+            templates = [
+                `Spearheaded talent acquisition cycles and candidate sourcing pipelines ${org}, reducing average time-to-hire by 18%.`,
+                `Engineered comprehensive employee onboarding manuals and training guidelines, improving onboarding satisfaction to 95%.`,
+                `Optimized performance evaluation frameworks and employee relations initiatives, reducing voluntary staff turnover by 12%.`
+            ];
+        } else if (category === "writing") {
+            const org = placeName || "editorial publications";
+            templates = [
+                `Spearheaded content creation and search engine optimization (SEO) copywriting ${org}, boosting site organic traffic by 40%.`,
+                `Engineered brand copy strategies and social media marketing plans, increasing overall reader engagement metrics by 35%.`,
+                `Optimized publication editing workflows and copy reviews, delivering 20+ articles ahead of strict editorial deadlines.`
+            ];
+        } else {
+            const org = placeName || "corporate operations";
+            templates = [
+                `Spearheaded operations and team leadership initiatives ${org}, increasing productivity by 15% through workflow automation.`,
+                `Engineered cross-department communication protocols and trackers, saving 8 hours of manual tracking work per week.`,
+                `Optimized project resource allocation strategies, delivering critical deliverables 2 weeks ahead of schedule.`
+            ];
+        }
+        
+        // If the user's description is very short, return templates directly
+        if (cleanText.length < 15) {
+            return templates.map(t => `- ${t}`).join('\n');
+        }
+        
         let lines = text.split(/[.\n]+/).map(l => l.trim()).filter(l => l.length > 5);
         let rewrittenLines = [];
         let usedVerbs = new Set();
         let usedMetrics = new Set();
-
-        const categoryMetrics = this.knowledgeBase.metrics[category] || this.knowledgeBase.metrics["generic"];
-
+        
         for (let i = 0; i < Math.min(3, Math.max(3, lines.length)); i++) {
-            let line = lines[i] || `maintaining and developing modern ${categorySkills[i % categorySkills.length] || "software"} applications`;
+            let line = lines[i];
+            if (!line) {
+                rewrittenLines.push(`- ${templates[i % templates.length]}`);
+                continue;
+            }
+            
             let verb = this.knowledgeBase.verbs.find(v => !usedVerbs.has(v)) || this.knowledgeBase.verbs[Math.floor(Math.random() * this.knowledgeBase.verbs.length)];
             usedVerbs.add(verb);
             
             let metric = categoryMetrics.find(m => !usedMetrics.has(m)) || categoryMetrics[Math.floor(Math.random() * categoryMetrics.length)];
             usedMetrics.add(metric);
-
+            
             let cleanLine = line
                 .replace(/^(\d+\s+(months?|years?|weeks?|days?)\s+(of\s+)?(experience\s+)?(worked\s+)?(as\s+a?)?)\s*/i, '')
                 .replace(/^(worked\s+as\s+a?|working\s+as\s+a?|role\s+as\s+a?|position\s+as\s+a?|employed\s+as\s+a?|acted\s+as\s+a?)\s*/i, '')
@@ -252,15 +342,16 @@ const AIService = {
                 return `${noun} ${prep} `;
             });
             
-            if (cleanLine.length < 3) {
-                cleanLine = `${categorySkills[i % categorySkills.length] || "system"} assets`;
+            if (cleanLine.length < 5) {
+                rewrittenLines.push(`- ${templates[i % templates.length]}`);
+                continue;
             }
             
             cleanLine = cleanLine.charAt(0).toUpperCase() + cleanLine.slice(1);
-
             let bullet = `- ${verb} ${cleanLine.charAt(0).toLowerCase() + cleanLine.slice(1).replace(/[\.]+$/, '')}, ${metric}.`;
             rewrittenLines.push(bullet);
         }
+        
         return rewrittenLines.join('\n');
     },
 
