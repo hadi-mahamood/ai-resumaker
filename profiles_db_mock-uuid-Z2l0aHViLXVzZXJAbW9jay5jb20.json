@@ -35,8 +35,8 @@
         "experience": [
           {
             "id": "exp-1",
-            "company": "Janatha Diagnostics",
-            "role": " Microbiologist",
+            "company": "mkh hospital",
+            "role": "microbiologist",
             "date": " April 2020 - March 2022",
             "desc": "Worked as a micro biologist in Janatha diagnostics From April 2020-march 2022"
           },
@@ -70,7 +70,7 @@
         "summary": "- Spearheaded spearheaded highly motivated professional, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
       },
       "createdAt": 1785784396971,
-      "updatedAt": 1785911939301
+      "updatedAt": 1785912576546
     }
   ],
   "activeProfileId": "default",
@@ -106,8 +106,8 @@
     "experience": [
       {
         "id": "exp-1",
-        "company": "Janatha Diagnostics",
-        "role": " Microbiologist",
+        "company": "mkh hospital",
+        "role": "microbiologist",
         "date": " April 2020 - March 2022",
         "desc": "Worked as a micro biologist in Janatha diagnostics From April 2020-march 2022"
       },

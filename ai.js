@@ -43,6 +43,7 @@ const AIService = {
             "design": ["Figma", "Adobe Creative Suite", "UI/UX Design", "Wireframing", "Prototyping", "User Research", "Information Architecture", "Design Systems", "HTML/CSS Basics", "Interaction Design", "Creative Thinking", "Communication"],
             "product": ["Product Roadmap", "User Personas", "Agile/Scrum", "Market Research", "Jira/Confluence", "Data Analytics", "A/B Testing", "Stakeholder Management", "Product Lifecycle", "Strategic Planning", "Leadership"],
             "marketing": ["SEO/SEM", "Google Analytics", "Content Strategy", "Copywriting", "Social Media Marketing", "Email Campaigns", "A/B Testing", "Brand Management", "Market Analysis", "CRM Tools (HubSpot)", "Creativity"],
+            "science": ["Laboratory Techniques", "Data Analysis", "Quality Control", "Research & Development", "Scientific Writing", "Regulatory Compliance", "Safety Standards", "Critical Thinking", "Troubleshooting", "Equipment Calibration", "Detail Oriented", "Experimental Design"],
             "generic": ["Project Management", "Team Leadership", "Strategic Planning", "Communication", "Problem Solving", "Time Management", "Critical Thinking", "Adaptability", "Collaboration", "Customer Relations"]
         },
         
@@ -88,6 +89,7 @@ const AIService = {
             if (title.includes("web") || title.includes("frontend")) return "web";
             return "software";
         }
+        if (title.includes("bio") || title.includes("micro") || title.includes("chem") || title.includes("medical") || title.includes("clinical") || title.includes("science") || title.includes("lab")) return "science";
         if (title.includes("data") || title.includes("analyst") || title.includes("science") || title.includes("ml") || title.includes("ai")) return "data";
         if (title.includes("design") || title.includes("ux") || title.includes("ui") || title.includes("product designer")) return "design";
         if (title.includes("product") || title.includes("manager") || title.includes("owner")) return "product";
@@ -211,7 +213,7 @@ const AIService = {
         if (this.activeProvider === "webgpu") {
             result = await this.callWebGPULLM(prompt, chunkCallback);
         } else if (this.activeProvider === "gemini") {
-            result = await this.callGeminiAPI(prompt, chunkCallback);
+            result = await this.callGeminiAPI(prompt, chunkCallback, text, jobTitle);
         } else {
             const mock = this.getOfflineRewriteMock(text, jobTitle);
             result = await this.simulateStreaming(mock, chunkCallback);
@@ -235,7 +237,7 @@ const AIService = {
         if (this.activeProvider === "webgpu") {
             result = await this.callWebGPULLM(prompt, onChunk);
         } else if (this.activeProvider === "gemini") {
-            result = await this.callGeminiAPI(prompt, onChunk);
+            result = await this.callGeminiAPI(prompt, onChunk, "", jobTitle);
         } else {
             const mock = this.getOfflineSkillsMock(jobTitle, existingSkills);
             result = await this.simulateStreaming(mock, onChunk);
@@ -277,7 +279,7 @@ Structure requirements:
         if (this.activeProvider === "webgpu") {
             result = await this.callWebGPULLM(prompt, onChunk);
         } else if (this.activeProvider === "gemini") {
-            result = await this.callGeminiAPI(prompt, onChunk);
+            result = await this.callGeminiAPI(prompt, onChunk, "", role);
         } else {
             const mock = this.getOfflineCoverLetterMock(resumeData);
             result = await this.simulateStreaming(mock, onChunk);
@@ -290,7 +292,7 @@ Structure requirements:
     /**
      * Gemini API Client Call
      */
-    async callGeminiAPI(promptText, onChunk) {
+    async callGeminiAPI(promptText, onChunk, originalText = "", jobTitle = "") {
         try {
             const headers = {
                 'Content-Type': 'application/json'
@@ -315,7 +317,7 @@ Structure requirements:
             return await this.simulateStreaming(text, onChunk);
         } catch (error) {
             console.error("Gemini Proxy API call failed: ", error);
-            const fallback = await this.offlineFallback(promptText);
+            const fallback = await this.offlineFallback(promptText, onChunk, originalText, jobTitle);
             return await this.simulateStreaming(fallback, onChunk);
         }
     },
@@ -437,20 +439,25 @@ Structure requirements:
     /**
      * Basic prompt parser for offline fallback with simulation support
      */
-    async offlineFallback(prompt, onChunk) {
+    async offlineFallback(prompt, onChunk, originalText = "", jobTitle = "") {
         const p = (prompt || "").toLowerCase();
         let res = "";
+        
+        const activeState = window.state || (typeof state !== "undefined" ? state : null);
+        const activeJob = jobTitle || (activeState ? activeState.targetJob : "") || "Software Developer";
+        
         if (p.includes("rewrite")) {
-            res = this.getOfflineRewriteMock("Sample developer description");
+            const textToRewrite = originalText || "Sample description";
+            res = this.getOfflineRewriteMock(textToRewrite, activeJob);
         } else if (p.includes("cover letter")) {
-            const activeState = window.state || (typeof state !== "undefined" ? state : null);
             if (activeState) {
                 res = this.getOfflineCoverLetterMock(activeState);
             } else {
                 res = "Dear Hiring Manager,\n\nI am writing to apply for the position...";
             }
         } else if (p.includes("recommend") || p.includes("suggest") || p.includes("skill")) {
-            res = this.getOfflineSkillsMock("Software Developer");
+            const currentSkills = activeState ? (activeState.skills || []) : [];
+            res = this.getOfflineSkillsMock(activeJob, currentSkills);
         } else {
             res = "Sincerely,\nJohn Doe";
         }
