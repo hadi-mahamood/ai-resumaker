@@ -206,7 +206,7 @@ function setFormFields() {
     if (document.getElementById("input-dob")) document.getElementById("input-dob").value = state.dob || "";
     if (document.getElementById("input-nationality")) document.getElementById("input-nationality").value = state.nationality || "";
     if (document.getElementById("input-visa")) document.getElementById("input-visa").value = state.visaStatus || "";
-    if (document.getElementById("input-marital")) document.getElementById("input-marital").value = state.maritalStatus || "";
+    if (window.loadMaritalGenderSelects) window.loadMaritalGenderSelects();
     if (window.renderLanguagesTags) window.renderLanguagesTags();
     
     // Auto-calculate keywords match for current profile
@@ -275,8 +275,7 @@ function bindInputEvents() {
         { id: "input-website", key: "website" },
         { id: "input-dob", key: "dob" },
         { id: "input-nationality", key: "nationality" },
-        { id: "input-visa", key: "visaStatus" },
-        { id: "input-marital", key: "maritalStatus" }
+        { id: "input-visa", key: "visaStatus" }
     ];
 
     textInputs.forEach(item => {
@@ -564,6 +563,58 @@ function showToast(message, type = 'success') {
 /* ==========================================
    DYNAMIC LIST RENDERERS & BUILDERS
    ========================================== */
+
+function loadMaritalGenderSelects() {
+    const maritalSelect = document.getElementById("select-marital-status");
+    const genderSelect = document.getElementById("select-gender-status");
+    if (!maritalSelect || !genderSelect) return;
+    
+    const val = state.maritalStatus || "";
+    if (val.includes(" / ")) {
+        const parts = val.split(" / ").map(p => p.trim());
+        maritalSelect.value = parts[0] || "";
+        genderSelect.value = parts[1] || "";
+    } else {
+        const maritalOptions = ["Single", "Married", "Divorced", "Widowed"];
+        const genderOptions = ["Male", "Female", "Non-binary", "Other", "Prefer not to say"];
+        if (maritalOptions.includes(val)) {
+            maritalSelect.value = val;
+            genderSelect.value = "";
+        } else if (genderOptions.includes(val)) {
+            maritalSelect.value = "";
+            genderSelect.value = val;
+        } else {
+            maritalSelect.value = "";
+            genderSelect.value = "";
+        }
+    }
+}
+
+function updateMaritalGenderCombined() {
+    const maritalSelect = document.getElementById("select-marital-status");
+    const genderSelect = document.getElementById("select-gender-status");
+    if (!maritalSelect || !genderSelect) return;
+    
+    const marital = maritalSelect.value;
+    const gender = genderSelect.value;
+    
+    if (marital && gender) {
+        state.maritalStatus = `${marital} / ${gender}`;
+    } else if (marital) {
+        state.maritalStatus = marital;
+    } else if (gender) {
+        state.maritalStatus = gender;
+    } else {
+        state.maritalStatus = "";
+    }
+    
+    updateSidebarBadges();
+    autoSave();
+    debouncedRenderPreview();
+}
+
+window.loadMaritalGenderSelects = loadMaritalGenderSelects;
+window.updateMaritalGenderCombined = updateMaritalGenderCombined;
 
 // Languages Tags builder
 function renderLanguagesTags() {
