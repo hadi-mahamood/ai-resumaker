@@ -1655,6 +1655,7 @@ window.closeATSModal = closeATSModal;
 window.openATSModal = openATSModal;
 window.openAIEngine = openAIEngine;
 window.openAISkills = openAISkills;
+window.runAISkillsSuggestion = runAISkillsSuggestion;
 window.openAICoverLetter = openAICoverLetter;
 window.runAICoverLetter = runAICoverLetter;
 window.applyExperienceRewrite = applyExperienceRewrite;

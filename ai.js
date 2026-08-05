@@ -454,7 +454,7 @@ const AIService = {
      * AI Skill Suggester
      */
     async suggestSkills(existingSkills, jobTitle, onChunk) {
-        const cacheKey = `skills_${btoa(unescape(encodeURIComponent(jobTitle + "_" + existingSkills.join(',')))).slice(0, 100)}`;
+        const cacheKey = `skills_v28_${btoa(unescape(encodeURIComponent(jobTitle + "_" + existingSkills.join(',')))).slice(0, 100)}`;
         const cached = this.getCache(cacheKey);
         if (cached) return await this.simulateStreaming(cached, onChunk);
 
