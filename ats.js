@@ -11,7 +11,9 @@
 
 // Delegate global saveState helper to autoSave if defined, otherwise fall back to localStorage
 window.saveState = function() {
-    if (typeof autoSave === "function") {
+    if (typeof window.autoSave === "function") {
+        window.autoSave();
+    } else if (typeof autoSave === "function") {
         autoSave();
     } else {
         localStorage.setItem('resumake_state', JSON.stringify(state));

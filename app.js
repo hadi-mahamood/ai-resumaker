@@ -1461,6 +1461,7 @@ window.formatMultiline = formatMultiline;
 window.renderResumePreview = renderResumePreview;
 window.resizeResumePreview = resizeResumePreview;
 window.showToast = showToast;
+window.autoSave = autoSave;
 window.toggleAccordion = toggleAccordion;
 window.expandAllAccordions = expandAllAccordions;
 window.collapseAllAccordions = collapseAllAccordions;
