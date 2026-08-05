@@ -1159,16 +1159,21 @@ window.mockLocalOptimization = function(resumeState) {
             let rewritten = [];
             
             for (let i = 0; i < Math.max(2, lines.length); i++) {
-                let line = lines[i] || "Responsible for maintaining and developing modern software modules.";
+                let line = lines[i] || `engineering and deploying modern ${state.targetJob || "software"} components`;
                 let verb = verbs[i % verbs.length];
                 let metric = metrics[i % metrics.length];
                 
                 let cleaned = line
                     .replace(/^(I was|responsible for|helped to|worked on|developed|designed|managed|made|created|did)\s+/i, '')
+                    .replace(/^(maintaining|developing|building|coding|creating|managing|leading|writing|implementing|designing|testing|deploying|supporting|tuning|integrating|engineering)\s+(and\s+(maintaining|developing|building|coding|creating|managing|leading|writing|implementing|designing|testing|deploying|supporting|tuning|integrating|engineering)\s+)?/i, '')
                     .trim();
                 
+                if (cleaned.length < 3) {
+                    cleaned = `${state.targetJob || "system"} components`;
+                }
+                
                 cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
-                rewritten.push(`- ${verb} ${cleaned.toLowerCase().replace(/[\.]+$/, '')}, ${metric}.`);
+                rewritten.push(`- ${verb} ${cleaned.charAt(0).toLowerCase() + cleaned.slice(1).replace(/[\.]+$/, '')}, ${metric}.`);
             }
             optimized.optimizedExperience.push({
                 id: exp.id,

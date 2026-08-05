@@ -96,9 +96,15 @@ const AIService = {
     },
 
     // Helper to generate offline experience rewrites without recursion
-    getOfflineRewriteMock(text) {
+    getOfflineRewriteMock(text, jobTitle = "Software Engineer") {
+        const category = this.detectCategory(jobTitle);
+        const categorySkills = this.knowledgeBase.skills[category] || this.knowledgeBase.skills["generic"];
+        
         if (!text || text.trim().length < 10) {
-            return "- Spearheaded development of core product features, improving system performance and usability.\n- Collaborated with cross-functional teams to design and deploy scalable architectures.\n- Optimized data pipelines and code structures, reducing average load times by 25%.";
+            const skill1 = categorySkills[0] || "core features";
+            const skill2 = categorySkills[1] || "scalable systems";
+            const skill3 = categorySkills[2] || "performance modules";
+            return `- Spearheaded design and integration of ${skill1} modules, boosting application load times by 35%.\n- Collaborated with engineering leads to deploy ${skill2} architectures.\n- Optimized codebase configurations and ${skill3} pipelines, reducing system latency by 25%.`;
         }
 
         let lines = text.split(/[.\n]+/).map(l => l.trim()).filter(l => l.length > 5);
@@ -107,7 +113,7 @@ const AIService = {
         let usedMetrics = new Set();
 
         for (let i = 0; i < Math.min(3, Math.max(3, lines.length)); i++) {
-            let line = lines[i] || "Responsible for maintaining and developing software applications.";
+            let line = lines[i] || `maintaining and developing modern ${categorySkills[i % categorySkills.length] || "software"} applications`;
             let verb = this.knowledgeBase.verbs.find(v => !usedVerbs.has(v)) || this.knowledgeBase.verbs[Math.floor(Math.random() * this.knowledgeBase.verbs.length)];
             usedVerbs.add(verb);
             
@@ -116,12 +122,17 @@ const AIService = {
 
             let cleanLine = line
                 .replace(/^(I was|responsible for|helped to|worked on|developed|designed|managed|made|created|did)\s+/i, '')
+                .replace(/^(maintaining|developing|building|coding|creating|managing|leading|writing|implementing|designing|testing|deploying|supporting|tuning|integrating|engineering)\s+(and\s+(maintaining|developing|building|coding|creating|managing|leading|writing|implementing|designing|testing|deploying|supporting|tuning|integrating|engineering)\s+)?/i, '')
                 .replace(/^\-/, '')
                 .trim();
             
+            if (cleanLine.length < 3) {
+                cleanLine = `${categorySkills[i % categorySkills.length] || "system"} assets`;
+            }
+            
             cleanLine = cleanLine.charAt(0).toUpperCase() + cleanLine.slice(1);
 
-            let bullet = `- ${verb} ${cleanLine.toLowerCase().replace(/[\.]+$/, '')}, ${metric}.`;
+            let bullet = `- ${verb} ${cleanLine.charAt(0).toLowerCase() + cleanLine.slice(1).replace(/[\.]+$/, '')}, ${metric}.`;
             rewrittenLines.push(bullet);
         }
         return rewrittenLines.join('\n');
@@ -202,7 +213,7 @@ const AIService = {
         } else if (this.activeProvider === "gemini") {
             result = await this.callGeminiAPI(prompt, chunkCallback);
         } else {
-            const mock = this.getOfflineRewriteMock(text);
+            const mock = this.getOfflineRewriteMock(text, jobTitle);
             result = await this.simulateStreaming(mock, chunkCallback);
         }
         

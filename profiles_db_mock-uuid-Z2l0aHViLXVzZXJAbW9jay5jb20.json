@@ -4,19 +4,19 @@
       "id": "default",
       "name": "Default Profile",
       "resumeData": {
-        "targetJob": "cloud engineering",
+        "targetJob": "MICROBIOLOGIST",
         "targetCountry": "IN",
-        "name": "hadi",
-        "title": "Full Stack Software Engineer",
-        "email": "alex.mercer@dev.io",
-        "phone": "+1 (555) 321-9876",
-        "location": "Seattle, WA",
-        "website": "github.com/alex-mercer",
-        "dob": "12 Oct 1998",
+        "name": "AHSANA P",
+        "title": "MICROBIOLOGIST",
+        "email": "ahsanasinu0506@gmail.com",
+        "phone": "9747229917",
+        "location": "Tirurangadi, Malappuram",
+        "website": "",
+        "dob": "",
         "nationality": "Indian",
-        "visaStatus": "Employment Visa (GCC Eligible)",
-        "maritalStatus": "Single / Male",
-        "languages": "English (Native), Hindi (Native), Arabic (Basic)",
+        "visaStatus": "",
+        "maritalStatus": "Married / Female",
+        "languages": "English, Malyalam, Tamil, Hindi",
         "skills": [
           "React.js",
           "JavaScript (ES6+)",
@@ -29,22 +29,23 @@
           "CI/CD",
           "TypeScript",
           "System Design",
-          "Agile Methodologies"
+          "Agile Methodologies",
+          "microbiologist"
         ],
         "experience": [
           {
             "id": "exp-1",
-            "company": "TechNova Solutions",
-            "role": "Software Engineer",
-            "date": "Jan 2024 - Present",
-            "desc": "- Spearheaded spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered collaborated with 5 engineers to design rest api endpoints and integrate them with react ui, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+            "company": "Janatha Diagnostics",
+            "role": " Microbiologist",
+            "date": " April 2020 - March 2022",
+            "desc": "Worked as a micro biologist in Janatha diagnostics From April 2020-march 2022"
           },
           {
             "id": "exp-2",
-            "company": "Quantum Code Inc",
-            "role": "Junior Web Developer",
-            "date": "Jun 2022 - Dec 2023",
-            "desc": "- Spearheaded spearheaded developed and maintained robust websites for client projects using javascript, html, and css, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+            "company": " MKH Hospital ",
+            "role": " Microbiologist",
+            "date": "8 Months",
+            "desc": "8 Months worked  as a microbiologist in MKH Hospital Tirurangadi"
           }
         ],
         "education": [
@@ -69,24 +70,24 @@
         "summary": "- Spearheaded spearheaded highly motivated professional, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered maintaining and developing software applications, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized maintaining and developing software applications, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
       },
       "createdAt": 1785784396971,
-      "updatedAt": 1785861939891
+      "updatedAt": 1785911939301
     }
   ],
   "activeProfileId": "default",
   "resumeData": {
-    "targetJob": "cloud engineering",
+    "targetJob": "MICROBIOLOGIST",
     "targetCountry": "IN",
-    "name": "hadi",
-    "title": "Full Stack Software Engineer",
-    "email": "alex.mercer@dev.io",
-    "phone": "+1 (555) 321-9876",
-    "location": "Seattle, WA",
-    "website": "github.com/alex-mercer",
-    "dob": "12 Oct 1998",
+    "name": "AHSANA P",
+    "title": "MICROBIOLOGIST",
+    "email": "ahsanasinu0506@gmail.com",
+    "phone": "9747229917",
+    "location": "Tirurangadi, Malappuram",
+    "website": "",
+    "dob": "",
     "nationality": "Indian",
-    "visaStatus": "Employment Visa (GCC Eligible)",
-    "maritalStatus": "Single / Male",
-    "languages": "English (Native), Hindi (Native), Arabic (Basic)",
+    "visaStatus": "",
+    "maritalStatus": "Married / Female",
+    "languages": "English, Malyalam, Tamil, Hindi",
     "skills": [
       "React.js",
       "JavaScript (ES6+)",
@@ -99,22 +100,23 @@
       "CI/CD",
       "TypeScript",
       "System Design",
-      "Agile Methodologies"
+      "Agile Methodologies",
+      "microbiologist"
     ],
     "experience": [
       {
         "id": "exp-1",
-        "company": "TechNova Solutions",
-        "role": "Software Engineer",
-        "date": "Jan 2024 - Present",
-        "desc": "- Spearheaded spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered collaborated with 5 engineers to design rest api endpoints and integrate them with react ui, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+        "company": "Janatha Diagnostics",
+        "role": " Microbiologist",
+        "date": " April 2020 - March 2022",
+        "desc": "Worked as a micro biologist in Janatha diagnostics From April 2020-march 2022"
       },
       {
         "id": "exp-2",
-        "company": "Quantum Code Inc",
-        "role": "Junior Web Developer",
-        "date": "Jun 2022 - Dec 2023",
-        "desc": "- Spearheaded spearheaded developed and maintained robust websites for client projects using javascript, html, and css, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+        "company": " MKH Hospital ",
+        "role": " Microbiologist",
+        "date": "8 Months",
+        "desc": "8 Months worked  as a microbiologist in MKH Hospital Tirurangadi"
       }
     ],
     "education": [
