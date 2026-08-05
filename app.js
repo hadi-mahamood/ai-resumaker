@@ -686,6 +686,8 @@ function renderResumePreview() {
     resizeResumePreview();
     // Setup contenteditable attributes on personal fields
     makePreviewSheetEditable();
+    // Apply user chosen typography metrics
+    if (window.applyLayoutMetrics) window.applyLayoutMetrics();
 }
 
 function setNestedValue(obj, path, value) {
@@ -1038,6 +1040,19 @@ function openAIEngine(expId) {
 
     openAIPanel("AI Bullet Optimization");
     
+    // Generate pre-written suggestions from database based on target job classification
+    const category = AIService.detectCategory(state.targetJob || "");
+    const skills = AIService.knowledgeBase.skills[category] || [];
+    const metrics = AIService.knowledgeBase.metrics[category] || [];
+    
+    const examples = [
+        `Spearheaded development of core ${skills[0] || "product"} features, ${metrics[0] || "improving performance"}.`,
+        `Engineered and integrated robust ${skills[1] || "system"} modules, ${metrics[1] || "saving manual effort"}.`,
+        `Optimized database structures and ${skills[2] || "data"} pipelines, ${metrics[2] || "reducing crash rates"}.`,
+        `Collaborated with cross-functional teams using ${skills[3] || "Agile"} methodologies, ${metrics[3] || "accelerating delivery"}.`,
+        `Led implementation of scalable ${skills[4] || "architecture"} strategies, ${metrics[4] || "improving productivity"}.`
+    ];
+
     const body = document.getElementById("ai-panel-body");
     body.innerHTML = `
         <div class="ai-card">
@@ -1058,6 +1073,18 @@ function openAIEngine(expId) {
             <button class="btn btn-primary" style="justify-content:center; margin-top: 8px;" onclick="runAIEperienceRewrite('${expId}')">
                 <i class="fa-solid fa-wand-magic"></i> Generate Optimization
             </button>
+        </div>
+        
+        <div class="ai-card" style="margin-top: 10px;">
+            <div class="ai-card-title"><i class="fa-solid fa-lightbulb"></i> Job-Specific Pre-Written Bullets</div>
+            <p style="font-size:0.72rem; color:var(--text-secondary); margin-bottom:8px;">Click any bullet to instantly append it to your current description:</p>
+            <div class="ai-bullet-suggestions-list" style="display:flex; flex-direction:column; gap:8px; max-height:160px; overflow-y:auto; padding-right:4px;">
+                ${examples.map(ex => `
+                    <div class="ai-bullet-item" onclick="document.getElementById('ai-rewrite-input').value += (document.getElementById('ai-rewrite-input').value ? '\\n' : '') + '- ${ex}'; window.showToast('Bullet appended!')" style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:6px; padding:8px 10px; font-size:0.75rem; color:var(--text-secondary); cursor:pointer;">
+                        - ${ex}
+                    </div>
+                `).join('')}
+            </div>
         </div>
         
         <div id="ai-rewrite-result-card" class="ai-card" style="display:none; flex-direction: column; gap: 8px;">
@@ -1455,6 +1482,81 @@ document.addEventListener("click", (e) => {
     }
 });
 
+// Typography & Layout custom variable state management
+let layoutState = {
+    fontSize: 11,
+    lineHeight: 1.4,
+    padding: 60
+};
+
+if (localStorage.getItem('resumake_layout')) {
+    try {
+        layoutState = JSON.parse(localStorage.getItem('resumake_layout'));
+    } catch(e) {}
+}
+
+function applyLayoutMetrics() {
+    const sheets = document.querySelectorAll(".resume-sheet");
+    sheets.forEach(sheet => {
+        sheet.style.setProperty("--resume-font-size", `${layoutState.fontSize}px`);
+        sheet.style.setProperty("--resume-line-height", `${layoutState.lineHeight}`);
+        sheet.style.setProperty("--resume-padding", `${layoutState.padding}px`);
+    });
+    
+    const clSheets = document.querySelectorAll(".cover-letter-sheet");
+    clSheets.forEach(sheet => {
+        sheet.style.setProperty("--resume-font-size", `${layoutState.fontSize}px`);
+        sheet.style.setProperty("--resume-line-height", `${layoutState.lineHeight}`);
+        sheet.style.setProperty("--resume-padding", `${layoutState.padding}px`);
+    });
+
+    const fLabel = document.getElementById("val-font-size");
+    if (fLabel) fLabel.innerText = `${layoutState.fontSize}px`;
+    
+    const lLabel = document.getElementById("val-line-height");
+    if (lLabel) lLabel.innerText = layoutState.lineHeight.toFixed(2);
+    
+    const pLabel = document.getElementById("val-padding");
+    if (pLabel) pLabel.innerText = `${layoutState.padding}px`;
+}
+
+function changeLayoutMetric(key, val) {
+    layoutState[key] = parseFloat(val);
+    localStorage.setItem('resumake_layout', JSON.stringify(layoutState));
+    applyLayoutMetrics();
+}
+
+function resetLayoutMetrics() {
+    layoutState = { fontSize: 11, lineHeight: 1.4, padding: 60 };
+    localStorage.setItem('resumake_layout', JSON.stringify(layoutState));
+    
+    if (document.getElementById("slider-font-size")) document.getElementById("slider-font-size").value = 11;
+    if (document.getElementById("slider-line-height")) document.getElementById("slider-line-height").value = 1.4;
+    if (document.getElementById("slider-padding")) document.getElementById("slider-padding").value = 60;
+    
+    applyLayoutMetrics();
+}
+
+function optimizeLayoutForOnePage() {
+    layoutState = { fontSize: 10, lineHeight: 1.25, padding: 40 };
+    localStorage.setItem('resumake_layout', JSON.stringify(layoutState));
+    
+    if (document.getElementById("slider-font-size")) document.getElementById("slider-font-size").value = 10;
+    if (document.getElementById("slider-line-height")) document.getElementById("slider-line-height").value = 1.25;
+    if (document.getElementById("slider-padding")) document.getElementById("slider-padding").value = 40;
+    
+    applyLayoutMetrics();
+    showToast("Layout optimized to fit single-page constraint!");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    applyLayoutMetrics();
+    
+    if (document.getElementById("slider-font-size")) document.getElementById("slider-font-size").value = layoutState.fontSize;
+    if (document.getElementById("slider-line-height")) document.getElementById("slider-line-height").value = layoutState.lineHeight;
+    if (document.getElementById("slider-padding")) document.getElementById("slider-padding").value = layoutState.padding;
+});
+
 // Bind module-scoped variables and functions to window scope for index.html compatibility
 window.state = state;
 window.formatMultiline = formatMultiline;
@@ -1478,6 +1580,10 @@ window.switchTemplate = switchTemplate;
 window.toggleSidebar = toggleSidebar;
 window.exportPDF = exportPDF;
 window.copyCoverLetter = copyCoverLetter;
+window.applyLayoutMetrics = applyLayoutMetrics;
+window.changeLayoutMetric = changeLayoutMetric;
+window.resetLayoutMetrics = resetLayoutMetrics;
+window.optimizeLayoutForOnePage = optimizeLayoutForOnePage;
 
 window.openInterviewPracticeModal = openInterviewPracticeModal;
 window.closeInterviewPracticeModal = closeInterviewPracticeModal;

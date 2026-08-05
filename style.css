@@ -1067,12 +1067,14 @@ textarea {
     max-width: 794px;
     flex-shrink: 0;
     min-height: 1123px; /* A4 height */
-    padding: 60px;
+    padding: var(--resume-padding, 60px);
+    font-size: var(--resume-font-size, 11px);
+    line-height: var(--resume-line-height, 1.4);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 
                 0 12px 24px -8px rgba(0, 0, 0, 0.4), 
                 0 1px 3px rgba(0, 0, 0, 0.15);
     position: relative;
-    transition: transform var(--transition-normal);
+    transition: transform var(--transition-normal), padding 0.15s ease-out;
     transform-origin: top center;
     border-radius: 2px;
     display: flex;
@@ -1299,7 +1301,7 @@ textarea {
 .resume-sheet li {
     font-family: inherit;
     color: inherit;
-    line-height: 1.4;
+    line-height: inherit;
 }
 
 /* Template 1: Modern (default) */
@@ -4039,5 +4041,20 @@ body.light-theme .zoom-btn:hover {
 
 body.light-theme #zoom-percent-badge:hover {
     color: var(--primary);
+}
+
+/* AI Bullet Library Interactive Cards */
+.ai-bullet-item {
+    transition: all var(--transition-fast) !important;
+}
+.ai-bullet-item:hover {
+    background: rgba(99, 102, 241, 0.08) !important;
+    border-color: var(--primary) !important;
+    color: white !important;
+    transform: translateX(4px);
+}
+body.light-theme .ai-bullet-item:hover {
+    background: rgba(99, 102, 241, 0.05) !important;
+    color: var(--primary-dark) !important;
 }
 

@@ -2824,6 +2824,8 @@ window.previewCoverLetterTheme = function() {
         </div>
     `;
     
+    if (window.applyLayoutMetrics) window.applyLayoutMetrics();
+    
     setTimeout(() => {
         if (window.resizeCoverLetterPreview) {
             window.resizeCoverLetterPreview();

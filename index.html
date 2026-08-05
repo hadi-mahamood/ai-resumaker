@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=26.0">
+    <link rel="stylesheet" href="style.css?v=27.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase Client JS SDK -->
@@ -142,6 +142,52 @@
                         <button class="util-link-btn" onclick="expandAllAccordions()"><i class="fa-solid fa-expand"></i> Expand All</button>
                         <span class="util-separator">|</span>
                         <button class="util-link-btn" onclick="collapseAllAccordions()"><i class="fa-solid fa-compress"></i> Collapse All</button>
+                    </div>
+                </div>
+
+                <!-- Layout & Typography Adjustments -->
+                <div class="accordion-item" id="sec-layout">
+                    <div class="accordion-header" onclick="toggleAccordion('sec-layout')">
+                        <div class="accordion-title">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Layout & Typography</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="sidebar-badge" style="background: var(--primary); color: white;">A4 Lock</span>
+                            <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner" style="display: flex; flex-direction: column; gap: 14px; padding: 12px 0;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                    <label style="margin:0; font-size:0.75rem;">Font Size</label>
+                                    <span id="val-font-size" style="font-size:0.75rem; font-weight:600; color:var(--primary);">11px</span>
+                                </div>
+                                <input type="range" id="slider-font-size" min="9" max="16" step="0.5" value="11" style="width:100%;" oninput="window.changeLayoutMetric('fontSize', this.value)">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                    <label style="margin:0; font-size:0.75rem;">Line Spacing</label>
+                                    <span id="val-line-height" style="font-size:0.75rem; font-weight:600; color:var(--primary);">1.40</span>
+                                </div>
+                                <input type="range" id="slider-line-height" min="1.0" max="1.8" step="0.05" value="1.4" style="width:100%;" oninput="window.changeLayoutMetric('lineHeight', this.value)">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                    <label style="margin:0; font-size:0.75rem;">Sheet Margins (Padding)</label>
+                                    <span id="val-padding" style="font-size:0.75rem; font-weight:600; color:var(--primary);">60px</span>
+                                </div>
+                                <input type="range" id="slider-padding" min="20" max="80" step="2" value="60" style="width:100%;" oninput="window.changeLayoutMetric('padding', this.value)">
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 4px;">
+                                <button class="btn btn-secondary" style="flex:1; justify-content:center; font-size:0.72rem; padding:4px 8px;" onclick="window.resetLayoutMetrics()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                                <button class="btn btn-success" style="flex:1; justify-content:center; font-size:0.72rem; padding:4px 8px;" onclick="window.optimizeLayoutForOnePage()"><i class="fa-solid fa-compress"></i> Auto-Fit A4</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -856,8 +902,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=26.0"></script>
-    <script src="ats.js?v=26.0"></script>
-    <script type="module" src="app.js?v=26.0"></script>
+    <script src="ai.js?v=27.0"></script>
+    <script src="ats.js?v=27.0"></script>
+    <script type="module" src="app.js?v=27.0"></script>
 </body>
 </html>
