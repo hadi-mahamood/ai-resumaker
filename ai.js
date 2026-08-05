@@ -328,9 +328,16 @@ const AIService = {
                 .replace(/^\-/, '')
                 .trim();
             
+            // Clean trailing timeframe suffixes (e.g. "for 8 months")
+            cleanLine = cleanLine
+                .replace(/\s+(for|during|over|of)\s+(\d+|\w+)\s+(months?|years?|weeks?|days?)/i, '')
+                .trim();
+            
             cleanLine = cleanLine.replace(/^(microbiologist|developer|engineer|analyst|designer|manager|owner|consultant|assistant|doctor|specialist|officer|administrator|scientist|teacher|professor|nurse|accountant|writer|editor|representative|agent|attorney|lawyer|practitioner|therapist|recruiter)\s+(in|at)\s+/i, (match, title, prep) => {
                 let noun = "operations";
                 title = title.toLowerCase();
+                if (title.includes("microbiologist") || title.includes("scientist")) noun = "laboratory research";
+                if (title.includes("nurse") || title.includes("healthcare")) noun = "clinical patient care";
                 if (title.endsWith("developer") || title.endsWith("engineer")) noun = "development";
                 if (title.endsWith("designer")) noun = "design";
                 if (title.endsWith("analyst")) noun = "analysis";
@@ -404,7 +411,7 @@ const AIService = {
     /**
      * AI Work Experience Rewriter
      */
-    async rewriteExperience(text, jobTitle, keywords = "", onChunk = null) {
+    async rewriteExperience(text, jobTitle, keywords = "", onChunk = null, bypassCache = false) {
         let weaveKeywords = "";
         let chunkCallback = onChunk;
         if (typeof keywords === "function") {
@@ -414,9 +421,11 @@ const AIService = {
             weaveKeywords = keywords;
         }
 
-        const cacheKey = `rewrite_${btoa(unescape(encodeURIComponent(jobTitle + "_" + weaveKeywords + "_" + text))).slice(0, 100)}`;
-        const cached = this.getCache(cacheKey);
-        if (cached) return await this.simulateStreaming(cached, chunkCallback);
+        const cacheKey = `rewrite_v28_${btoa(unescape(encodeURIComponent(jobTitle + "_" + weaveKeywords + "_" + text))).slice(0, 100)}`;
+        if (!bypassCache) {
+            const cached = this.getCache(cacheKey);
+            if (cached) return await this.simulateStreaming(cached, chunkCallback);
+        }
 
         let prompt = `You are a professional ATS resume writer. Rewrite this job description for a "${jobTitle}" role using strong, active industry-specific action verbs (e.g. "Spearheaded", "Architected", "Engineered", "Optimized"), quantify business achievements (like conversion rates, speed improvements, cost savings) where possible, and format it to easily clear ATS parsers.`;
         if (weaveKeywords && weaveKeywords.trim()) {

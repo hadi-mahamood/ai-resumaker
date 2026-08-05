@@ -1097,13 +1097,13 @@ function openAIEngine(expId) {
             <div class="ai-result-box" id="ai-rewrite-diff" style="display:none; white-space: pre-wrap; line-height: 1.6;"></div>
             <div class="ai-btn-group" style="margin-top: 8px;">
                 <button class="ai-btn ai-btn-accent" onclick="applyExperienceRewrite('${expId}')">Apply to Resume</button>
-                <button class="ai-btn ai-btn-outline" onclick="runAIEperienceRewrite('${expId}')">Regenerate</button>
+                <button class="ai-btn ai-btn-outline" onclick="runAIEperienceRewrite('${expId}', true)">Regenerate</button>
             </div>
         </div>
     `;
 }
 
-async function runAIEperienceRewrite(expId) {
+async function runAIEperienceRewrite(expId, bypassCache = false) {
     const textInput = document.getElementById("ai-rewrite-input").value;
     const keywordsVal = document.getElementById("ai-rewrite-keywords") ? document.getElementById("ai-rewrite-keywords").value : "";
     const resultCard = document.getElementById("ai-rewrite-result-card");
@@ -1124,7 +1124,7 @@ async function runAIEperienceRewrite(expId) {
         if (diffBox) {
             diffBox.innerHTML = renderDiffHTML(textInput, chunkText);
         }
-    });
+    }, bypassCache);
     
     resultBox.className = "ai-result-box";
     resultBox.innerText = optimized;
