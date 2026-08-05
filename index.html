@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=40.0">
+    <link rel="stylesheet" href="style.css?v=41.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase Client JS SDK -->
@@ -361,21 +361,34 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="input-languages">Languages (Comma separated)</label>
-                                <input type="text" id="input-languages" list="languages-suggestions" placeholder="e.g. English (Fluent), Hindi (Native)">
-                                <datalist id="languages-suggestions">
-                                    <option value="English (Fluent), Hindi (Native), Malayalam (Professional)"></option>
-                                    <option value="English (Fluent), Malayalam (Native), Hindi (Professional)"></option>
-                                    <option value="English (Fluent), Arabic (Native)"></option>
-                                    <option value="English (Native), Spanish (Fluent)"></option>
-                                    <option value="English (Fluent), Tagalog (Native)"></option>
-                                    <option value="English (Fluent), Tamil (Native)"></option>
-                                    <option value="English (Fluent), Telugu (Native)"></option>
-                                    <option value="English (Fluent), Bengali (Native)"></option>
-                                    <option value="English (Native), French (Bilingual)"></option>
-                                    <option value="English (Native), German (Professional)"></option>
-                                    <option value="English (Fluent), Hindi (Native)"></option>
-                                    <option value="English (Native), Hindi (Native), Arabic (Basic)"></option>
+                                <label>Languages & Proficiency</label>
+                                <div class="languages-tags-container" id="languages-tags-container" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--input-bg); min-height: 42px; align-items: center; margin-bottom: 8px;">
+                                    <div style="display: flex; gap: 6px; flex-grow: 1; min-width: 150px;">
+                                        <input type="text" id="language-name-input" list="language-presets" placeholder="Add language..." style="flex: 2; border: none; padding: 4px; outline: none; background: transparent; font-size: 0.85rem; width: 100%;">
+                                        <select id="language-proficiency-select" style="flex: 1; border: none; padding: 4px; outline: none; background: transparent; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; min-width: 80px;">
+                                            <option value="Native">Native</option>
+                                            <option value="Fluent">Fluent</option>
+                                            <option value="Professional">Professional</option>
+                                            <option value="Intermediate">Intermediate</option>
+                                            <option value="Basic">Basic</option>
+                                        </select>
+                                        <button type="button" onclick="window.addLanguageTag()" style="background: none; border: none; color: var(--primary); padding: 0 8px; cursor: pointer; font-size: 1.1rem; outline: none; display: flex; align-items: center;"><i class="fa-solid fa-circle-plus"></i></button>
+                                    </div>
+                                </div>
+                                <datalist id="language-presets">
+                                    <option value="English"></option>
+                                    <option value="Malayalam"></option>
+                                    <option value="Hindi"></option>
+                                    <option value="Arabic"></option>
+                                    <option value="Spanish"></option>
+                                    <option value="French"></option>
+                                    <option value="German"></option>
+                                    <option value="Tamil"></option>
+                                    <option value="Telugu"></option>
+                                    <option value="Kannada"></option>
+                                    <option value="Bengali"></option>
+                                    <option value="Urdu"></option>
+                                    <option value="Tagalog"></option>
                                 </datalist>
                             </div>
                         </div>
@@ -967,8 +980,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=40.0"></script>
-    <script src="ats.js?v=40.0"></script>
-    <script type="module" src="app.js?v=40.0"></script>
+    <script src="ai.js?v=41.0"></script>
+    <script src="ats.js?v=41.0"></script>
+    <script type="module" src="app.js?v=41.0"></script>
 </body>
 </html>

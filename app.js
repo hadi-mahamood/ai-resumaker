@@ -167,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderEducationList();
     renderProjectsList();
     renderSkillsTags();
+    renderLanguagesTags();
 
     // Render preview
     renderResumePreview();
@@ -206,7 +207,7 @@ function setFormFields() {
     if (document.getElementById("input-nationality")) document.getElementById("input-nationality").value = state.nationality || "";
     if (document.getElementById("input-visa")) document.getElementById("input-visa").value = state.visaStatus || "";
     if (document.getElementById("input-marital")) document.getElementById("input-marital").value = state.maritalStatus || "";
-    if (document.getElementById("input-languages")) document.getElementById("input-languages").value = state.languages || "";
+    if (window.renderLanguagesTags) window.renderLanguagesTags();
     
     // Auto-calculate keywords match for current profile
     if (window.calculateJDMatch) {
@@ -275,8 +276,7 @@ function bindInputEvents() {
         { id: "input-dob", key: "dob" },
         { id: "input-nationality", key: "nationality" },
         { id: "input-visa", key: "visaStatus" },
-        { id: "input-marital", key: "maritalStatus" },
-        { id: "input-languages", key: "languages" }
+        { id: "input-marital", key: "maritalStatus" }
     ];
 
     textInputs.forEach(item => {
@@ -477,6 +477,17 @@ function bindInputEvents() {
             }
         }
     });
+
+    // Language name input listener
+    const langInput = document.getElementById("language-name-input");
+    if (langInput) {
+        langInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                window.addLanguageTag();
+            }
+        });
+    }
 }
 
 // Auto Save State Helper
@@ -553,6 +564,66 @@ function showToast(message, type = 'success') {
 /* ==========================================
    DYNAMIC LIST RENDERERS & BUILDERS
    ========================================== */
+
+// Languages Tags builder
+function renderLanguagesTags() {
+    const container = document.getElementById("languages-tags-container");
+    const nameInput = document.getElementById("language-name-input");
+    
+    if (!container || !nameInput) return;
+    
+    // Clear old tags
+    container.querySelectorAll('.tag').forEach(t => t.remove());
+    
+    const items = state.languages ? state.languages.split(',').map(s => s.trim()).filter(Boolean) : [];
+    
+    items.forEach((item, index) => {
+        const tag = document.createElement("div");
+        tag.className = "tag";
+        tag.innerHTML = `<span class="tag-text">${item}</span> <span class="tag-remove" onclick="window.removeLanguageTag(${index})">&times;</span>`;
+        
+        container.insertBefore(tag, nameInput.parentNode);
+    });
+}
+
+function addLanguageTag() {
+    const nameInput = document.getElementById("language-name-input");
+    const profSelect = document.getElementById("language-proficiency-select");
+    if (!nameInput || !profSelect) return;
+    
+    const name = nameInput.value.trim();
+    const prof = profSelect.value;
+    
+    if (name) {
+        const newTag = `${name} (${prof})`;
+        const items = state.languages ? state.languages.split(',').map(s => s.trim()).filter(Boolean) : [];
+        
+        if (!items.includes(newTag)) {
+            items.push(newTag);
+            state.languages = items.join(', ');
+            nameInput.value = "";
+            renderLanguagesTags();
+            updateSidebarBadges();
+            autoSave();
+            renderResumePreview();
+            showToast(`Language ${name} added!`);
+        }
+    }
+}
+
+function removeLanguageTag(index) {
+    const items = state.languages ? state.languages.split(',').map(s => s.trim()).filter(Boolean) : [];
+    items.splice(index, 1);
+    state.languages = items.join(', ');
+    renderLanguagesTags();
+    updateSidebarBadges();
+    autoSave();
+    renderResumePreview();
+}
+
+window.renderLanguagesTags = renderLanguagesTags;
+window.addLanguageTag = addLanguageTag;
+window.removeLanguageTag = removeLanguageTag;
 
 // Skills Tags builder
 function renderSkillsTags() {
