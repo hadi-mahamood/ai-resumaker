@@ -4172,3 +4172,43 @@ body.light-theme .ai-skill-badge.added {
     color: #059669 !important;
 }
 
+/* Premium Keywords Match Alignment & Button Animations */
+.keyword-chip {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.keyword-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.keyword-chip.matched:hover {
+    background: rgba(16, 185, 129, 0.25) !important;
+    border-color: rgba(16, 185, 129, 0.5) !important;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15);
+}
+.keyword-chip.missing:hover {
+    background: rgba(239, 68, 68, 0.25) !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    color: white !important;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.15);
+}
+
+/* Glassmorphic Glowing Accent */
+.accordion-item {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.accordion-item.active {
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.06);
+}
+
+/* Global Premium Button hover interactions */
+.btn, .ai-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn:hover, .ai-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12);
+}
+.btn:active, .ai-btn:active {
+    transform: scale(0.97);
+}
+

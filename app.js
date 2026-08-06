@@ -2876,3 +2876,41 @@ function loadSampleResumeData() {
 }
 
 window.loadSampleResumeData = loadSampleResumeData;
+
+// Mobile Swipe Gesture Recognition to slide between Edit and Preview sheets
+function initMobileSwipeGestures() {
+    let startX = 0;
+    let startY = 0;
+    
+    document.addEventListener("touchstart", (e) => {
+        if (window.innerWidth > 768) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    }, { passive: true });
+    
+    document.addEventListener("touchend", (e) => {
+        if (window.innerWidth > 768) return;
+        
+        const diffX = e.changedTouches[0].clientX - startX;
+        const diffY = e.changedTouches[0].clientY - startY;
+        
+        // Ensure horizontal swipe is dominant and significant (e.g. > 100px)
+        if (Math.abs(diffX) > 100 && Math.abs(diffY) < 60) {
+            if (diffX > 0) {
+                // Swipe Right -> Switch to Edit tab
+                if (window.switchMobileTab) {
+                    window.switchMobileTab("edit");
+                }
+            } else {
+                // Swipe Left -> Switch to Preview tab
+                if (window.switchMobileTab) {
+                    window.switchMobileTab("preview");
+                }
+            }
+        }
+    }, { passive: true });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    initMobileSwipeGestures();
+});

@@ -564,12 +564,38 @@ window.calculateJDMatch = function() {
     
     // Update Match Score
     const matchScoreElement = document.getElementById("ats-jd-match-score");
+    let matchScore = auditResult.jdMode ? Math.round((auditResult.matchedKeywords.length / auditResult.extractedKeywords.length) * 100) : 0;
     if (matchScoreElement) {
-        let matchScore = auditResult.jdMode ? Math.round((auditResult.matchedKeywords.length / auditResult.extractedKeywords.length) * 100) : 0;
         matchScoreElement.innerText = `${matchScore}%`;
         if (matchScore >= 80) matchScoreElement.style.color = "var(--success)";
         else if (matchScore >= 50) matchScoreElement.style.color = "var(--warning)";
         else matchScoreElement.style.color = "var(--danger)";
+    }
+    
+    // Sync to Sidebar Match Progress Gauge
+    const sidebarPct = document.getElementById("sidebar-ats-pct");
+    const sidebarBar = document.getElementById("sidebar-ats-progress-bar");
+    const sidebarBarContainer = document.getElementById("sidebar-ats-progress-container");
+    if (sidebarPct && sidebarBar && sidebarBarContainer) {
+        if (auditResult.jdMode && auditResult.extractedKeywords.length > 0) {
+            sidebarBarContainer.style.display = "block";
+            sidebarPct.style.display = "inline";
+            sidebarPct.innerText = `${matchScore}%`;
+            sidebarBar.style.width = `${matchScore}%`;
+            if (matchScore >= 80) {
+                sidebarBar.style.backgroundColor = "var(--success)";
+                sidebarPct.style.color = "var(--success)";
+            } else if (matchScore >= 50) {
+                sidebarBar.style.backgroundColor = "var(--warning)";
+                sidebarPct.style.color = "var(--warning)";
+            } else {
+                sidebarBar.style.backgroundColor = "var(--danger)";
+                sidebarPct.style.color = "var(--danger)";
+            }
+        } else {
+            sidebarBarContainer.style.display = "none";
+            sidebarPct.style.display = "none";
+        }
     }
     
     // Render Matched
