@@ -1,0 +1,10 @@
+# Robots.txt file for ResuMake AI
+User-agent: *
+Allow: /
+
+# Exclude backend auth callbacks or temp configurations
+Disallow: /api/auth/callback
+Disallow: /config/
+
+# Sitemap location
+Sitemap: https://resumake-ai.vercel.app/sitemap.xml

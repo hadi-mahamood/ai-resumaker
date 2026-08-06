@@ -5,11 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=62.0">
+    <link rel="stylesheet" href="style.css?v=63.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase Client JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Structured Metadata JSON-LD for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "ResuMake AI",
+      "url": "https://resumake-ai.vercel.app",
+      "description": "Premium AI Resume Builder and ATS Compatibility Auditor to create high-impact professional resumes.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All"
+    }
+    </script>
 </head>
 <body>
     <!-- Premium Ambient Glow Orbs -->
@@ -866,7 +878,7 @@
     </div>
 
     <!-- AI Drawer Panel -->
-    <div class="ai-panel" id="ai-panel">
+    <div class="ai-panel" id="ai-panel" role="dialog" aria-modal="true" aria-labelledby="ai-panel-title">
         <div class="ai-header">
             <div class="ai-header-title">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
@@ -880,13 +892,13 @@
     </div>
 
     <!-- ATS Details Modal -->
-    <div class="ats-modal" id="ats-modal">
+    <div class="ats-modal" id="ats-modal" role="dialog" aria-modal="true" aria-labelledby="ats-modal-title">
         <div class="ats-modal-card">
             <div class="ats-modal-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <i class="fa-solid fa-circle-nodes" style="color: var(--success); font-size: 1.4rem;"></i>
                     <div>
-                        <h3 style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">ATS Optimization & AI Planner</h3>
+                        <h3 id="ats-modal-title" style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">ATS Optimization & AI Planner</h3>
                         <span style="font-size: 0.72rem; color: var(--text-secondary);">Audit, match and auto-optimize your resume with Gemini AI</span>
                     </div>
                 </div>
@@ -1014,13 +1026,13 @@
     </div>
 
     <!-- Cover Letter Preview Modal -->
-    <div class="ats-modal" id="cover-letter-preview-modal">
+    <div class="ats-modal" id="cover-letter-preview-modal" role="dialog" aria-modal="true" aria-labelledby="cover-letter-modal-title">
         <div class="ats-modal-card" style="max-width: 900px; height: 90vh;">
             <div class="ats-modal-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <i class="fa-solid fa-envelope-open-text" style="color: #a78bfa; font-size: 1.3rem;"></i>
                     <div>
-                        <h3 style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">Styled Cover Letter Preview</h3>
+                        <h3 id="cover-letter-modal-title" style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">Styled Cover Letter Preview</h3>
                         <span style="font-size: 0.72rem; color: var(--text-secondary);" id="cover-letter-theme-subtitle">Inheriting Layout Styling</span>
                     </div>
                 </div>
@@ -1040,13 +1052,13 @@
     </div>
 
     <!-- AI Practice Interview Modal -->
-    <div class="ats-modal" id="ats-interview-practice-modal">
+    <div class="ats-modal" id="ats-interview-practice-modal" role="dialog" aria-modal="true" aria-labelledby="interview-modal-title">
         <div class="ats-modal-card" style="max-width: 800px; height: 85vh;">
             <div class="ats-modal-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <i class="fa-solid fa-comments" style="color: #a78bfa; font-size: 1.3rem;"></i>
                     <div>
-                        <h3 style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">AI Interview Practice</h3>
+                        <h3 id="interview-modal-title" style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">AI Interview Practice</h3>
                         <span style="font-size: 0.72rem; color: var(--text-secondary);">Tailored questions based on your resume and target role</span>
                     </div>
                 </div>
@@ -1093,7 +1105,7 @@
     </div>
 
     <!-- Cloud Authentication Modal -->
-    <div class="ats-modal" id="auth-modal">
+    <div class="ats-modal" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
         <div class="ats-modal-card ats-modal-card-compact" style="max-width: 420px;">
             <button class="ats-modal-close" onclick="window.closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
             <div class="ats-modal-header" style="border-bottom: none; padding-bottom: 0;">
@@ -1164,8 +1176,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=62.0"></script>
-    <script src="ats.js?v=62.0"></script>
-    <script type="module" src="app.js?v=62.0"></script>
+    <script src="ai.js?v=63.0"></script>
+    <script src="ats.js?v=63.0"></script>
+    <script type="module" src="app.js?v=63.0"></script>
 </body>
 </html>
