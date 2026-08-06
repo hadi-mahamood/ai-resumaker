@@ -25,11 +25,7 @@
           "REST APIs",
           "SQL",
           "Git/GitHub",
-          "Docker",
-          "CI/CD",
-          "TypeScript",
-          "System Design",
-          "Agile Methodologies"
+          "Docker"
         ],
         "experience": [
           {
@@ -37,14 +33,14 @@
             "company": "TechNova Solutions",
             "role": "Software Engineer",
             "date": "Jan 2024 - Present",
-            "desc": "- Spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%.\n- Engineered collaborated with 5 engineers to design REST API endpoints and integrate them with React UI, saving 8 hours of manual deployment work per week.\n- Optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates."
+            "desc": "- Spearheaded development of core web application dashboard, improving speed by 35%.\n- Collaborated with 5 engineers to design REST API endpoints and integrate them with React UI.\n- Integrated automated unit tests, increasing system reliability by 25%."
           },
           {
             "id": "exp-2",
             "company": "Quantum Code Inc",
             "role": "Junior Web Developer",
             "date": "Jun 2022 - Dec 2023",
-            "desc": "- Spearheaded developed and maintained robust websites for client projects using JavaScript, HTML, and CSS, boosting application load times by 35%.\n- Engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week.\n- Optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates."
+            "desc": "- Developed and maintained robust websites for client projects using JavaScript, HTML, and CSS.\n- Revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%.\n- Debugged production issues, resolving an average of 10+ critical issues weekly."
           }
         ],
         "education": [
@@ -61,7 +57,7 @@
             "id": "proj-1",
             "title": "DevPortfolio Generator",
             "role": "Creator",
-            "desc": "- Spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%.\n- Engineered gained 150+ stars on GitHub, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
+            "desc": "An open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites. Gained 150+ stars on GitHub."
           }
         ],
         "activeTemplate": "modern",
@@ -69,7 +65,7 @@
         "summary": "- Spearheaded spearheaded spearheaded highly accomplished professional specializing in software systems with a proven record of leading technical implementations, optimizing application workflows, and delivering high-performance scalable solutions, boosting application load times by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered engineered robust system architectures and automated deployment pipelines using Node, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized js, saving 8 hoursly cycles, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
       },
       "createdAt": 1785784396971,
-      "updatedAt": 1786011793323
+      "updatedAt": 1786012294823
     }
   ],
   "activeProfileId": "default",
@@ -95,11 +91,7 @@
       "REST APIs",
       "SQL",
       "Git/GitHub",
-      "Docker",
-      "CI/CD",
-      "TypeScript",
-      "System Design",
-      "Agile Methodologies"
+      "Docker"
     ],
     "experience": [
       {
@@ -107,14 +99,14 @@
         "company": "TechNova Solutions",
         "role": "Software Engineer",
         "date": "Jan 2024 - Present",
-        "desc": "- Spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%.\n- Engineered collaborated with 5 engineers to design REST API endpoints and integrate them with React UI, saving 8 hours of manual deployment work per week.\n- Optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates."
+        "desc": "- Spearheaded development of core web application dashboard, improving speed by 35%.\n- Collaborated with 5 engineers to design REST API endpoints and integrate them with React UI.\n- Integrated automated unit tests, increasing system reliability by 25%."
       },
       {
         "id": "exp-2",
         "company": "Quantum Code Inc",
         "role": "Junior Web Developer",
         "date": "Jun 2022 - Dec 2023",
-        "desc": "- Spearheaded developed and maintained robust websites for client projects using JavaScript, HTML, and CSS, boosting application load times by 35%.\n- Engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week.\n- Optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates."
+        "desc": "- Developed and maintained robust websites for client projects using JavaScript, HTML, and CSS.\n- Revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%.\n- Debugged production issues, resolving an average of 10+ critical issues weekly."
       }
     ],
     "education": [
@@ -131,7 +123,7 @@
         "id": "proj-1",
         "title": "DevPortfolio Generator",
         "role": "Creator",
-        "desc": "- Spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%.\n- Engineered gained 150+ stars on GitHub, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
+        "desc": "An open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites. Gained 150+ stars on GitHub."
       }
     ],
     "activeTemplate": "modern",

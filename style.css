@@ -4212,3 +4212,105 @@ body.light-theme .ai-skill-badge.added {
     transform: scale(0.97);
 }
 
+/* Premium High-Tech Background Grid */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Premium Floating Glowing Orbs */
+.bg-orb {
+    position: fixed;
+    width: 45vw;
+    height: 45vw;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+    z-index: -2;
+    opacity: 0.25;
+    animation: orbFloat 25s infinite alternate ease-in-out;
+    transition: opacity 0.5s ease;
+}
+.bg-orb-1 {
+    top: -15%;
+    left: -15%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 75%);
+}
+.bg-orb-2 {
+    bottom: -15%;
+    right: -15%;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 75%);
+    animation-delay: -6s;
+}
+@keyframes orbFloat {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(8%, 10%) scale(1.12); }
+}
+
+/* Hide background glowing orbs in light theme for readability */
+body.light-theme .bg-orb {
+    opacity: 0.05;
+}
+
+/* Premium Slim Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    transition: background 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+body.light-theme ::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.06);
+}
+body.light-theme ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* Refined Form input transitions */
+input, select, textarea {
+    transition: border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18) !important;
+    background: rgba(0, 0, 0, 0.35) !important;
+}
+
+body.light-theme input:focus, body.light-theme select:focus, body.light-theme textarea:focus {
+    background: #ffffff !important;
+}
+
+/* Refined List Item Card transitions */
+.list-item-card {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(8px);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.list-item-card:hover {
+    border-color: rgba(99, 102, 241, 0.3) !important;
+    background: rgba(255, 255, 255, 0.035) !important;
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.05), inset 0 0 12px rgba(99, 102, 241, 0.02) !important;
+    transform: translateY(-2px);
+}
+
