@@ -1843,10 +1843,30 @@ function openAICoverLetter() {
     body.innerHTML = `
         <div class="ai-card">
             <div class="ai-card-title"><i class="fa-solid fa-envelope-open-text"></i> Cover Letter Writer</div>
-            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 12px;">
                 Synthesizes your personal info, experiences, and skills into a formal target letter for a <em>${state.targetJob}</em> application.
             </p>
-            <button class="btn btn-primary" style="justify-content:center; margin-top: 8px;" onclick="runAICoverLetter()">
+            
+            <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 0.72rem; font-weight: 600; color: var(--text-secondary);">Writing Tone</label>
+                <select id="ai-cl-tone" class="form-input" style="width: 100%; box-sizing: border-box; background: #0f172a; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; color: white;">
+                    <option value="Professional" selected>Professional (Standard)</option>
+                    <option value="Confident">Confident & Assertive</option>
+                    <option value="Creative">Creative & Storytelling</option>
+                    <option value="Direct">Direct & Concise</option>
+                </select>
+            </div>
+            
+            <div style="margin-top: 10px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 0.72rem; font-weight: 600; color: var(--text-secondary);">Document Length</label>
+                <select id="ai-cl-length" class="form-input" style="width: 100%; box-sizing: border-box; background: #0f172a; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; color: white;">
+                    <option value="Medium" selected>Medium (3 Paragraphs)</option>
+                    <option value="Short">Short (2 Paragraphs)</option>
+                    <option value="Long">Long (4 Paragraphs)</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-primary" style="justify-content:center; margin-top: 8px; width: 100%;" onclick="runAICoverLetter()">
                 <i class="fa-solid fa-wand-magic"></i> Generate Cover Letter
             </button>
         </div>
@@ -1868,11 +1888,16 @@ function openAICoverLetter() {
 async function runAICoverLetter() {
     const resultCard = document.getElementById("ai-cl-result-card");
     const textTarget = document.getElementById("ai-cl-result-text");
+    const toneSelect = document.getElementById("ai-cl-tone");
+    const lengthSelect = document.getElementById("ai-cl-length");
+    
+    const tone = toneSelect ? toneSelect.value : "Professional";
+    const length = lengthSelect ? lengthSelect.value : "Medium";
     
     resultCard.style.display = "flex";
     textTarget.value = "Drafting cover letter... Please wait.";
     
-    const letter = await AIService.generateCoverLetter(state, (chunkText) => {
+    const letter = await AIService.generateCoverLetter(state, tone, length, (chunkText) => {
         textTarget.value = chunkText;
     });
     textTarget.value = letter;

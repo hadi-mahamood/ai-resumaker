@@ -385,7 +385,7 @@ const AIService = {
     },
 
     // Helper to generate offline cover letters without recursion
-    getOfflineCoverLetterMock(resumeData) {
+    getOfflineCoverLetterMock(resumeData, tone = "Professional", length = "Medium") {
         let name = resumeData.name || "John Doe";
         let role = resumeData.targetJob || "Software Developer";
         let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 3).join(', ') : "Software Engineering";
@@ -393,11 +393,25 @@ const AIService = {
         let dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         let greeting = `Dear Hiring Manager,`;
         
-        let openingTpl = this.knowledgeBase.coverLetters.opening[Math.floor(Math.random() * this.knowledgeBase.coverLetters.opening.length)];
-        let opening = openingTpl.replace('[Role]', role).replace('[Skill]', skills);
+        // Define tone opening templates
+        const openings = {
+            Professional: `I am writing to express my strong interest in the ${role} position. With a solid foundation in ${skills} and hands-on experience building efficient solutions, I am confident in my ability to make an immediate impact on your initiatives.`,
+            Confident: `My proven track record of delivering technical solutions and specialized skills in ${skills} make me an ideal candidate for the ${role} opening. I am fully prepared to lead initiatives and achieve results from day one.`,
+            Creative: `My journey in technology has been driven by a relentless curiosity about how code intersects with real-world problems. I am eager to bring this passion and my specialized expertise in ${skills} to the ${role} position.`,
+            Direct: `I am applying for the ${role} role. With extensive experience in ${skills}, I can immediately contribute to your ongoing developments and streamline core software delivery.`
+        };
         
-        let bodyTpl = this.knowledgeBase.coverLetters.body[Math.floor(Math.random() * this.knowledgeBase.coverLetters.body.length)];
-        let body = bodyTpl.replace('[Role]', role).replace(/\[Skill\]/g, skills);
+        const opening = openings[tone] || openings.Professional;
+        
+        // Define tone body templates
+        const bodies = {
+            Professional: `In my previous roles, I focused on designing scalable architectures and writing clean, maintainable code. I have a proven track record of collaborating across cross-functional teams to translate complex business requirements into robust software. For instance, I successfully leveraged ${skills} and related frameworks to build systems that significantly optimized performance and streamlined key workflows.`,
+            Confident: `I have consistently driven technical excellence and successfully delivered user-centric solutions throughout my career. During my recent work, I spearheaded several feature developments, utilizing ${skills} to construct responsive, high-performance interfaces and backend APIs. I thrive in challenging environments that require high performance and decisive problem-solving.`,
+            Creative: `I believe that exceptional software requires not just engineering discipline, but creative design choices. My background enables me to approach problems from unique angles, bridging the gap between developers and stakeholders to build engaging interfaces using ${skills}.`,
+            Direct: `My experience is centered around delivering clean solutions quickly. I am proficient in building backend systems and frontend views using ${skills}, ensuring optimal performance, speed improvements, and minimal downtime.`
+        };
+        
+        const body = bodies[tone] || bodies.Professional;
         
         let experienceDetail = "";
         if (resumeData.experience && resumeData.experience.length > 0) {
@@ -407,8 +421,25 @@ const AIService = {
             experienceDetail = "I have developed strong competencies in modern software development methodologies and enjoy working on complex technical challenges.";
         }
         
-        let closing = this.knowledgeBase.coverLetters.closing[Math.floor(Math.random() * this.knowledgeBase.coverLetters.closing.length)];
-        return `${dateStr}\n\n${greeting}\n\n${opening}\n\n${body}\n\n${experienceDetail}\n\n${closing}\n\nSincerely,\n\n${name}`;
+        // Handle length constraints
+        let paragraphs = [];
+        if (length === "Short") {
+            paragraphs = [opening, experienceDetail];
+        } else if (length === "Long") {
+            const extraParagraph = `Furthermore, I am highly collaborative and dedicated to continuous improvement. I am always exploring new frameworks and architectural patterns to keep software delivery pipelines optimized and reliable.`;
+            paragraphs = [opening, body, experienceDetail, extraParagraph];
+        } else { // Medium (Default)
+            paragraphs = [opening, body, experienceDetail];
+        }
+        
+        let closing = `I welcome the opportunity to discuss how my technical skills and background align with your team's needs. Thank you for your time and consideration.`;
+        if (tone === "Confident") {
+            closing = `I look forward to discussing how my experience and drive can help your team exceed its milestones. Thank you for evaluating my candidacy.`;
+        } else if (tone === "Direct") {
+            closing = `I look forward to meeting with you to discuss how I can add immediate value to your current projects.`;
+        }
+        
+        return `${dateStr}\n\n${greeting}\n\n${paragraphs.join('\n\n')}\n\n${closing}\n\nSincerely,\n\n${name}`;
     },
 
     /**
@@ -477,23 +508,41 @@ const AIService = {
     /**
      * AI Cover Letter Generator
      */
-    async generateCoverLetter(resumeData, onChunk) {
+    async generateCoverLetter(resumeData, tone, length, onChunk) {
+        let actualTone = "Professional";
+        let actualLength = "Medium";
+        let actualOnChunk = null;
+        
+        if (typeof tone === "function") {
+            actualOnChunk = tone;
+        } else {
+            actualTone = tone || "Professional";
+            if (typeof length === "function") {
+                actualOnChunk = length;
+            } else {
+                actualLength = length || "Medium";
+                actualOnChunk = onChunk;
+            }
+        }
+
         let name = resumeData.name || "John Doe";
         let role = resumeData.targetJob || "Software Developer";
         
-        const summary = `${name}_${role}_${(resumeData.skills || []).join(',')}_${(resumeData.experience || []).map(e => e.date + e.company).join(',')}`;
+        const summary = `${name}_${role}_${(resumeData.skills || []).join(',')}_${(resumeData.experience || []).map(e => e.date + e.company).join(',')}_${actualTone}_${actualLength}`;
         const cacheKey = `cover_${btoa(unescape(encodeURIComponent(summary))).slice(0, 100)}`;
         const cached = this.getCache(cacheKey);
         if (cached && !cached.includes("WebGPU Error") && !cached.includes("API Proxy Error") && !cached.includes("React.js, Node.js")) {
-            return await this.simulateStreaming(cached, onChunk);
+            return await this.simulateStreaming(cached, actualOnChunk);
         }
 
         let skills = resumeData.skills && resumeData.skills.length > 0 ? resumeData.skills.slice(0, 5).join(', ') : "Software Engineering";
-        const prompt = `You are an expert executive recruiter. Write a highly compelling, professional, and personalized cover letter.
+        const prompt = `You are an expert executive recruiter. Write a highly compelling, personalized cover letter.
 Candidate Name: ${name}.
 Target Role: ${role}.
 Key Candidate Skills: ${skills}.
 Experience History: ${JSON.stringify(resumeData.experience || [])}.
+Writing Tone Style: ${actualTone}.
+Desired Document Length: ${actualLength} layout (Short = 2 paragraphs, Medium = 3 paragraphs, Long = 4 paragraphs).
 
 Structure requirements:
 1. Start with the date and a professional hiring manager greeting.
@@ -504,12 +553,12 @@ Structure requirements:
         
         let result;
         if (this.activeProvider === "webgpu") {
-            result = await this.callWebGPULLM(prompt, onChunk);
+            result = await this.callWebGPULLM(prompt, actualOnChunk);
         } else if (this.activeProvider === "gemini") {
-            result = await this.callGeminiAPI(prompt, onChunk, "", role);
+            result = await this.callGeminiAPI(prompt, actualOnChunk, "", role);
         } else {
-            const mock = this.getOfflineCoverLetterMock(resumeData);
-            result = await this.simulateStreaming(mock, onChunk);
+            const mock = this.getOfflineCoverLetterMock(resumeData, actualTone, actualLength);
+            result = await this.simulateStreaming(mock, actualOnChunk);
         }
 
         this.setCache(cacheKey, result);
