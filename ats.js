@@ -177,36 +177,36 @@ const ATSAuditor = {
         let missingJDKeywords = [];
         let usingJdMode = false;
         
-        // 1. Contact Information Check (Max 15 points)
+        // 1. Contact Information Check (Max 10 points)
         let contactScore = 0;
-        if (resumeData.name && resumeData.name.trim().length > 2) contactScore += 3;
+        if (resumeData.name && resumeData.name.trim().length > 2) contactScore += 2;
         if (resumeData.email && resumeData.email.includes("@")) {
-            contactScore += 4;
+            contactScore += 3;
         } else {
             suggestions.push({ type: "danger", text: "Missing valid Email Address. ATS systems require a parsed contact email." });
         }
         if (resumeData.phone && resumeData.phone.trim().length > 5) {
-            contactScore += 4;
+            contactScore += 3;
         } else {
             suggestions.push({ type: "warning", text: "Missing Phone Number. Employers cannot contact you automatically." });
         }
         if (resumeData.location && resumeData.location.trim().length > 3) {
-            contactScore += 4;
+            contactScore += 2;
         } else {
             suggestions.push({ type: "warning", text: "Missing City/Location. Parsers often filter candidates based on local geofencing." });
         }
         
-        if (contactScore === 15) {
+        if (contactScore === 10) {
             suggestions.push({ type: "success", text: "Contact Information is complete and easily parsable." });
         }
         score += contactScore;
 
-        // 2. Sections Completeness (Max 20 points)
+        // 2. Sections Completeness (Max 15 points)
         let sectionsScore = 0;
         
         // Work Experience
         if (resumeData.experience && resumeData.experience.length > 0) {
-            sectionsScore += 8;
+            sectionsScore += 7;
             let descriptionsOk = resumeData.experience.every(exp => exp.desc && exp.desc.trim().length > 40);
             if (!descriptionsOk) {
                 suggestions.push({ type: "warning", text: "Some work descriptions are too short. Expand accomplishments with achievements." });
@@ -218,24 +218,24 @@ const ATSAuditor = {
 
         // Education
         if (resumeData.education && resumeData.education.length > 0) {
-            sectionsScore += 6;
+            sectionsScore += 4;
         } else {
             suggestions.push({ type: "danger", text: "Missing Education. Standard parsers scan for degrees or academic timelines." });
         }
 
         // Skills
         if (resumeData.skills && resumeData.skills.length >= 6) {
-            sectionsScore += 6;
+            sectionsScore += 4;
         } else if (resumeData.skills && resumeData.skills.length > 0) {
-            sectionsScore += 3;
+            sectionsScore += 2;
             suggestions.push({ type: "warning", text: `Only ${resumeData.skills.length} skills listed. Aim for 8-15 core skills to match search filters.` });
         } else {
             suggestions.push({ type: "danger", text: "Skills section is empty. Critical technical and soft skills must be explicitly named." });
         }
         score += sectionsScore;
 
-        // 3. Bullet Point Formatting (Max 15 points)
-        let formattingScore = 15;
+        // 3. Bullet Point Formatting (Max 10 points)
+        let formattingScore = 10;
         let hasExp = resumeData.experience && resumeData.experience.length > 0;
         if (hasExp) {
             let bulletsCount = 0;
@@ -254,10 +254,10 @@ const ATSAuditor = {
             });
 
             if (bulletsCount === 0 && paragraphsCount > 0) {
-                formattingScore = 3;
+                formattingScore = 2;
                 suggestions.push({ type: "danger", text: "Format experience items as a bulleted list. Paragraph blocks break parser tokenizers." });
             } else if (paragraphsCount > bulletsCount) {
-                formattingScore = 8;
+                formattingScore = 6;
                 suggestions.push({ type: "warning", text: "Mixed paragraphs and bullets. Convert all duties into action-verb bullet points." });
             } else {
                 suggestions.push({ type: "success", text: "Excellent bullet-point formatting utilized in experience descriptions." });
@@ -267,7 +267,7 @@ const ATSAuditor = {
         }
         score += formattingScore;
 
-        // 4. Job Description Keyword Matching (Max 40 points)
+        // 4. Job Description Keyword Matching (Max 35 points)
         let keywordScore = 0;
         let fullResumeText = (
             (resumeData.name || "") + " " +
@@ -296,7 +296,7 @@ const ATSAuditor = {
                 });
 
                 const matchRatio = matchedJDKeywords.length / extractedJDKeywords.length;
-                keywordScore = Math.round(matchRatio * 40);
+                keywordScore = Math.round(matchRatio * 35);
                 
                 if (matchRatio >= 0.75) {
                     suggestions.push({ type: "success", text: `Exceptional job description match (${matchedJDKeywords.length}/${extractedJDKeywords.length} key skills identified).` });
@@ -325,7 +325,7 @@ const ATSAuditor = {
                 });
 
                 let matchRatio = matched.length / targetKeywords.length;
-                keywordScore = Math.round(matchRatio * 40);
+                keywordScore = Math.round(matchRatio * 35);
                 
                 if (matchRatio >= 0.7) {
                     suggestions.push({ type: "success", text: `High static keywords matched (${matched.length}/${targetKeywords.length}) for "${jobTitle}".` });
@@ -339,6 +339,63 @@ const ATSAuditor = {
             }
         }
         score += keywordScore;
+
+        // 5. Action Verb vs Buzzword Audit (Max 20 points)
+        let verbScore = 0;
+        const weakBuzzwords = ["responsible for", "helped", "assisted", "managed", "worked on", "handled", "duties included", "experienced in", "team player", "detail oriented", "hard working", "self motivated"];
+        const strongActionVerbs = ["spearheaded", "engineered", "optimized", "implemented", "designed", "architected", "developed", "executed", "accelerated", "decreased", "increased", "maximized", "minimized", "pioneered", "orchestrated", "streamlined", "formulated", "conceptualized", "delivered"];
+        
+        let weakCount = 0;
+        let strongCount = 0;
+        let detectedWeak = [];
+
+        weakBuzzwords.forEach(buzz => {
+            const escaped = buzz.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            const regex = new RegExp('\\b' + escaped + '\\b', 'gi');
+            const matches = fullResumeText.match(regex);
+            if (matches) {
+                weakCount += matches.length;
+                detectedWeak.push(buzz);
+            }
+        });
+
+        strongActionVerbs.forEach(verb => {
+            const escaped = verb.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            const regex = new RegExp('\\b' + escaped + '\\b', 'gi');
+            const matches = fullResumeText.match(regex);
+            if (matches) {
+                strongCount += matches.length;
+            }
+        });
+
+        if (strongCount > 0) {
+            verbScore += Math.min(15, strongCount * 3);
+        }
+        if (weakCount === 0 && strongCount > 2) {
+            verbScore += 5;
+        } else {
+            verbScore -= Math.min(5, weakCount * 2);
+        }
+        verbScore = Math.max(0, Math.min(20, verbScore));
+        score += verbScore;
+
+        if (detectedWeak.length > 0) {
+            suggestions.push({ 
+                type: "warning", 
+                text: `Detected weak buzzwords: "${detectedWeak.join(', ')}". Replace them with action-oriented phrases (e.g. replace 'responsible for' with 'spearheaded').` 
+            });
+        }
+        if (strongCount >= 3) {
+            suggestions.push({ 
+                type: "success", 
+                text: `Excellent usage of strong action verbs (${strongCount} detected).` 
+            });
+        } else {
+            suggestions.push({ 
+                type: "warning", 
+                text: `Only ${strongCount} strong action verbs detected. Infuse achievements with active verbs like 'spearheaded', 'optimized', or 'engineered'.` 
+            });
+        }
 
         // 5. Word Count and Spacing Density (Max 10 points)
         let lengthScore = 10;
