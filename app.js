@@ -47,53 +47,23 @@ const debouncedRenderPreview = debounce(() => {
 
 // Core App State
 var state = {
-    targetJob: "Software Developer",
+    targetJob: "",
     targetCountry: "US",
-    name: "Alex Mercer",
-    title: "Full Stack Software Engineer",
-    email: "alex.mercer@dev.io",
-    phone: "+1 (555) 321-9876",
-    location: "Seattle, WA",
-    website: "github.com/alex-mercer",
-    dob: "12 Oct 1998",
-    nationality: "Indian",
-    visaStatus: "Employment Visa (GCC Eligible)",
-    maritalStatus: "Single / Male",
-    languages: "English (Native), Hindi (Native), Arabic (Basic)",
-    skills: ["React.js", "JavaScript (ES6+)", "Node.js", "Python", "REST APIs", "SQL", "Git/GitHub", "Docker"],
-    experience: [
-        {
-            id: "exp-1",
-            company: "TechNova Solutions",
-            role: "Software Engineer",
-            date: "Jan 2024 - Present",
-            desc: "- Spearheaded development of core web application dashboard, improving speed by 35%.\n- Collaborated with 5 engineers to design REST API endpoints and integrate them with React UI.\n- Integrated automated unit tests, increasing system reliability by 25%."
-        },
-        {
-            id: "exp-2",
-            company: "Quantum Code Inc",
-            role: "Junior Web Developer",
-            date: "Jun 2022 - Dec 2023",
-            desc: "- Developed and maintained robust websites for client projects using JavaScript, HTML, and CSS.\n- Revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%.\n- Debugged production issues, resolving an average of 10+ critical issues weekly."
-        }
-    ],
-    education: [
-        {
-            id: "edu-1",
-            institution: "University of Washington",
-            degree: "Bachelor of Science in Computer Science",
-            date: "2018 - 2022",
-            desc: "Graduated with Honors. Specialized in Software Architecture and Database Systems."
-        }
-    ],
-    projects: [
-        {
-            id: "proj-1",
-            title: "DevPortfolio Generator",
-            role: "Creator",
-            desc: "An open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites. Gained 150+ stars on GitHub."
-        }
-    ],
+    name: "",
+    title: "",
+    email: "",
+    phone: "",
+    location: "",
+    website: "",
+    dob: "",
+    nationality: "",
+    visaStatus: "",
+    maritalStatus: "",
+    languages: "",
+    skills: [],
+    experience: [],
+    education: [],
+    projects: [],
     activeTemplate: "modern"
 };
 
