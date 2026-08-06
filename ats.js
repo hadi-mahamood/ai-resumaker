@@ -2169,16 +2169,18 @@ window.initProfiles = async function() {
                 const active = window.profiles.find(p => p.id === window.activeProfileId) || window.profiles[0];
                 window.updateStateObject(active.resumeData);
                 
-                // Re-render UI forms and preview
-                setFormFields();
-                updateSidebarBadges();
-                renderExperienceList();
-                renderEducationList();
-                renderProjectsList();
-                renderSkillsTags();
-                renderResumePreview();
-                updateATSScore();
-                window.renderProfileDropdown();
+                // Re-render UI forms and preview if initialized
+                if (window.appInitialized) {
+                    if (typeof setFormFields === "function") setFormFields();
+                    if (typeof updateSidebarBadges === "function") updateSidebarBadges();
+                    if (typeof renderExperienceList === "function") renderExperienceList();
+                    if (typeof renderEducationList === "function") renderEducationList();
+                    if (typeof renderProjectsList === "function") renderProjectsList();
+                    if (typeof renderSkillsTags === "function") renderSkillsTags();
+                    if (typeof renderResumePreview === "function") renderResumePreview();
+                    if (typeof updateATSScore === "function") updateATSScore();
+                    if (typeof window.renderProfileDropdown === "function") window.renderProfileDropdown();
+                }
                 return;
             }
         }
@@ -2230,7 +2232,17 @@ window.initProfiles = async function() {
     // Sync migrations back to server
     window.syncProfilesToServer();
     
-    window.renderProfileDropdown();
+    if (window.appInitialized) {
+        if (typeof setFormFields === "function") setFormFields();
+        if (typeof updateSidebarBadges === "function") updateSidebarBadges();
+        if (typeof renderExperienceList === "function") renderExperienceList();
+        if (typeof renderEducationList === "function") renderEducationList();
+        if (typeof renderProjectsList === "function") renderProjectsList();
+        if (typeof renderSkillsTags === "function") renderSkillsTags();
+        if (typeof renderResumePreview === "function") renderResumePreview();
+        if (typeof updateATSScore === "function") updateATSScore();
+        if (typeof window.renderProfileDropdown === "function") window.renderProfileDropdown();
+    }
 };
 
 window.renderProfileDropdown = function() {

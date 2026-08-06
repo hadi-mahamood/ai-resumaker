@@ -160,6 +160,9 @@ document.addEventListener("DOMContentLoaded", () => {
             window.resizeCoverLetterPreview();
         }
     });
+
+    // Signal app initialization is complete
+    window.appInitialized = true;
 });
 
 // Sync state data to form inputs
