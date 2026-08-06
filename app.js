@@ -1011,16 +1011,16 @@ function renderExperienceList() {
             <div class="form-row">
                 <div class="form-group">
                     <label>Company</label>
-                    <input type="text" id="exp-company-${exp.id}" value="${exp.company}" oninput="updateExperience('${exp.id}', 'company', this.value)" placeholder="e.g. Google">
+                    <input type="text" id="exp-company-${exp.id}" value="${exp.company}" oninput="updateExperience('${exp.id}', 'company', this.value)" placeholder="e.g. Google, Microsoft, Startup (Type to set)">
                 </div>
                 <div class="form-group">
                     <label>Role</label>
-                    <input type="text" id="exp-role-${exp.id}" value="${exp.role}" oninput="updateExperience('${exp.id}', 'role', this.value)" placeholder="e.g. Lead Engineer">
+                    <input type="text" id="exp-role-${exp.id}" value="${exp.role}" oninput="updateExperience('${exp.id}', 'role', this.value)" placeholder="e.g. Lead Engineer, Product Manager, Analyst (Type to set)">
                 </div>
             </div>
             <div class="form-group">
                 <label>Date Range</label>
-                <input type="text" id="exp-date-${exp.id}" value="${exp.date}" oninput="updateExperience('${exp.id}', 'date', this.value)" placeholder="e.g. Jan 2022 - Present">
+                <input type="text" id="exp-date-${exp.id}" value="${exp.date}" oninput="updateExperience('${exp.id}', 'date', this.value)" placeholder="e.g. Jan 2022 - Present, 2018 - 2020 (Type to set)">
             </div>
             <div class="form-group">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
@@ -1029,7 +1029,7 @@ function renderExperienceList() {
                         <i class="fa-solid fa-wand-magic-sparkles"></i> AI Rewrite
                     </button>
                 </div>
-                <textarea id="exp-desc-${exp.id}" oninput="updateExperience('${exp.id}', 'desc', this.value)" placeholder="Describe achievements (e.g. Led a team of 5 to rebuild database index mapping, decreasing query latency by 40%)...">${exp.desc}</textarea>
+                <textarea id="exp-desc-${exp.id}" oninput="updateExperience('${exp.id}', 'desc', this.value)" placeholder="e.g. Rebuilt database index mapping, decreasing query latency by 40% (Press Enter for new bullet)...">${exp.desc}</textarea>
             </div>
 
             <!-- STAR Method Helper Toggle -->
@@ -1130,20 +1130,20 @@ function renderEducationList() {
             <div class="form-row">
                 <div class="form-group">
                     <label>Institution</label>
-                    <input type="text" id="edu-institution-${edu.id}" value="${edu.institution}" oninput="updateEducation('${edu.id}', 'institution', this.value)" placeholder="e.g. Stanford University">
+                    <input type="text" id="edu-institution-${edu.id}" value="${edu.institution}" oninput="updateEducation('${edu.id}', 'institution', this.value)" placeholder="e.g. Stanford University, MIT, High School (Type to set)">
                 </div>
                 <div class="form-group">
                     <label>Degree / Certificate</label>
-                    <input type="text" id="edu-degree-${edu.id}" value="${edu.degree}" oninput="updateEducation('${edu.id}', 'degree', this.value)" placeholder="e.g. MS in Computer Science">
+                    <input type="text" id="edu-degree-${edu.id}" value="${edu.degree}" oninput="updateEducation('${edu.id}', 'degree', this.value)" placeholder="e.g. MS in Computer Science, MBA, BTech (Type to set)">
                 </div>
             </div>
             <div class="form-group">
                 <label>Timeline / Dates</label>
-                <input type="text" id="edu-date-${edu.id}" value="${edu.date}" oninput="updateEducation('${edu.id}', 'date', this.value)" placeholder="e.g. 2018 - 2020">
+                <input type="text" id="edu-date-${edu.id}" value="${edu.date}" oninput="updateEducation('${edu.id}', 'date', this.value)" placeholder="e.g. 2018 - 2020, 2014 - 2018 (Type to set)">
             </div>
             <div class="form-group">
                 <label>Additional Info (Optional)</label>
-                <textarea id="edu-desc-${edu.id}" oninput="updateEducation('${edu.id}', 'desc', this.value)" placeholder="GPA, notable courses, honors...">${edu.desc}</textarea>
+                <textarea id="edu-desc-${edu.id}" oninput="updateEducation('${edu.id}', 'desc', this.value)" placeholder="e.g. GPA 3.8/4.0, Dean's List, coursework in Algorithms (Type to set)">${edu.desc}</textarea>
             </div>
         `;
         container.appendChild(card);
@@ -1198,16 +1198,16 @@ function renderProjectsList() {
             <div class="form-row">
                 <div class="form-group">
                     <label>Project Name</label>
-                    <input type="text" value="${proj.title}" oninput="updateProject('${proj.id}', 'title', this.value)" placeholder="e.g. E-Commerce Backend">
+                    <input type="text" value="${proj.title}" oninput="updateProject('${proj.id}', 'title', this.value)" placeholder="e.g. E-Commerce Backend, Portfolio Webpage (Type to set)">
                 </div>
                 <div class="form-group">
                     <label>Role</label>
-                    <input type="text" value="${proj.role}" oninput="updateProject('${proj.id}', 'role', this.value)" placeholder="e.g. Sole Architect">
+                    <input type="text" value="${proj.role}" oninput="updateProject('${proj.id}', 'role', this.value)" placeholder="e.g. Sole Architect, Lead Developer, Contributor (Type to set)">
                 </div>
             </div>
             <div class="form-group">
                 <label>Description / Technical Details</label>
-                <textarea oninput="updateProject('${proj.id}', 'desc', this.value)" placeholder="Describe features and technologies used (e.g. Designed distributed caching mechanism, improving page load speeds by 25%)...">${proj.desc}</textarea>
+                <textarea oninput="updateProject('${proj.id}', 'desc', this.value)" placeholder="e.g. Designed distributed caching mechanism, improving page load speeds by 25% (Type to set)...">${proj.desc}</textarea>
             </div>
         `;
         container.appendChild(card);
