@@ -438,13 +438,13 @@ function bindInputEvents() {
         }
         
         locInput.addEventListener("input", (e) => {
-            const selectedVal = e.target.value.trim();
-            const matchedPreset = LOCATION_PRESETS.find(item => item.name.toLowerCase() === selectedVal.toLowerCase());
+            const val = e.target.value.trim();
+            const prefix = window.detectPrefixFromLocation ? window.detectPrefixFromLocation(val) : "";
             
-            if (matchedPreset && phoneInput) {
+            if (prefix && phoneInput) {
                 const currentPhone = phoneInput.value.trim();
                 if (!currentPhone) {
-                    phoneInput.value = matchedPreset.prefix + " ";
+                    phoneInput.value = prefix + " ";
                     state.phone = phoneInput.value;
                     updateSidebarBadges();
                     autoSave();
@@ -452,12 +452,23 @@ function bindInputEvents() {
                 } else {
                     const digits = currentPhone.replace(/\D/g, '');
                     if (digits.length === 10 && !currentPhone.startsWith("+") && !currentPhone.startsWith("0")) {
-                        phoneInput.value = matchedPreset.prefix + " " + currentPhone;
+                        phoneInput.value = prefix + " " + currentPhone;
                         state.phone = phoneInput.value;
                         updateSidebarBadges();
                         autoSave();
                         debouncedRenderPreview();
-                        showToast(`Formatted phone number with country prefix ${matchedPreset.prefix}!`);
+                        showToast(`Formatted phone number with country prefix ${prefix}!`);
+                    } else if (currentPhone.startsWith("+")) {
+                        const prefixes = ["+91", "+971", "+966", "+968", "+974", "+965", "+973", "+65", "+49", "+33", "+44", "+1", "+61", "+92", "+880", "+63", "+81", "+82", "+852", "+86", "+886", "+66", "+60", "+62", "+94", "+977", "+64", "+20", "+27", "+254", "+234", "+212", "+31", "+32", "+41", "+39", "+34", "+353", "+43", "+48", "+46", "+47", "+45", "+52", "+55", "+54", "+57"];
+                        const matchedOldPrefix = prefixes.find(p => currentPhone.startsWith(p));
+                        if (matchedOldPrefix && matchedOldPrefix !== prefix) {
+                            phoneInput.value = currentPhone.replace(matchedOldPrefix, prefix);
+                            state.phone = phoneInput.value;
+                            updateSidebarBadges();
+                            autoSave();
+                            debouncedRenderPreview();
+                            showToast(`Updated phone country code to ${prefix} based on new location!`);
+                        }
                     }
                 }
             }
@@ -476,17 +487,8 @@ function bindInputEvents() {
         phoneInput.setAttribute("list", "phone-suggestions");
         
         const populatePhoneSuggestions = () => {
-            const locVal = (locInput ? locInput.value.trim().toLowerCase() : "");
-            let matchedPrefix = "";
-            if (locVal) {
-                const matchedPreset = LOCATION_PRESETS.find(item => 
-                    locVal.includes(item.name.toLowerCase()) || 
-                    item.name.toLowerCase().includes(locVal)
-                );
-                if (matchedPreset) {
-                    matchedPrefix = matchedPreset.prefix;
-                }
-            }
+            const locVal = (locInput ? locInput.value.trim() : "");
+            const matchedPrefix = window.detectPrefixFromLocation ? window.detectPrefixFromLocation(locVal) : "";
             
             const PHONE_CODE_SUGGESTIONS = [
                 { code: "+91", label: "+91 (India)" },
@@ -2710,3 +2712,80 @@ document.addEventListener("touchend", (e) => {
         }
     }
 }, { passive: true });
+
+function detectPrefixFromLocation(locText) {
+    if (!locText) return "";
+    const clean = locText.toLowerCase();
+    
+    const keywordsMap = [
+        { keys: ["india", "kerala", "mumbai", "delhi", "bangalore", "chennai", "hyderabad", "pune", "kolkata", "ahmedabad", "jaipur", "lucknow", "patna", "malappuram", "tirurangadi", "kochi", "kozhikode", "trivandrum", "thrissur", "palakkad", "wayanad", "in"], prefix: "+91" },
+        { keys: ["usa", "united states", "america", "seattle", "san francisco", "new york", "austin", "boston", "chicago", "los angeles", "houston", "miami", "atlanta", "denver", "portland", "us"], prefix: "+1" },
+        { keys: ["canada", "toronto", "vancouver", "montreal", "ca"], prefix: "+1" },
+        { keys: ["united kingdom", "uk", "london", "manchester", "birmingham", "edinburgh", "glasgow", "leeds", "bristol", "gb"], prefix: "+44" },
+        { keys: ["united arab emirates", "uae", "dubai", "abu dhabi", "sharjah", "ajman", "ras al khaimah", "fujairah", "ae"], prefix: "+971" },
+        { keys: ["saudi arabia", "saudi", "riyadh", "jeddah", "mecca", "medina", "dammam", "khobar", "sa"], prefix: "+966" },
+        { keys: ["oman", "muscat", "salalah", "sohar", "nizwa", "om"], prefix: "+968" },
+        { keys: ["qatar", "doha", "al rayyan", "al wakrah", "khor", "qa"], prefix: "+974" },
+        { keys: ["kuwait", "kuwait city", "hawally", "salmiya", "kw"], prefix: "+965" },
+        { keys: ["bahrain", "manama", "riffa", "muharraq", "bh"], prefix: "+973" },
+        { keys: ["singapore", "sg"], prefix: "+65" },
+        { keys: ["germany", "berlin", "munich", "frankfurt", "de"], prefix: "+49" },
+        { keys: ["france", "paris", "lyon", "marseille", "fr"], prefix: "+33" },
+        { keys: ["australia", "sydney", "melbourne", "brisbane", "perth", "adelaide", "au"], prefix: "+61" },
+        { keys: ["pakistan", "karachi", "lahore", "pk"], prefix: "+92" },
+        { keys: ["bangladesh", "dhaka", "bd"], prefix: "+880" },
+        { keys: ["philippines", "manila", "cebu", "ph"], prefix: "+63" },
+        { keys: ["japan", "tokyo", "osaka", "jp"], prefix: "+81" },
+        { keys: ["south korea", "korea", "seoul", "kr"], prefix: "+82" },
+        { keys: ["hong kong", "hk"], prefix: "+852" },
+        { keys: ["china", "shanghai", "beijing", "cn"], prefix: "+86" },
+        { keys: ["taiwan", "taipei", "tw"], prefix: "+886" },
+        { keys: ["thailand", "bangkok", "th"], prefix: "+66" },
+        { keys: ["malaysia", "kuala lumpur", "my"], prefix: "+60" },
+        { keys: ["indonesia", "jakarta", "id"], prefix: "+62" },
+        { keys: ["sri lanka", "colombo", "lk"], prefix: "+94" },
+        { keys: ["nepal", "kathmandu", "np"], prefix: "+977" },
+        { keys: ["new zealand", "auckland", "wellington", "nz"], prefix: "+64" },
+        { keys: ["egypt", "cairo", "eg"], prefix: "+20" },
+        { keys: ["south africa", "johannesburg", "cape town", "za"], prefix: "+27" },
+        { keys: ["kenya", "nairobi", "ke"], prefix: "+254" },
+        { keys: ["nigeria", "lagos", "ng"], prefix: "+234" },
+        { keys: ["morocco", "casablanca", "ma"], prefix: "+212" },
+        { keys: ["netherlands", "holland", "amsterdam", "rotterdam", "nl"], prefix: "+31" },
+        { keys: ["belgium", "brussels", "be"], prefix: "+32" },
+        { keys: ["switzerland", "zurich", "geneva", "ch"], prefix: "+41" },
+        { keys: ["italy", "rome", "milan", "it"], prefix: "+39" },
+        { keys: ["spain", "madrid", "barcelona", "es"], prefix: "+34" },
+        { keys: ["ireland", "dublin", "ie"], prefix: "+353" },
+        { keys: ["austria", "vienna", "at"], prefix: "+43" },
+        { keys: ["poland", "warsaw", "pl"], prefix: "+48" },
+        { keys: ["sweden", "stockholm", "se"], prefix: "+46" },
+        { keys: ["norway", "oslo", "no"], prefix: "+47" },
+        { keys: ["denmark", "copenhagen", "dk"], prefix: "+45" },
+        { keys: ["mexico", "mexico city", "mx"], prefix: "+52" },
+        { keys: ["brazil", "sao paulo", "br"], prefix: "+55" },
+        { keys: ["argentina", "buenos aires", "ar"], prefix: "+54" },
+        { keys: ["colombia", "bogota", "co"], prefix: "+57" }
+    ];
+    
+    for (let mapping of keywordsMap) {
+        for (let key of mapping.keys) {
+            const regex = new RegExp(`\\b${key}\\b`, 'i');
+            if (regex.test(clean)) {
+                return mapping.prefix;
+            }
+        }
+    }
+    
+    for (let mapping of keywordsMap) {
+        for (let key of mapping.keys) {
+            if (clean.includes(key)) {
+                return mapping.prefix;
+            }
+        }
+    }
+    
+    return "";
+}
+
+window.detectPrefixFromLocation = detectPrefixFromLocation;
