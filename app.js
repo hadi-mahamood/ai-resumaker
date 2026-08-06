@@ -1982,6 +1982,11 @@ function updateSidebarBadges() {
     // 6. Projects Count
     const badgeProj = document.getElementById("badge-proj");
     if (badgeProj) badgeProj.innerText = state.projects ? state.projects.length : 0;
+
+    // Call Resume Strength progress helper
+    if (window.updateCompletenessProgress) {
+        window.updateCompletenessProgress();
+    }
 }
 
 window.previewZoom = 100;
@@ -3067,3 +3072,64 @@ function updatePDFPageAdvisor() {
 }
 
 window.updatePDFPageAdvisor = updatePDFPageAdvisor;
+
+function updateCompletenessProgress() {
+    // 1. Personal Details (20% weight)
+    const personalFields = [state.name, state.title, state.email, state.phone, state.location, state.website];
+    const personalFilled = personalFields.filter(f => f && f.trim().length > 0).length;
+    const personalPct = personalFilled / personalFields.length;
+    
+    // 2. Regional Details (15% weight)
+    const regionalFields = [state.dob, state.nationality, state.visaStatus, state.maritalStatus, state.languages];
+    const regionalFilled = regionalFields.filter(f => f && f.trim().length > 0).length;
+    const regionalPct = regionalFilled / regionalFields.length;
+
+    // 3. Work Experience (20% weight)
+    const hasExp = state.experience && state.experience.length > 0;
+    const expPct = hasExp ? 1 : 0;
+
+    // 4. Education (15% weight)
+    const hasEdu = state.education && state.education.length > 0;
+    const eduPct = hasEdu ? 1 : 0;
+
+    // 5. Key Skills (15% weight)
+    const hasSkills = state.skills && state.skills.length > 0;
+    const skillsPct = hasSkills ? 1 : 0;
+
+    // 6. Projects (15% weight)
+    const hasProj = state.projects && state.projects.length > 0;
+    const projPct = hasProj ? 1 : 0;
+
+    // Weighted Score
+    const score = (personalPct * 0.20) + (regionalPct * 0.15) + (expPct * 0.20) + (eduPct * 0.15) + (skillsPct * 0.15) + (projPct * 0.15);
+    const overallPct = Math.round(score * 100);
+
+    const progressCircle = document.getElementById("completeness-progress-circle");
+    const pctBadge = document.getElementById("completeness-percentage-badge");
+    const statusText = document.getElementById("completeness-status-text");
+
+    if (progressCircle && pctBadge && statusText) {
+        progressCircle.setAttribute("stroke-dasharray", `${overallPct}, 100`);
+        pctBadge.innerText = `${overallPct}%`;
+
+        if (overallPct === 100) {
+            statusText.innerText = "All-Star Profile";
+            statusText.style.color = "#10b981"; // Emerald var(--success)
+            progressCircle.setAttribute("stroke", "#10b981");
+        } else if (overallPct >= 75) {
+            statusText.innerText = "Excellent Strength";
+            statusText.style.color = "var(--primary)";
+            progressCircle.setAttribute("stroke", "var(--primary)");
+        } else if (overallPct >= 40) {
+            statusText.innerText = "Good Progress";
+            statusText.style.color = "var(--accent)";
+            progressCircle.setAttribute("stroke", "var(--accent)");
+        } else {
+            statusText.innerText = "Building Profile";
+            statusText.style.color = "white";
+            progressCircle.setAttribute("stroke", "var(--primary)");
+        }
+    }
+}
+
+window.updateCompletenessProgress = updateCompletenessProgress;
