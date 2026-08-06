@@ -2018,6 +2018,11 @@ function resizeResumePreview() {
         scaler.style.width = scale === 1 ? "794px" : "100%";
         scaler.style.justifyContent = "center";
     }
+    
+    // Call PDF page count & overflow advisor helper
+    if (window.updatePDFPageAdvisor) {
+        window.updatePDFPageAdvisor();
+    }
 }
 
 window.adjustPreviewZoom = function(amount) {
@@ -3027,3 +3032,38 @@ function toggleSectionVisibility(sectionKey, isChecked) {
 
 window.applySectionVisibility = applySectionVisibility;
 window.toggleSectionVisibility = toggleSectionVisibility;
+
+function updatePDFPageAdvisor() {
+    const sheet = document.getElementById("resume-sheet");
+    const advisor = document.getElementById("pdf-page-advisor");
+    const status = document.getElementById("pdf-page-status");
+    if (!sheet || !advisor || !status) return;
+    
+    // A4 print target height: 1123px
+    const height = sheet.offsetHeight;
+    const pages = Math.ceil(height / 1123);
+    
+    status.innerText = `${pages} Page${pages > 1 ? 's' : ''}`;
+    
+    // Check if close to overflow (within 40px of next page boundary)
+    const threshold = 1123;
+    const offsetInCurrentPage = height % threshold;
+    const isCloseToOverflow = offsetInCurrentPage > 1080;
+    
+    if (isCloseToOverflow) {
+        advisor.style.backgroundColor = "rgba(245, 158, 11, 0.08)";
+        advisor.style.borderColor = "rgba(245, 158, 11, 0.2)";
+        advisor.style.color = "#fbbf24";
+        status.innerText = `${pages} Page${pages > 1 ? 's' : ''} (Close to split)`;
+    } else if (pages > 2) {
+        advisor.style.backgroundColor = "rgba(239, 68, 68, 0.08)";
+        advisor.style.borderColor = "rgba(239, 68, 68, 0.2)";
+        advisor.style.color = "#f87171";
+    } else {
+        advisor.style.backgroundColor = "rgba(16, 185, 129, 0.08)";
+        advisor.style.borderColor = "rgba(16, 185, 129, 0.2)";
+        advisor.style.color = "#34d399";
+    }
+}
+
+window.updatePDFPageAdvisor = updatePDFPageAdvisor;

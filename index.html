@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=63.0">
+    <link rel="stylesheet" href="style.css?v=64.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase Client JS SDK -->
@@ -778,6 +778,11 @@
                         </label>
                     </div>
 
+                    <!-- PDF Page & Overflow Advisor -->
+                    <div id="pdf-page-advisor" data-tooltip="Standard A4 Page Count & Overflow Status" style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); color: #34d399; transition: all 0.25s ease;">
+                        <i class="fa-solid fa-file-lines"></i> <span id="pdf-page-status">1 Page</span>
+                    </div>
+
                     <!-- Live Preview Zoom Controller -->
                     <div class="zoom-controller" data-tooltip="Adjust preview scaling level">
                         <button class="zoom-btn" onclick="window.adjustPreviewZoom(-10)" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
@@ -1176,8 +1181,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=63.0"></script>
-    <script src="ats.js?v=63.0"></script>
-    <script type="module" src="app.js?v=63.0"></script>
+    <script src="ai.js?v=64.0"></script>
+    <script src="ats.js?v=64.0"></script>
+    <script type="module" src="app.js?v=64.0"></script>
 </body>
 </html>

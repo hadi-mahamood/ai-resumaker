@@ -33,14 +33,14 @@
             "company": "TechNova Solutions",
             "role": "Software Engineer",
             "date": "Jan 2024 - Present",
-            "desc": "- Spearheaded spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered collaborated with 5 engineers to design REST API endpoints and integrate them with React UI, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+            "desc": "- Spearheaded development of core web application dashboard, improving speed by 35%.\n- Collaborated with 5 engineers to design REST API endpoints and integrate them with React UI.\n- Integrated automated unit tests, increasing system reliability by 25%."
           },
           {
             "id": "exp-2",
             "company": "Quantum Code Inc",
             "role": "Junior Web Developer",
             "date": "Jun 2022 - Dec 2023",
-            "desc": "- Spearheaded spearheaded developed and maintained robust websites for client projects using JavaScript, HTML, and CSS, increasing team productivity by 15% through workflow automation, increasing team productivity by 15% through workflow automation.\n- Engineered engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, delivering the target milestone 2 weeks ahead of schedule, delivering the target milestone 2 weeks ahead of schedule.\n- Optimized optimized debugged production issues, resolving an average of 10+ critical issues weekly, saving 8 hours of manual tracking work per week, saving 8 hours of manual tracking work per week."
+            "desc": "- Developed and maintained robust websites for client projects using JavaScript, HTML, and CSS.\n- Revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%.\n- Debugged production issues, resolving an average of 10+ critical issues weekly."
           }
         ],
         "education": [
@@ -65,7 +65,7 @@
         "summary": "- Spearheaded spearheaded spearheaded highly accomplished professional specializing in software systems with a proven record of leading technical implementations, optimizing application workflows, and delivering high-performance scalable solutions, boosting application load times by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered engineered robust system architectures and automated deployment pipelines using Node, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized js, saving 8 hoursly cycles, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
       },
       "createdAt": 1785784396971,
-      "updatedAt": 1786016653652
+      "updatedAt": 1786018557609
     }
   ],
   "activeProfileId": "default",
@@ -99,14 +99,14 @@
         "company": "TechNova Solutions",
         "role": "Software Engineer",
         "date": "Jan 2024 - Present",
-        "desc": "- Spearheaded spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered collaborated with 5 engineers to design REST API endpoints and integrate them with React UI, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+        "desc": "- Spearheaded development of core web application dashboard, improving speed by 35%.\n- Collaborated with 5 engineers to design REST API endpoints and integrate them with React UI.\n- Integrated automated unit tests, increasing system reliability by 25%."
       },
       {
         "id": "exp-2",
         "company": "Quantum Code Inc",
         "role": "Junior Web Developer",
         "date": "Jun 2022 - Dec 2023",
-        "desc": "- Spearheaded spearheaded developed and maintained robust websites for client projects using JavaScript, HTML, and CSS, increasing team productivity by 15% through workflow automation, increasing team productivity by 15% through workflow automation.\n- Engineered engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, delivering the target milestone 2 weeks ahead of schedule, delivering the target milestone 2 weeks ahead of schedule.\n- Optimized optimized debugged production issues, resolving an average of 10+ critical issues weekly, saving 8 hours of manual tracking work per week, saving 8 hours of manual tracking work per week."
+        "desc": "- Developed and maintained robust websites for client projects using JavaScript, HTML, and CSS.\n- Revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%.\n- Debugged production issues, resolving an average of 10+ critical issues weekly."
       }
     ],
     "education": [
