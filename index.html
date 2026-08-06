@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=61.0">
+    <link rel="stylesheet" href="style.css?v=62.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase Client JS SDK -->
@@ -639,6 +639,37 @@
                     </div>
                 </div>
 
+                <!-- Section Visibility Controller -->
+                <div class="accordion-item" id="sec-visibility">
+                    <div class="accordion-header" onclick="toggleAccordion('sec-visibility')">
+                        <div class="accordion-title">
+                            <i class="fa-solid fa-eye-slash"></i>
+                            <span>Section Visibility</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner" style="display: flex; flex-direction: column; gap: 12px; padding: 12px 6px;">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 0.8rem; color: var(--text-primary);">
+                                <input type="checkbox" id="visible-regional" checked onchange="window.toggleSectionVisibility('showRegional', this.checked)" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
+                                Show Regional & Identity Details
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 0.8rem; color: var(--text-primary);">
+                                <input type="checkbox" id="visible-skills" checked onchange="window.toggleSectionVisibility('showSkills', this.checked)" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
+                                Show Key Competencies (Skills)
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 0.8rem; color: var(--text-primary);">
+                                <input type="checkbox" id="visible-education" checked onchange="window.toggleSectionVisibility('showEducation', this.checked)" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
+                                Show Education Details
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-size: 0.8rem; color: var(--text-primary);">
+                                <input type="checkbox" id="visible-projects" checked onchange="window.toggleSectionVisibility('showProjects', this.checked)" style="accent-color: var(--primary); cursor: pointer; width: 15px; height: 15px;">
+                                Show Technical Projects Details
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </aside>
 
@@ -1133,8 +1164,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=61.0"></script>
-    <script src="ats.js?v=61.0"></script>
-    <script type="module" src="app.js?v=61.0"></script>
+    <script src="ai.js?v=62.0"></script>
+    <script src="ats.js?v=62.0"></script>
+    <script type="module" src="app.js?v=62.0"></script>
 </body>
 </html>

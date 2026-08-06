@@ -64,7 +64,11 @@ var state = {
     experience: [],
     education: [],
     projects: [],
-    activeTemplate: "modern"
+    activeTemplate: "modern",
+    showRegional: true,
+    showSkills: true,
+    showEducation: true,
+    showProjects: true
 };
 
 // Accordion Logic
@@ -179,6 +183,17 @@ function setFormFields() {
     if (document.getElementById("input-visa")) document.getElementById("input-visa").value = state.visaStatus || "";
     if (window.loadMaritalGenderSelects) window.loadMaritalGenderSelects();
     if (window.renderLanguagesTags) window.renderLanguagesTags();
+    
+    // Set section visibility checkboxes based on state
+    const chkRegional = document.getElementById("visible-regional");
+    const chkSkills = document.getElementById("visible-skills");
+    const chkEducation = document.getElementById("visible-education");
+    const chkProjects = document.getElementById("visible-projects");
+    
+    if (chkRegional) chkRegional.checked = state.showRegional !== false;
+    if (chkSkills) chkSkills.checked = state.showSkills !== false;
+    if (chkEducation) chkEducation.checked = state.showEducation !== false;
+    if (chkProjects) chkProjects.checked = state.showProjects !== false;
     
     // Auto-calculate keywords match for current profile
     if (window.calculateJDMatch) {
@@ -1298,6 +1313,8 @@ function renderResumePreview() {
     makePreviewSheetEditable();
     // Apply user chosen typography metrics
     if (window.applyLayoutMetrics) window.applyLayoutMetrics();
+    // Apply layout section visibility toggles
+    applySectionVisibility();
 }
 
 function setNestedValue(obj, path, value) {
@@ -2968,3 +2985,45 @@ async function optimizeAllExperiencesAI() {
 }
 
 window.optimizeAllExperiencesAI = optimizeAllExperiencesAI;
+
+function applySectionVisibility() {
+    const sheet = document.getElementById("resume-sheet");
+    if (!sheet) return;
+    
+    const sections = sheet.querySelectorAll(".resume-section");
+    
+    const showProjects = state.showProjects !== false;
+    const showEducation = state.showEducation !== false;
+    const showSkills = state.showSkills !== false;
+    const showRegional = state.showRegional !== false;
+    
+    sections.forEach(sec => {
+        const titleText = (sec.querySelector(".resume-section-title") || sec.querySelector("h2") || {}).innerText || "";
+        const lowerTitle = titleText.toLowerCase();
+        
+        if ((lowerTitle.includes("project") || lowerTitle.includes("proyectos")) && !showProjects) {
+            sec.style.display = "none";
+        } else if ((lowerTitle.includes("education") || lowerTitle.includes("educación")) && !showEducation) {
+            sec.style.display = "none";
+        } else if ((lowerTitle.includes("skill") || lowerTitle.includes("competenc") || lowerTitle.includes("habilidades")) && !showSkills) {
+            sec.style.display = "none";
+        } else {
+            sec.style.display = "";
+        }
+    });
+    
+    const regionalSec = sheet.querySelector(".resume-regional-section") || sheet.querySelector(".regional-grid-preview") || sheet.querySelector(".regional-details-preview");
+    if (regionalSec) {
+        regionalSec.style.display = showRegional ? "" : "none";
+    }
+}
+
+function toggleSectionVisibility(sectionKey, isChecked) {
+    state[sectionKey] = isChecked;
+    autoSave();
+    applySectionVisibility();
+    showToast(`Updated section visibility!`, "info");
+}
+
+window.applySectionVisibility = applySectionVisibility;
+window.toggleSectionVisibility = toggleSectionVisibility;
