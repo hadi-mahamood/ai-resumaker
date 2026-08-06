@@ -1029,7 +1029,7 @@ function renderExperienceList() {
                         <i class="fa-solid fa-wand-magic-sparkles"></i> AI Rewrite
                     </button>
                 </div>
-                <textarea id="exp-desc-${exp.id}" oninput="updateExperience('${exp.id}', 'desc', this.value)" placeholder="Include bullet points for achievements...">${exp.desc}</textarea>
+                <textarea id="exp-desc-${exp.id}" oninput="updateExperience('${exp.id}', 'desc', this.value)" placeholder="Describe achievements (e.g. Led a team of 5 to rebuild database index mapping, decreasing query latency by 40%)...">${exp.desc}</textarea>
             </div>
 
             <!-- STAR Method Helper Toggle -->
@@ -1143,7 +1143,7 @@ function renderEducationList() {
             </div>
             <div class="form-group">
                 <label>Additional Info (Optional)</label>
-                <textarea id="edu-desc-${edu.id}" oninput="updateEducation('${edu.id}', 'desc', this.value)" placeholder="GPA, notable courses...">${edu.desc}</textarea>
+                <textarea id="edu-desc-${edu.id}" oninput="updateEducation('${edu.id}', 'desc', this.value)" placeholder="GPA, notable courses, honors...">${edu.desc}</textarea>
             </div>
         `;
         container.appendChild(card);
@@ -1207,7 +1207,7 @@ function renderProjectsList() {
             </div>
             <div class="form-group">
                 <label>Description / Technical Details</label>
-                <textarea oninput="updateProject('${proj.id}', 'desc', this.value)" placeholder="Describe features, stack used...">${proj.desc}</textarea>
+                <textarea oninput="updateProject('${proj.id}', 'desc', this.value)" placeholder="Describe features and technologies used (e.g. Designed distributed caching mechanism, improving page load speeds by 25%)...">${proj.desc}</textarea>
             </div>
         `;
         container.appendChild(card);

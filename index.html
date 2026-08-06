@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=52.0">
+    <link rel="stylesheet" href="style.css?v=53.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase Client JS SDK -->
@@ -207,15 +207,15 @@
                         <div class="accordion-inner" style="display: flex; flex-direction: column; gap: 10px;">
                             <div class="form-group" style="margin-bottom: 0;">
                                 <label for="target-job">Target Job Title</label>
-                                <input type="text" id="target-job" placeholder="e.g., Senior Software Engineer" value="Software Developer">
+                                <input type="text" id="target-job" placeholder="e.g. Senior Software Engineer" value="Software Developer">
                             </div>
                             <div class="form-group" style="margin-bottom: 0;">
                                 <label for="target-company">Target Company</label>
-                                <input type="text" id="target-company" placeholder="e.g., Google" oninput="window.updateJobTarget('targetCompany', this.value)">
+                                <input type="text" id="target-company" placeholder="e.g. Google" oninput="window.updateJobTarget('targetCompany', this.value)">
                             </div>
                             <div class="form-group" style="margin-bottom: 0;">
                                 <label for="target-job-desc">Job Description (Shared Context)</label>
-                                <textarea id="target-job-desc" placeholder="Paste the target job description here..." oninput="window.updateJobTarget('jobDescription', this.value)" style="width: 100%; height: 120px; font-size: 0.8rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: white; border-radius: 4px; padding: 6px 10px; resize: vertical; outline: none;"></textarea>
+                                <textarea id="target-job-desc" placeholder="Paste the target job description here to optimize your resume..." oninput="window.updateJobTarget('jobDescription', this.value)" style="width: 100%; height: 120px; font-size: 0.8rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: white; border-radius: 4px; padding: 6px 10px; resize: vertical; outline: none;"></textarea>
                             </div>
                             
                             <!-- Compact Keywords Comparison Panel -->
@@ -246,33 +246,33 @@
                             <div class="form-group">
                                 <label>Name</label>
                                 <div class="name-split-editor" style="display: flex; gap: 8px;">
-                                    <input type="text" id="input-first-name" placeholder="First Name" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); outline: none; font-size: 0.85rem;" oninput="window.updateNameCombined()">
-                                    <input type="text" id="input-last-name" placeholder="Second Name" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); outline: none; font-size: 0.85rem;" oninput="window.updateNameCombined()">
+                                    <input type="text" id="input-first-name" placeholder="e.g. Alex" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); outline: none; font-size: 0.85rem;" oninput="window.updateNameCombined()">
+                                    <input type="text" id="input-last-name" placeholder="e.g. Mercer" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); outline: none; font-size: 0.85rem;" oninput="window.updateNameCombined()">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="input-title">Professional Title</label>
-                                <input type="text" id="input-title" placeholder="e.g., Full Stack Engineer">
+                                <input type="text" id="input-title" placeholder="e.g. Senior Software Engineer">
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="input-email">Email</label>
-                                    <input type="email" id="input-email" placeholder="john.doe@example.com">
+                                    <input type="email" id="input-email" placeholder="e.g. alex.mercer@gmail.com">
                                 </div>
                                 <div class="form-group">
                                     <label for="input-phone">Phone</label>
-                                    <input type="tel" id="input-phone" placeholder="+1 (555) 000-0000">
+                                    <input type="tel" id="input-phone" placeholder="e.g. +1 555-0199">
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="input-location">Location</label>
-                                    <input type="text" id="input-location" list="location-suggestions" placeholder="e.g. Seattle, WA">
+                                    <input type="text" id="input-location" list="location-suggestions" placeholder="e.g. Seattle, WA, USA">
                                     <datalist id="location-suggestions"></datalist>
                                 </div>
                                 <div class="form-group">
                                     <label for="input-website">Website / Portfolio</label>
-                                    <input type="text" id="input-website" placeholder="linkedin.com/in/johndoe">
+                                    <input type="text" id="input-website" placeholder="e.g. linkedin.com/in/alexmercer">
                                 </div>
                             </div>
                         </div>
@@ -322,7 +322,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="input-nationality">Nationality</label>
-                                    <input type="text" id="input-nationality" list="nationality-suggestions" placeholder="e.g. Indian">
+                                    <input type="text" id="input-nationality" list="nationality-suggestions" placeholder="e.g. American">
                                     <datalist id="nationality-suggestions">
                                         <!-- Asia & South Asia -->
                                         <option value="Indian"></option>
@@ -397,7 +397,7 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="input-visa">Visa / Residency Status</label>
-                                    <input type="text" id="input-visa" list="visa-suggestions" placeholder="e.g. Golden Visa / Employment">
+                                    <input type="text" id="input-visa" list="visa-suggestions" placeholder="e.g. Citizen, Employment Visa">
                                     <datalist id="visa-suggestions">
                                         <option value="Citizen"></option>
                                         <option value="Employment Visa"></option>
@@ -441,7 +441,7 @@
                                 <label>Languages & Proficiency</label>
                                 <div class="languages-tags-container" id="languages-tags-container" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--input-bg); min-height: 42px; align-items: center; margin-bottom: 8px;">
                                     <div style="display: flex; gap: 6px; flex-grow: 1; min-width: 150px;">
-                                        <input type="text" id="language-name-input" list="language-presets" placeholder="Add language..." style="flex: 2; border: none; padding: 4px; outline: none; background: transparent; font-size: 0.85rem; width: 100%;">
+                                        <input type="text" id="language-name-input" list="language-presets" placeholder="e.g. English" style="flex: 2; border: none; padding: 4px; outline: none; background: transparent; font-size: 0.85rem; width: 100%;">
                                         <select id="language-proficiency-select" style="flex: 1; border: none; padding: 4px; outline: none; background: transparent; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; min-width: 80px;">
                                             <option value="Native">Native</option>
                                             <option value="Fluent">Fluent</option>
@@ -592,7 +592,7 @@
                             <div class="form-group">
                                 <label>Current Skills (Double-click tag to edit, Enter to add)</label>
                                 <div class="tags-input-container" id="skills-tags-container">
-                                    <input type="text" id="skill-input" placeholder="Type and hit Enter...">
+                                    <input type="text" id="skill-input" placeholder="e.g. JavaScript, Python, React (Press Enter to add)">
                                 </div>
                             </div>
                             <button class="btn-add" onclick="openAISkills()"><i class="fa-solid fa-wand-magic-sparkles"></i> Suggest Missing Skills</button>
@@ -1116,8 +1116,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=52.0"></script>
-    <script src="ats.js?v=52.0"></script>
-    <script type="module" src="app.js?v=52.0"></script>
+    <script src="ai.js?v=53.0"></script>
+    <script src="ats.js?v=53.0"></script>
+    <script type="module" src="app.js?v=53.0"></script>
 </body>
 </html>
