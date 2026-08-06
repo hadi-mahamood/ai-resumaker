@@ -2806,3 +2806,73 @@ function detectPrefixFromLocation(locText) {
 }
 
 window.detectPrefixFromLocation = detectPrefixFromLocation;
+
+function loadSampleResumeData() {
+    state.targetJob = "Senior Full Stack Software Engineer";
+    state.name = "Alex Mercer";
+    state.title = "Senior Full Stack Software Engineer";
+    state.email = "alex.mercer@gmail.com";
+    state.phone = "+1 555-0199";
+    state.location = "Seattle, WA, USA";
+    state.website = "linkedin.com/in/alexmercer";
+    state.dob = "12-10-1998";
+    state.nationality = "American";
+    state.visaStatus = "Citizen";
+    state.maritalStatus = "Single / Male";
+    state.languages = "English (Native), Spanish (Fluent)";
+    state.skills = ["React.js", "JavaScript (ES6+)", "Node.js", "Python", "REST APIs", "SQL", "Git/GitHub", "Docker"];
+    state.experience = [
+        {
+            id: "exp-1",
+            company: "TechNova Solutions",
+            role: "Software Engineer",
+            date: "Jan 2024 - Present",
+            desc: "- Spearheaded development of core web application dashboard, improving speed by 35%.\n- Collaborated with 5 engineers to design REST API endpoints and integrate them with React UI.\n- Integrated automated unit tests, increasing system reliability by 25%."
+        },
+        {
+            id: "exp-2",
+            company: "Quantum Code Inc",
+            role: "Junior Web Developer",
+            date: "Jun 2022 - Dec 2023",
+            desc: "- Developed and maintained robust websites for client projects using JavaScript, HTML, and CSS.\n- Revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%.\n- Debugged production issues, resolving an average of 10+ critical issues weekly."
+        }
+    ];
+    state.education = [
+        {
+            id: "edu-1",
+            institution: "University of Washington",
+            degree: "Bachelor of Science in Computer Science",
+            date: "2018 - 2022",
+            desc: "Graduated with Honors. Specialized in Software Architecture and Database Systems."
+        }
+    ];
+    state.projects = [
+        {
+            id: "proj-1",
+            title: "DevPortfolio Generator",
+            role: "Creator",
+            desc: "An open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites. Gained 150+ stars on GitHub."
+        }
+    ];
+    
+    // Set form fields
+    setFormFields();
+    
+    // Render dynamic lists
+    renderSkillsTags();
+    renderExperienceList();
+    renderEducationList();
+    renderProjectsList();
+    
+    // Save, update UI badges, render preview, and toast
+    autoSave();
+    updateSidebarBadges();
+    renderResumePreview();
+    if (window.showToast) {
+        showToast("Sample premium resume loaded successfully!");
+    } else {
+        alert("Sample premium resume loaded successfully!");
+    }
+}
+
+window.loadSampleResumeData = loadSampleResumeData;
