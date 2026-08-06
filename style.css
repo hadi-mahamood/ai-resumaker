@@ -4314,3 +4314,61 @@ body.light-theme input:focus, body.light-theme select:focus, body.light-theme te
     transform: translateY(-2px);
 }
 
+/* State-of-the-Art Typography refinement */
+h1, h2, h3, h4, h5, h6, .logo-text, .accordion-title span, .toolbar-group button, .btn, .ai-btn {
+    font-family: 'Outfit', sans-serif !important;
+    letter-spacing: -0.15px;
+}
+
+/* Smooth Entrances page animations */
+@keyframes sidebarSlideIn {
+    from { transform: translateX(-15px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes previewFadeIn {
+    from { transform: translateY(15px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.sidebar {
+    animation: sidebarSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.preview-workspace {
+    animation: previewFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Glassmorphic Shimmer effect overlay for primary buttons */
+.btn-primary, .ai-btn-accent, .btn-add {
+    position: relative !important;
+    overflow: hidden !important;
+}
+.btn-primary::after, .ai-btn-accent::after, .btn-add::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -50% !important;
+    width: 200% !important;
+    height: 100% !important;
+    background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 255, 255, 0.12),
+        transparent
+    ) !important;
+    transform: skewX(-25deg) !important;
+    transition: 0.75s ease !important;
+    pointer-events: none !important;
+}
+.btn-primary:hover::after, .ai-btn-accent:hover::after, .btn-add:hover::after {
+    left: 120% !important;
+}
+
+/* A4 Sheet 3D Depth & Glowing Shadows */
+.resume-sheet, .cover-letter-sheet {
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.resume-sheet:hover, .cover-letter-sheet:hover {
+    box-shadow: 0 35px 80px rgba(99, 102, 241, 0.12), 0 0 0 1px rgba(99, 102, 241, 0.25) !important;
+    transform: translateY(-2px) scale(1.002);
+}
+
