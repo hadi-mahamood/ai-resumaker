@@ -197,7 +197,7 @@ function setFormFields() {
     if (document.getElementById("target-job-desc")) {
         document.getElementById("target-job-desc").value = state.jobDescription || "";
     }
-    document.getElementById("input-name").value = state.name || "";
+    if (window.loadNameSelects) window.loadNameSelects();
     document.getElementById("input-title").value = state.title || "";
     document.getElementById("input-email").value = state.email || "";
     document.getElementById("input-phone").value = state.phone || "";
@@ -371,7 +371,6 @@ const LOCATION_PRESETS = [
 function bindInputEvents() {
     const textInputs = [
         { id: "target-job", key: "targetJob" },
-        { id: "input-name", key: "name" },
         { id: "input-title", key: "title" },
         { id: "input-email", key: "email" },
         { id: "input-phone", key: "phone" },
@@ -663,6 +662,54 @@ function showToast(message, type = 'success') {
 /* ==========================================
    DYNAMIC LIST RENDERERS & BUILDERS
    ========================================== */
+
+function loadNameSelects() {
+    const firstInput = document.getElementById("input-first-name");
+    const lastInput = document.getElementById("input-last-name");
+    if (!firstInput || !lastInput) return;
+    
+    const nameVal = state.name || "";
+    if (!nameVal) {
+        firstInput.value = "";
+        lastInput.value = "";
+        return;
+    }
+    
+    const parts = nameVal.trim().split(/\s+/);
+    if (parts.length > 1) {
+        firstInput.value = parts[0];
+        lastInput.value = parts.slice(1).join(" ");
+    } else {
+        firstInput.value = nameVal;
+        lastInput.value = "";
+    }
+}
+
+function updateNameCombined() {
+    const firstInput = document.getElementById("input-first-name");
+    const lastInput = document.getElementById("input-last-name");
+    if (!firstInput || !lastInput) return;
+    
+    const first = firstInput.value.trim();
+    const last = lastInput.value.trim();
+    
+    if (first && last) {
+        state.name = `${first} ${last}`;
+    } else if (first) {
+        state.name = first;
+    } else if (last) {
+        state.name = last;
+    } else {
+        state.name = "";
+    }
+    
+    updateSidebarBadges();
+    autoSave();
+    debouncedRenderPreview();
+}
+
+window.loadNameSelects = loadNameSelects;
+window.updateNameCombined = updateNameCombined;
 
 function populateDOBDropdowns() {
     const daySelect = document.getElementById("select-dob-day");
