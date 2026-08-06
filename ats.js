@@ -2952,4 +2952,5 @@ window.resizeCoverLetterPreview = function() {
 };
 
 window.ATSAuditor = ATSAuditor;
+export { ATSAuditor };
 

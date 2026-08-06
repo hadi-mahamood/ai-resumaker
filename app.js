@@ -22,6 +22,8 @@ import {
     evaluateInterviewAnswer,
     loadFallbackEvaluation
 } from "./practice.js";
+import { AIService } from "./ai.js";
+import { ATSAuditor } from "./ats.js";
 
 // Debounce helper to prevent rapid main-thread blocks during fast typing
 function debounce(func, wait) {

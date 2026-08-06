@@ -790,3 +790,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.AIService = AIService;
+export { AIService };
