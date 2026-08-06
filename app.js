@@ -2914,3 +2914,57 @@ function initMobileSwipeGestures() {
 document.addEventListener("DOMContentLoaded", () => {
     initMobileSwipeGestures();
 });
+
+async function optimizeAllExperiencesAI() {
+    if (!state.experience || state.experience.length === 0) {
+        if (window.showToast) showToast("Please add at least one work experience first!");
+        else alert("Please add at least one work experience first!");
+        return;
+    }
+    
+    let optimizedCount = 0;
+    state.experience.forEach(exp => {
+        const text = exp.desc || "";
+        if (text.trim().length > 0) {
+            optimizedCount++;
+        }
+    });
+    
+    if (optimizedCount === 0) {
+        if (window.showToast) showToast("No descriptions found to optimize!");
+        else alert("No descriptions found to optimize!");
+        return;
+    }
+    
+    if (window.showToast) showToast("Optimizing all experience descriptions using AI... Please wait.");
+    
+    try {
+        const promises = state.experience.map(async (exp) => {
+            const text = exp.desc || "";
+            if (text.trim().length > 0) {
+                // Determine category dynamically
+                const category = (window.ATSAuditor && window.ATSAuditor.detectCategory) 
+                    ? window.ATSAuditor.detectCategory(exp.role || state.title || "") 
+                    : "generic";
+                
+                // Call rewriter
+                const result = await AIService.rewriteExperience(text, category);
+                exp.desc = result;
+            }
+        });
+        
+        await Promise.all(promises);
+        
+        renderExperienceList();
+        autoSave();
+        updateSidebarBadges();
+        renderResumePreview();
+        if (window.showToast) showToast(`AI successfully optimized ${optimizedCount} job descriptions!`);
+        else alert(`AI successfully optimized ${optimizedCount} job descriptions!`);
+    } catch (err) {
+        if (window.showToast) showToast("An error occurred during AI optimization.");
+        else alert("An error occurred during AI optimization.");
+    }
+}
+
+window.optimizeAllExperiencesAI = optimizeAllExperiencesAI;

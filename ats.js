@@ -2882,3 +2882,5 @@ window.resizeCoverLetterPreview = function() {
     }
 };
 
+window.ATSAuditor = ATSAuditor;
+
