@@ -4,34 +4,47 @@
       "id": "default",
       "name": "Default Profile",
       "resumeData": {
-        "targetJob": "",
+        "targetJob": "Senior Full Stack Software Engineer",
         "targetCountry": "IN",
-        "name": "AHSANA P",
-        "title": "MICROBIOLOGIST",
-        "email": "ahsanasinu0506@gmail.com",
-        "phone": "+91 (555) 321-9876",
-        "location": "Tirurangadi, Kerala, India",
-        "website": "",
-        "dob": "",
-        "nationality": "",
-        "visaStatus": "",
-        "maritalStatus": "",
-        "languages": "",
-        "skills": [],
+        "name": "Alex Mercer",
+        "title": "Senior Full Stack Software Engineer",
+        "email": "alex.mercer@gmail.com",
+        "phone": "+1 555-0199",
+        "location": "Seattle, WA, USA",
+        "website": "linkedin.com/in/alexmercer",
+        "dob": "12-10-1998",
+        "nationality": "American",
+        "visaStatus": "Citizen",
+        "maritalStatus": "Single / Male",
+        "languages": "English (Native), Spanish (Fluent)",
+        "skills": [
+          "React.js",
+          "JavaScript (ES6+)",
+          "Node.js",
+          "Python",
+          "REST APIs",
+          "SQL",
+          "Git/GitHub",
+          "Docker",
+          "CI/CD",
+          "TypeScript",
+          "System Design",
+          "Agile Methodologies"
+        ],
         "experience": [
           {
             "id": "exp-1",
-            "company": "mkh hospital",
-            "role": "microbiologist",
-            "date": " April 2020 - March 2022",
-            "desc": "- Spearheaded spearheaded development of core features, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered database models saving 10+ hours of manual testing per week, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
+            "company": "TechNova Solutions",
+            "role": "Software Engineer",
+            "date": "Jan 2024 - Present",
+            "desc": "- Spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%.\n- Engineered collaborated with 5 engineers to design REST API endpoints and integrate them with React UI, saving 8 hours of manual deployment work per week.\n- Optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates."
           },
           {
             "id": "exp-2",
-            "company": "mkh hospital ",
-            "role": "microbiologist",
-            "date": "8 Months",
-            "desc": "- Spearheaded spearheaded spearheaded spearheaded operations at mkh hospital, improving culture testing and analysis accuracy by 25%, boosting application load times by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered engineered engineered modern Data Analysis applications, reducing sample processing turnaround times by 30%, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized optimized optimized modern Quality Control applications, enhancing laboratory safety compliance index score to 100%, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+            "company": "Quantum Code Inc",
+            "role": "Junior Web Developer",
+            "date": "Jun 2022 - Dec 2023",
+            "desc": "- Spearheaded developed and maintained robust websites for client projects using JavaScript, HTML, and CSS, boosting application load times by 35%.\n- Engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week.\n- Optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates."
           }
         ],
         "education": [
@@ -48,47 +61,60 @@
             "id": "proj-1",
             "title": "DevPortfolio Generator",
             "role": "Creator",
-            "desc": "- Spearheaded designed and developed responsive dashboard improving user experience metrics by 25%, boosting application load times by 35%.\n- Engineered maximized codebase test coverage to 85%, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
+            "desc": "- Spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%.\n- Engineered gained 150+ stars on GitHub, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
           }
         ],
         "activeTemplate": "modern",
         "jobDescription": "",
-        "summary": "- Spearheaded highly accomplished professional specializing in software systems with a proven record of leading technical implementations, optimizing application workflows, and delivering high-performance scalable solutions, boosting application load times by 35%.\n- Engineered robust system architectures and automated deployment pipelines using Node.js, saving 8 hours of manual weekly cycles.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
+        "summary": "- Spearheaded spearheaded highly accomplished professional specializing in software systems with a proven record of leading technical implementations, optimizing application workflows, and delivering high-performance scalable solutions, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered robust system architectures and automated deployment pipelines using Node, saving 8 hours of manual deployment work per week.\n- Optimized js, saving 8 hoursly cycles, resulting in a 42% reduction in production crash rates."
       },
       "createdAt": 1785784396971,
-      "updatedAt": 1786011445609
+      "updatedAt": 1786011601497
     }
   ],
   "activeProfileId": "default",
   "resumeData": {
-    "targetJob": "",
+    "targetJob": "Senior Full Stack Software Engineer",
     "targetCountry": "IN",
-    "name": "AHSANA P",
-    "title": "MICROBIOLOGIST",
-    "email": "ahsanasinu0506@gmail.com",
-    "phone": "+91 (555) 321-9876",
-    "location": "Tirurangadi, Kerala, India",
-    "website": "",
-    "dob": "",
-    "nationality": "",
-    "visaStatus": "",
-    "maritalStatus": "",
-    "languages": "",
-    "skills": [],
+    "name": "Alex Mercer",
+    "title": "Senior Full Stack Software Engineer",
+    "email": "alex.mercer@gmail.com",
+    "phone": "+1 555-0199",
+    "location": "Seattle, WA, USA",
+    "website": "linkedin.com/in/alexmercer",
+    "dob": "12-10-1998",
+    "nationality": "American",
+    "visaStatus": "Citizen",
+    "maritalStatus": "Single / Male",
+    "languages": "English (Native), Spanish (Fluent)",
+    "skills": [
+      "React.js",
+      "JavaScript (ES6+)",
+      "Node.js",
+      "Python",
+      "REST APIs",
+      "SQL",
+      "Git/GitHub",
+      "Docker",
+      "CI/CD",
+      "TypeScript",
+      "System Design",
+      "Agile Methodologies"
+    ],
     "experience": [
       {
         "id": "exp-1",
-        "company": "mkh hospital",
-        "role": "microbiologist",
-        "date": " April 2020 - March 2022",
-        "desc": "- Spearheaded spearheaded development of core features, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered database models saving 10+ hours of manual testing per week, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
+        "company": "TechNova Solutions",
+        "role": "Software Engineer",
+        "date": "Jan 2024 - Present",
+        "desc": "- Spearheaded spearheaded development of core web application dashboard, improving speed by 35%, boosting application load times by 35%.\n- Engineered collaborated with 5 engineers to design REST API endpoints and integrate them with React UI, saving 8 hours of manual deployment work per week.\n- Optimized integrated automated unit tests, increasing system reliability by 25%, resulting in a 42% reduction in production crash rates."
       },
       {
         "id": "exp-2",
-        "company": "mkh hospital ",
-        "role": "microbiologist",
-        "date": "8 Months",
-        "desc": "- Spearheaded spearheaded spearheaded spearheaded operations at mkh hospital, improving culture testing and analysis accuracy by 25%, boosting application load times by 35%, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered engineered engineered modern Data Analysis applications, reducing sample processing turnaround times by 30%, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week, saving 8 hours of manual deployment work per week.\n- Optimized optimized optimized optimized modern Quality Control applications, enhancing laboratory safety compliance index score to 100%, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates, resulting in a 42% reduction in production crash rates."
+        "company": "Quantum Code Inc",
+        "role": "Junior Web Developer",
+        "date": "Jun 2022 - Dec 2023",
+        "desc": "- Spearheaded developed and maintained robust websites for client projects using JavaScript, HTML, and CSS, boosting application load times by 35%.\n- Engineered revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%, saving 8 hours of manual deployment work per week.\n- Optimized debugged production issues, resolving an average of 10+ critical issues weekly, resulting in a 42% reduction in production crash rates."
       }
     ],
     "education": [
@@ -105,11 +131,11 @@
         "id": "proj-1",
         "title": "DevPortfolio Generator",
         "role": "Creator",
-        "desc": "- Spearheaded designed and developed responsive dashboard improving user experience metrics by 25%, boosting application load times by 35%.\n- Engineered maximized codebase test coverage to 85%, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
+        "desc": "- Spearheaded an open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites, boosting application load times by 35%.\n- Engineered gained 150+ stars on GitHub, saving 8 hours of manual deployment work per week.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
       }
     ],
     "activeTemplate": "modern",
     "jobDescription": "",
-    "summary": "- Spearheaded highly accomplished professional specializing in software systems with a proven record of leading technical implementations, optimizing application workflows, and delivering high-performance scalable solutions, boosting application load times by 35%.\n- Engineered robust system architectures and automated deployment pipelines using Node.js, saving 8 hours of manual weekly cycles.\n- Optimized database query configurations and index tuning for Python schemas, resulting in a 42% reduction in production downtime."
+    "summary": "- Spearheaded spearheaded highly accomplished professional specializing in software systems with a proven record of leading technical implementations, optimizing application workflows, and delivering high-performance scalable solutions, boosting application load times by 35%, boosting application load times by 35%.\n- Engineered engineered robust system architectures and automated deployment pipelines using Node, saving 8 hours of manual deployment work per week.\n- Optimized js, saving 8 hoursly cycles, resulting in a 42% reduction in production crash rates."
   }
 }
