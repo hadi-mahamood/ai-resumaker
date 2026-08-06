@@ -220,17 +220,27 @@ function setFormFields() {
 }
 
 const LOCATION_PRESETS = [
+    // India
     { name: "Malappuram, Kerala, India", prefix: "+91" },
     { name: "Tirurangadi, Kerala, India", prefix: "+91" },
     { name: "Kochi, Kerala, India", prefix: "+91" },
     { name: "Kozhikode, Kerala, India", prefix: "+91" },
     { name: "Trivandrum, Kerala, India", prefix: "+91" },
+    { name: "Thrissur, Kerala, India", prefix: "+91" },
+    { name: "Palakkad, Kerala, India", prefix: "+91" },
+    { name: "Wayanad, Kerala, India", prefix: "+91" },
     { name: "Bangalore, Karnataka, India", prefix: "+91" },
     { name: "Chennai, Tamil Nadu, India", prefix: "+91" },
     { name: "Mumbai, Maharashtra, India", prefix: "+91" },
     { name: "Delhi, NCR, India", prefix: "+91" },
     { name: "Hyderabad, Telangana, India", prefix: "+91" },
     { name: "Pune, Maharashtra, India", prefix: "+91" },
+    { name: "Kolkata, West Bengal, India", prefix: "+91" },
+    { name: "Ahmedabad, Gujarat, India", prefix: "+91" },
+    { name: "Jaipur, Rajasthan, India", prefix: "+91" },
+    { name: "Lucknow, Uttar Pradesh, India", prefix: "+91" },
+    { name: "Patna, Bihar, India", prefix: "+91" },
+    // United States
     { name: "Seattle, WA, USA", prefix: "+1" },
     { name: "San Francisco, CA, USA", prefix: "+1" },
     { name: "New York, NY, USA", prefix: "+1" },
@@ -238,30 +248,123 @@ const LOCATION_PRESETS = [
     { name: "Boston, MA, USA", prefix: "+1" },
     { name: "Chicago, IL, USA", prefix: "+1" },
     { name: "Los Angeles, CA, USA", prefix: "+1" },
+    { name: "Houston, TX, USA", prefix: "+1" },
+    { name: "Miami, FL, USA", prefix: "+1" },
+    { name: "Atlanta, GA, USA", prefix: "+1" },
+    { name: "Denver, CO, USA", prefix: "+1" },
+    { name: "Portland, OR, USA", prefix: "+1" },
+    // United Arab Emirates
+    { name: "Dubai, United Arab Emirates", prefix: "+971" },
+    { name: "Abu Dhabi, United Arab Emirates", prefix: "+971" },
+    { name: "Sharjah, United Arab Emirates", prefix: "+971" },
+    { name: "Ajman, United Arab Emirates", prefix: "+971" },
+    { name: "Ras Al Khaimah, United Arab Emirates", prefix: "+971" },
+    { name: "Fujairah, United Arab Emirates", prefix: "+971" },
+    // Saudi Arabia
+    { name: "Riyadh, Saudi Arabia", prefix: "+966" },
+    { name: "Jeddah, Saudi Arabia", prefix: "+966" },
+    { name: "Mecca, Saudi Arabia", prefix: "+966" },
+    { name: "Medina, Saudi Arabia", prefix: "+966" },
+    { name: "Dammam, Saudi Arabia", prefix: "+966" },
+    { name: "Khobar, Saudi Arabia", prefix: "+966" },
+    // Oman
+    { name: "Muscat, Oman", prefix: "+968" },
+    { name: "Salalah, Oman", prefix: "+968" },
+    { name: "Sohar, Oman", prefix: "+968" },
+    { name: "Nizwa, Oman", prefix: "+968" },
+    // Qatar
+    { name: "Doha, Qatar", prefix: "+974" },
+    { name: "Al Rayyan, Qatar", prefix: "+974" },
+    { name: "Al Wakrah, Qatar", prefix: "+974" },
+    { name: "Khor, Qatar", prefix: "+974" },
+    // Kuwait
+    { name: "Kuwait City, Kuwait", prefix: "+965" },
+    { name: "Hawally, Kuwait", prefix: "+965" },
+    { name: "Salmiya, Kuwait", prefix: "+965" },
+    // Bahrain
+    { name: "Manama, Bahrain", prefix: "+973" },
+    { name: "Riffa, Bahrain", prefix: "+973" },
+    { name: "Muharraq, Bahrain", prefix: "+973" },
+    // United Kingdom
     { name: "London, United Kingdom", prefix: "+44" },
     { name: "Manchester, United Kingdom", prefix: "+44" },
     { name: "Birmingham, United Kingdom", prefix: "+44" },
-    { name: "Dubai, United Arab Emirates", prefix: "+971" },
-    { name: "Abu Dhabi, United Arab Emirates", prefix: "+971" },
-    { name: "Riyadh, Saudi Arabia", prefix: "+966" },
-    { name: "Jeddah, Saudi Arabia", prefix: "+966" },
-    { name: "Muscat, Oman", prefix: "+968" },
-    { name: "Doha, Qatar", prefix: "+974" },
-    { name: "Kuwait City, Kuwait", prefix: "+965" },
-    { name: "Manama, Bahrain", prefix: "+973" },
+    { name: "Edinburgh, United Kingdom", prefix: "+44" },
+    { name: "Glasgow, United Kingdom", prefix: "+44" },
+    { name: "Leeds, United Kingdom", prefix: "+44" },
+    { name: "Bristol, United Kingdom", prefix: "+44" },
+    // Singapore
     { name: "Singapore, SG", prefix: "+65" },
+    // Germany
     { name: "Berlin, Germany", prefix: "+49" },
     { name: "Munich, Germany", prefix: "+49" },
     { name: "Frankfurt, Germany", prefix: "+49" },
+    // France
     { name: "Paris, France", prefix: "+33" },
+    { name: "Lyon, France", prefix: "+33" },
+    { name: "Marseille, France", prefix: "+33" },
+    // Canada
     { name: "Toronto, ON, Canada", prefix: "+1" },
     { name: "Vancouver, BC, Canada", prefix: "+1" },
     { name: "Montreal, QC, Canada", prefix: "+1" },
+    // Australia
     { name: "Sydney, NSW, Australia", prefix: "+61" },
     { name: "Melbourne, VIC, Australia", prefix: "+61" },
+    { name: "Brisbane, QLD, Australia", prefix: "+61" },
+    { name: "Perth, WA, Australia", prefix: "+61" },
+    { name: "Adelaide, SA, Australia", prefix: "+61" },
+    // Pakistan
     { name: "Karachi, Pakistan", prefix: "+92" },
+    { name: "Lahore, Pakistan", prefix: "+92" },
+    // Bangladesh
     { name: "Dhaka, Bangladesh", prefix: "+880" },
-    { name: "Manila, Philippines", prefix: "+63" }
+    // Philippines
+    { name: "Manila, Philippines", prefix: "+63" },
+    { name: "Cebu, Philippines", prefix: "+63" },
+    // East & Southeast Asia
+    { name: "Tokyo, Japan", prefix: "+81" },
+    { name: "Osaka, Japan", prefix: "+81" },
+    { name: "Seoul, South Korea", prefix: "+82" },
+    { name: "Hong Kong, HK", prefix: "+852" },
+    { name: "Shanghai, China", prefix: "+86" },
+    { name: "Beijing, China", prefix: "+86" },
+    { name: "Taipei, Taiwan", prefix: "+886" },
+    { name: "Bangkok, Thailand", prefix: "+66" },
+    { name: "Kuala Lumpur, Malaysia", prefix: "+60" },
+    { name: "Jakarta, Indonesia", prefix: "+62" },
+    { name: "Colombo, Sri Lanka", prefix: "+94" },
+    { name: "Kathmandu, Nepal", prefix: "+977" },
+    // Oceania
+    { name: "Auckland, New Zealand", prefix: "+64" },
+    { name: "Wellington, New Zealand", prefix: "+64" },
+    // Africa
+    { name: "Cairo, Egypt", prefix: "+20" },
+    { name: "Johannesburg, South Africa", prefix: "+27" },
+    { name: "Cape Town, South Africa", prefix: "+27" },
+    { name: "Nairobi, Kenya", prefix: "+254" },
+    { name: "Lagos, Nigeria", prefix: "+234" },
+    { name: "Casablanca, Morocco", prefix: "+212" },
+    // Europe (Other)
+    { name: "Amsterdam, Netherlands", prefix: "+31" },
+    { name: "Rotterdam, Netherlands", prefix: "+31" },
+    { name: "Brussels, Belgium", prefix: "+32" },
+    { name: "Zurich, Switzerland", prefix: "+41" },
+    { name: "Geneva, Switzerland", prefix: "+41" },
+    { name: "Rome, Italy", prefix: "+39" },
+    { name: "Milan, Italy", prefix: "+39" },
+    { name: "Madrid, Spain", prefix: "+34" },
+    { name: "Barcelona, Spain", prefix: "+34" },
+    { name: "Dublin, Ireland", prefix: "+353" },
+    { name: "Vienna, Austria", prefix: "+43" },
+    { name: "Warsaw, Poland", prefix: "+48" },
+    { name: "Stockholm, Sweden", prefix: "+46" },
+    { name: "Oslo, Norway", prefix: "+47" },
+    { name: "Copenhagen, Denmark", prefix: "+45" },
+    // Americas (Other)
+    { name: "Mexico City, Mexico", prefix: "+52" },
+    { name: "Sao Paulo, Brazil", prefix: "+55" },
+    { name: "Buenos Aires, Argentina", prefix: "+54" },
+    { name: "Bogota, Colombia", prefix: "+57" }
 ];
 
 // Bind standard text input keyup events to auto-save and update preview
