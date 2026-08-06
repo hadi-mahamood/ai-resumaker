@@ -203,7 +203,8 @@ function setFormFields() {
     document.getElementById("input-phone").value = state.phone || "";
     document.getElementById("input-location").value = state.location || "";
     document.getElementById("input-website").value = state.website || "";
-    if (document.getElementById("input-dob")) document.getElementById("input-dob").value = state.dob || "";
+    if (window.populateDOBDropdowns) window.populateDOBDropdowns();
+    if (window.loadDOBSelects) window.loadDOBSelects();
     if (document.getElementById("input-nationality")) document.getElementById("input-nationality").value = state.nationality || "";
     if (document.getElementById("input-visa")) document.getElementById("input-visa").value = state.visaStatus || "";
     if (window.loadMaritalGenderSelects) window.loadMaritalGenderSelects();
@@ -273,7 +274,6 @@ function bindInputEvents() {
         { id: "input-phone", key: "phone" },
         { id: "input-location", key: "location" },
         { id: "input-website", key: "website" },
-        { id: "input-dob", key: "dob" },
         { id: "input-nationality", key: "nationality" },
         { id: "input-visa", key: "visaStatus" }
     ];
@@ -563,6 +563,110 @@ function showToast(message, type = 'success') {
 /* ==========================================
    DYNAMIC LIST RENDERERS & BUILDERS
    ========================================== */
+
+function populateDOBDropdowns() {
+    const daySelect = document.getElementById("select-dob-day");
+    const yearSelect = document.getElementById("select-dob-year");
+    if (!daySelect || !yearSelect) return;
+    
+    // Clear old options except the placeholder
+    daySelect.innerHTML = '<option value="">DD</option>';
+    yearSelect.innerHTML = '<option value="">YYYY</option>';
+    
+    // Populate Days 01 - 31
+    for (let d = 1; d <= 31; d++) {
+        const val = String(d).padStart(2, '0');
+        daySelect.insertAdjacentHTML('beforeend', `<option value="${val}">${val}</option>`);
+    }
+    
+    // Populate Years (2026 down to 1950)
+    const currentYear = new Date().getFullYear();
+    for (let y = currentYear; y >= 1950; y--) {
+        yearSelect.insertAdjacentHTML('beforeend', `<option value="${y}">${y}</option>`);
+    }
+}
+
+function loadDOBSelects() {
+    const daySelect = document.getElementById("select-dob-day");
+    const monthSelect = document.getElementById("select-dob-month");
+    const yearSelect = document.getElementById("select-dob-year");
+    if (!daySelect || !monthSelect || !yearSelect) return;
+    
+    const dob = state.dob || "";
+    if (!dob) {
+        daySelect.value = "";
+        monthSelect.value = "";
+        yearSelect.value = "";
+        return;
+    }
+    
+    let day = "", month = "", year = "";
+    
+    // Check for DD-MM-YY or DD-MM-YYYY format (e.g. 12-10-98, 12-10-1998)
+    const dmyMatch = dob.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})$/);
+    if (dmyMatch) {
+        day = dmyMatch[1].padStart(2, '0');
+        month = dmyMatch[2].padStart(2, '0');
+        let yr = dmyMatch[3];
+        if (yr.length === 2) {
+            const num = parseInt(yr, 10);
+            year = num > 30 ? `19${yr}` : `20${yr}`;
+        } else {
+            year = yr;
+        }
+    } else {
+        // Check for words format (e.g. "12 Oct 1998")
+        const wordMatch = dob.match(/^(\d{1,2})\s+([A-Za-z]{3,10})\s+(\d{4})$/);
+        if (wordMatch) {
+            day = wordMatch[1].padStart(2, '0');
+            const monthNames = {
+                "jan": "01", "feb": "02", "mar": "03", "apr": "04", "may": "05", "jun": "06",
+                "jul": "07", "aug": "08", "sep": "09", "oct": "10", "nov": "11", "dec": "12"
+            };
+            const mName = wordMatch[2].toLowerCase().substring(0, 3);
+            month = monthNames[mName] || "01";
+            year = wordMatch[3];
+        } else {
+            // Check for YYYY-MM-DD standard date input fallback
+            const ymdMatch = dob.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+            if (ymdMatch) {
+                year = ymdMatch[1];
+                month = ymdMatch[2].padStart(2, '0');
+                day = ymdMatch[3].padStart(2, '0');
+            }
+        }
+    }
+    
+    daySelect.value = day;
+    monthSelect.value = month;
+    yearSelect.value = year;
+}
+
+function updateDOBCombined() {
+    const daySelect = document.getElementById("select-dob-day");
+    const monthSelect = document.getElementById("select-dob-month");
+    const yearSelect = document.getElementById("select-dob-year");
+    if (!daySelect || !monthSelect || !yearSelect) return;
+    
+    const day = daySelect.value;
+    const month = monthSelect.value;
+    const year = yearSelect.value;
+    
+    if (day && month && year) {
+        const shortYear = year.slice(-2);
+        state.dob = `${day}-${month}-${shortYear}`;
+    } else {
+        state.dob = "";
+    }
+    
+    updateSidebarBadges();
+    autoSave();
+    debouncedRenderPreview();
+}
+
+window.populateDOBDropdowns = populateDOBDropdowns;
+window.loadDOBSelects = loadDOBSelects;
+window.updateDOBCombined = updateDOBCombined;
 
 function loadMaritalGenderSelects() {
     const maritalSelect = document.getElementById("select-marital-status");

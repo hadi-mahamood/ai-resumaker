@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=46.0">
+    <link rel="stylesheet" href="style.css?v=47.0">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase Client JS SDK -->
@@ -291,8 +291,30 @@
                         <div class="accordion-inner">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="input-dob">Date of Birth</label>
-                                    <input type="text" id="input-dob" placeholder="e.g. 15 Jan 1998">
+                                    <label>Date of Birth (DD-MM-YY)</label>
+                                    <div class="dob-select-editor" style="display: flex; gap: 6px;">
+                                        <select id="select-dob-day" onchange="window.updateDOBCombined()" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); outline: none; font-size: 0.85rem; cursor: pointer;">
+                                            <option value="">DD</option>
+                                        </select>
+                                        <select id="select-dob-month" onchange="window.updateDOBCombined()" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); outline: none; font-size: 0.85rem; cursor: pointer;">
+                                            <option value="">MM</option>
+                                            <option value="01">01 (Jan)</option>
+                                            <option value="02">02 (Feb)</option>
+                                            <option value="03">03 (Mar)</option>
+                                            <option value="04">04 (Apr)</option>
+                                            <option value="05">05 (May)</option>
+                                            <option value="06">06 (Jun)</option>
+                                            <option value="07">07 (Jul)</option>
+                                            <option value="08">08 (Aug)</option>
+                                            <option value="09">09 (Sep)</option>
+                                            <option value="10">10 (Oct)</option>
+                                            <option value="11">11 (Nov)</option>
+                                            <option value="12">12 (Dec)</option>
+                                        </select>
+                                        <select id="select-dob-year" onchange="window.updateDOBCombined()" style="flex: 1.2; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); outline: none; font-size: 0.85rem; cursor: pointer;">
+                                            <option value="">YYYY</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="input-nationality">Nationality</label>
@@ -1090,8 +1112,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=46.0"></script>
-    <script src="ats.js?v=46.0"></script>
-    <script type="module" src="app.js?v=46.0"></script>
+    <script src="ai.js?v=47.0"></script>
+    <script src="ats.js?v=47.0"></script>
+    <script type="module" src="app.js?v=47.0"></script>
 </body>
 </html>
