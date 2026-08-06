@@ -201,7 +201,7 @@ function setFormFields() {
     document.getElementById("input-title").value = state.title || "";
     document.getElementById("input-email").value = state.email || "";
     document.getElementById("input-phone").value = state.phone || "";
-    document.getElementById("input-location").value = state.location || "";
+    if (window.loadLocationSelects) window.loadLocationSelects();
     document.getElementById("input-website").value = state.website || "";
     if (window.populateDOBDropdowns) window.populateDOBDropdowns();
     if (window.loadDOBSelects) window.loadDOBSelects();
@@ -290,82 +290,6 @@ function bindInputEvents() {
         }
     });
 
-    // Create datalist elements dynamically for Location Suggestions
-    let datalist = document.getElementById("location-suggestions");
-    if (!datalist) {
-        datalist = document.createElement("datalist");
-        datalist.id = "location-suggestions";
-        document.body.appendChild(datalist);
-    }
-    
-    const locInput = document.getElementById("input-location");
-    const phoneInput = document.getElementById("input-phone");
-    
-    if (locInput) {
-        locInput.setAttribute("list", "location-suggestions");
-        
-        const populateLocationSuggestions = () => {
-            const phoneVal = (phoneInput ? phoneInput.value.trim() : "");
-            let matchedPrefix = "";
-            
-            // Check country prefix typed by user
-            if (phoneVal.startsWith("+")) {
-                for (let preset of LOCATION_PRESETS) {
-                    if (phoneVal.startsWith(preset.prefix)) {
-                        matchedPrefix = preset.prefix;
-                        break;
-                    }
-                }
-            } else if (phoneVal.startsWith("91")) {
-                matchedPrefix = "+91";
-            }
-            
-            // Sort to prioritize matched country prefix, else alphabetical
-            const sorted = [...LOCATION_PRESETS].sort((a, b) => {
-                if (matchedPrefix) {
-                    if (a.prefix === matchedPrefix && b.prefix !== matchedPrefix) return -1;
-                    if (a.prefix !== matchedPrefix && b.prefix === matchedPrefix) return 1;
-                }
-                return a.name.localeCompare(b.name);
-            });
-            
-            datalist.innerHTML = sorted.map(item => `<option value="${item.name}"></option>`).join('');
-        };
-        
-        locInput.addEventListener("focus", populateLocationSuggestions);
-        if (phoneInput) {
-            phoneInput.addEventListener("input", populateLocationSuggestions);
-        }
-        
-        // Listen for user location selection to pre-fill/update phone dial code prefix
-        locInput.addEventListener("input", (e) => {
-            const selectedVal = e.target.value.trim();
-            const matchedPreset = LOCATION_PRESETS.find(item => item.name.toLowerCase() === selectedVal.toLowerCase());
-            
-            if (matchedPreset && phoneInput) {
-                const currentPhone = phoneInput.value.trim();
-                if (!currentPhone) {
-                    phoneInput.value = matchedPreset.prefix + " ";
-                    state.phone = phoneInput.value;
-                    updateSidebarBadges();
-                    autoSave();
-                    debouncedRenderPreview();
-                } else {
-                    const digits = currentPhone.replace(/\D/g, '');
-                    // Auto prepend matching prefix if phone is a standard 10-digit number without format
-                    if (digits.length === 10 && !currentPhone.startsWith("+") && !currentPhone.startsWith("0")) {
-                        phoneInput.value = matchedPreset.prefix + " " + currentPhone;
-                        state.phone = phoneInput.value;
-                        updateSidebarBadges();
-                        autoSave();
-                        debouncedRenderPreview();
-                        showToast(`Formatted phone number with country prefix ${matchedPreset.prefix}!`);
-                    }
-                }
-            }
-        });
-    }
-
     // Create datalist elements dynamically for Phone Suggestions
     let phoneDatalist = document.getElementById("phone-suggestions");
     if (!phoneDatalist) {
@@ -374,20 +298,36 @@ function bindInputEvents() {
         document.body.appendChild(phoneDatalist);
     }
     
+    const phoneInput = document.getElementById("input-phone");
+    
     if (phoneInput) {
         phoneInput.setAttribute("list", "phone-suggestions");
         
         const populatePhoneSuggestions = () => {
-            const locVal = (locInput ? locInput.value.trim().toLowerCase() : "");
+            const countrySelect = document.getElementById("select-location-country");
+            const countryVal = countrySelect ? countrySelect.value.trim().toLowerCase() : "";
             let matchedPrefix = "";
-            if (locVal) {
-                const matchedPreset = LOCATION_PRESETS.find(item => 
-                    locVal.includes(item.name.toLowerCase()) || 
-                    item.name.toLowerCase().includes(locVal)
-                );
-                if (matchedPreset) {
-                    matchedPrefix = matchedPreset.prefix;
-                }
+            if (countryVal) {
+                const countryToPrefix = {
+                    "india": "+91",
+                    "usa": "+1",
+                    "united kingdom": "+44",
+                    "united arab emirates": "+971",
+                    "saudi arabia": "+966",
+                    "oman": "+968",
+                    "qatar": "+974",
+                    "kuwait": "+965",
+                    "bahrain": "+973",
+                    "singapore": "+65",
+                    "germany": "+49",
+                    "france": "+33",
+                    "canada": "+1",
+                    "australia": "+61",
+                    "pakistan": "+92",
+                    "bangladesh": "+880",
+                    "philippines": "+63"
+                };
+                matchedPrefix = countryToPrefix[countryVal] || "";
             }
             
             const PHONE_CODE_SUGGESTIONS = [
@@ -424,34 +364,43 @@ function bindInputEvents() {
         
         phoneInput.addEventListener("input", (e) => {
             const phoneVal = e.target.value.trim();
-            if (locInput && !locInput.value.trim()) {
+            const cityInput = document.getElementById("input-location-city");
+            const countrySelect = document.getElementById("select-location-country");
+            
+            if (cityInput && countrySelect && !cityInput.value.trim() && !countrySelect.value) {
                 const DEFAULT_CITIES = {
-                    "+91": "Malappuram, Kerala, India",
-                    "+1": "Seattle, WA, USA",
-                    "+44": "London, United Kingdom",
-                    "+971": "Dubai, United Arab Emirates",
-                    "+966": "Riyadh, Saudi Arabia",
-                    "+968": "Muscat, Oman",
-                    "+974": "Doha, Qatar",
-                    "+965": "Kuwait City, Kuwait",
-                    "+973": "Manama, Bahrain",
-                    "+65": "Singapore, SG",
-                    "+49": "Berlin, Germany",
-                    "+61": "Sydney, NSW, Australia",
-                    "+33": "Paris, France",
-                    "+92": "Karachi, Pakistan",
-                    "+880": "Dhaka, Bangladesh",
-                    "+63": "Manila, Philippines"
+                    "+91": { city: "Malappuram, Kerala", country: "India" },
+                    "+1": { city: "Seattle, WA", country: "USA" },
+                    "+44": { city: "London", country: "United Kingdom" },
+                    "+971": { city: "Dubai", country: "United Arab Emirates" },
+                    "+966": { city: "Riyadh", country: "Saudi Arabia" },
+                    "+968": { city: "Muscat", country: "Oman" },
+                    "+974": { city: "Doha", country: "Qatar" },
+                    "+965": { city: "Kuwait City", country: "Kuwait" },
+                    "+973": { city: "Manama", country: "Bahrain" },
+                    "+65": { city: "Singapore", country: "Singapore" },
+                    "+49": { city: "Berlin", country: "Germany" },
+                    "+61": { city: "Sydney, NSW", country: "Australia" },
+                    "+33": { city: "Paris", country: "France" },
+                    "+92": { city: "Karachi", country: "Pakistan" },
+                    "+880": { city: "Dhaka", country: "Bangladesh" },
+                    "+63": { city: "Manila", country: "Philippines" }
                 };
                 
                 for (let prefix in DEFAULT_CITIES) {
                     if (phoneVal === prefix || phoneVal === prefix + " ") {
-                        locInput.value = DEFAULT_CITIES[prefix];
-                        state.location = locInput.value;
+                        cityInput.value = DEFAULT_CITIES[prefix].city;
+                        countrySelect.value = DEFAULT_CITIES[prefix].country;
+                        
+                        if (window.filterCitySuggestions) {
+                            window.filterCitySuggestions(DEFAULT_CITIES[prefix].country);
+                        }
+                        
+                        state.location = `${DEFAULT_CITIES[prefix].city}, ${DEFAULT_CITIES[prefix].country}`;
                         updateSidebarBadges();
                         autoSave();
                         debouncedRenderPreview();
-                        showToast(`Set default location to ${DEFAULT_CITIES[prefix]} based on phone code!`);
+                        showToast(`Set default location to ${state.location} based on phone code!`);
                         break;
                     }
                 }
@@ -563,6 +512,206 @@ function showToast(message, type = 'success') {
 /* ==========================================
    DYNAMIC LIST RENDERERS & BUILDERS
    ========================================== */
+
+function loadLocationSelects() {
+    const countrySelect = document.getElementById("select-location-country");
+    const cityInput = document.getElementById("input-location-city");
+    if (!countrySelect || !cityInput) return;
+    
+    const loc = state.location || "";
+    if (!loc) {
+        countrySelect.value = "";
+        cityInput.value = "";
+        return;
+    }
+    
+    const countries = [
+        "United States", "USA", "India", "United Kingdom", "United Arab Emirates",
+        "Saudi Arabia", "Oman", "Qatar", "Kuwait", "Bahrain", "Singapore",
+        "Germany", "France", "Canada", "Australia", "Pakistan", "Bangladesh",
+        "Philippines"
+    ];
+    
+    let detectedCountry = "";
+    let detectedCityState = loc;
+    
+    for (let c of countries) {
+        const regex = new RegExp(`,?\\s*${c.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i');
+        if (regex.test(loc)) {
+            detectedCountry = c;
+            detectedCityState = loc.replace(regex, "").trim();
+            if (detectedCityState.endsWith(",")) {
+                detectedCityState = detectedCityState.slice(0, -1).trim();
+            }
+            break;
+        }
+    }
+    
+    if (detectedCountry === "United States") detectedCountry = "USA";
+    
+    countrySelect.value = detectedCountry;
+    cityInput.value = detectedCityState;
+    
+    if (window.filterCitySuggestions) {
+        window.filterCitySuggestions(detectedCountry);
+    }
+}
+
+function filterCitySuggestions(country) {
+    const suggestionsDatalist = document.getElementById("location-city-suggestions");
+    if (!suggestionsDatalist) return;
+    
+    suggestionsDatalist.innerHTML = "";
+    
+    const countryToPrefix = {
+        "India": "+91",
+        "USA": "+1",
+        "United Kingdom": "+44",
+        "United Arab Emirates": "+971",
+        "Saudi Arabia": "+966",
+        "Oman": "+968",
+        "Qatar": "+974",
+        "Kuwait": "+965",
+        "Bahrain": "+973",
+        "Singapore": "+65",
+        "Germany": "+49",
+        "France": "+33",
+        "Canada": "+1",
+        "Australia": "+61",
+        "Pakistan": "+92",
+        "Bangladesh": "+880",
+        "Philippines": "+63"
+    };
+    
+    const targetPrefix = countryToPrefix[country];
+    let filteredPresets = LOCATION_PRESETS;
+    if (targetPrefix) {
+        filteredPresets = LOCATION_PRESETS.filter(item => item.prefix === targetPrefix);
+    }
+    
+    filteredPresets.forEach(preset => {
+        let cleanName = preset.name;
+        const countriesToStrip = ["India", "USA", "United Kingdom", "United Arab Emirates", "Saudi Arabia", "Oman", "Qatar", "Kuwait", "Bahrain", "Singapore", "Germany", "France", "Canada", "Australia", "Pakistan", "Bangladesh", "Philippines"];
+        for (let c of countriesToStrip) {
+            const regex = new RegExp(`,?\\s*${c}$`, 'i');
+            if (regex.test(cleanName)) {
+                cleanName = cleanName.replace(regex, "").trim();
+                if (cleanName.endsWith(",")) cleanName = cleanName.slice(0, -1).trim();
+                break;
+            }
+        }
+        suggestionsDatalist.insertAdjacentHTML('beforeend', `<option value="${cleanName}"></option>`);
+    });
+}
+
+function updateLocationCombined() {
+    const countrySelect = document.getElementById("select-location-country");
+    const cityInput = document.getElementById("input-location-city");
+    if (!countrySelect || !cityInput) return;
+    
+    const country = countrySelect.value;
+    const cityState = cityInput.value.trim();
+    
+    if (cityState && country) {
+        const countryLabel = country === "USA" ? "USA" : country;
+        state.location = `${cityState}, ${countryLabel}`;
+    } else if (cityState) {
+        state.location = cityState;
+    } else if (country) {
+        state.location = country === "USA" ? "USA" : country;
+    } else {
+        state.location = "";
+    }
+    
+    // Auto-select country & prefix if cityState matches a preset
+    const countries = [
+        "United States", "USA", "India", "United Kingdom", "United Arab Emirates",
+        "Saudi Arabia", "Oman", "Qatar", "Kuwait", "Bahrain", "Singapore",
+        "Germany", "France", "Canada", "Australia", "Pakistan", "Bangladesh",
+        "Philippines"
+    ];
+    
+    const matchedPreset = LOCATION_PRESETS.find(item => {
+        let cleanPresetCity = item.name;
+        const countriesToStrip = ["India", "USA", "United Kingdom", "United Arab Emirates", "Saudi Arabia", "Oman", "Qatar", "Kuwait", "Bahrain", "Singapore", "Germany", "France", "Canada", "Australia", "Pakistan", "Bangladesh", "Philippines"];
+        for (let c of countriesToStrip) {
+            const regex = new RegExp(`,?\\s*${c}$`, 'i');
+            if (regex.test(cleanPresetCity)) {
+                cleanPresetCity = cleanPresetCity.replace(regex, "").trim();
+                if (cleanPresetCity.endsWith(",")) cleanPresetCity = cleanPresetCity.slice(0, -1).trim();
+                break;
+            }
+        }
+        return cleanPresetCity.toLowerCase() === cityState.toLowerCase();
+    });
+    
+    const phoneInput = document.getElementById("input-phone");
+    
+    if (matchedPreset) {
+        let presetCountry = "";
+        if (matchedPreset.name.endsWith("USA")) presetCountry = "USA";
+        else {
+            const matchedCountry = countries.find(c => matchedPreset.name.toLowerCase().endsWith(c.toLowerCase()));
+            if (matchedCountry) presetCountry = matchedCountry;
+        }
+        
+        if (presetCountry && countrySelect.value !== presetCountry) {
+            countrySelect.value = presetCountry;
+            window.filterCitySuggestions(presetCountry);
+        }
+        
+        if (phoneInput) {
+            const currentPhone = phoneInput.value.trim();
+            if (!currentPhone) {
+                phoneInput.value = matchedPreset.prefix + " ";
+                state.phone = phoneInput.value;
+            } else {
+                const digits = currentPhone.replace(/\D/g, '');
+                if (digits.length === 10 && !currentPhone.startsWith("+") && !currentPhone.startsWith("0")) {
+                    phoneInput.value = matchedPreset.prefix + " " + currentPhone;
+                    state.phone = phoneInput.value;
+                    showToast(`Formatted phone number with country prefix ${matchedPreset.prefix}!`);
+                }
+            }
+        }
+    } else if (country) {
+        // Auto prefix if phone is empty
+        if (phoneInput && !phoneInput.value.trim()) {
+            const countryToPrefix = {
+                "India": "+91",
+                "USA": "+1",
+                "United Kingdom": "+44",
+                "United Arab Emirates": "+971",
+                "Saudi Arabia": "+966",
+                "Oman": "+968",
+                "Qatar": "+974",
+                "Kuwait": "+965",
+                "Bahrain": "+973",
+                "Singapore": "+65",
+                "Germany": "+49",
+                "France": "+33",
+                "Canada": "+1",
+                "Australia": "+61",
+                "Pakistan": "+92",
+                "Bangladesh": "+880",
+                "Philippines": "+63"
+            };
+            const prefix = countryToPrefix[country];
+            if (prefix) {
+                phoneInput.value = prefix + " ";
+                state.phone = phoneInput.value;
+            }
+        }
+    }
+    
+    updateSidebarBadges();
+    autoSave();
+    debouncedRenderPreview();
+}
+
+window.loadLocationSelects = loadLocationSelects;
+window.filterCitySuggestions = filterCitySuggestions;
+window.updateLocationCombined = updateLocationCombined;
 
 function populateDOBDropdowns() {
     const daySelect = document.getElementById("select-dob-day");
