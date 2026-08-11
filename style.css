@@ -4423,3 +4423,17 @@ h1, h2, h3, h4, h5, h6, .logo-text, .accordion-title span, .toolbar-group button
     padding-left: 20px !important;
 }
 
+/* Micro-adaptability rules for ultra-compact mobile viewports */
+@media (max-width: 380px) {
+    .profile-completeness-card {
+        padding: 8px 10px !important;
+        margin: 8px 10px 4px 10px !important;
+    }
+    #completeness-status-text {
+        font-size: 0.76rem !important;
+    }
+    .developer-ad-container {
+        padding: 10px 2px 2px 2px !important;
+    }
+}
+
