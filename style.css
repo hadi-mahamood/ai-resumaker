@@ -1118,6 +1118,7 @@ textarea {
     padding: var(--resume-padding, 60px);
     font-size: var(--resume-font-size, 11px);
     line-height: var(--resume-line-height, 1.4);
+    --resume-accent-color: #6366f1;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 
                 0 12px 24px -8px rgba(0, 0, 0, 0.4), 
                 0 1px 3px rgba(0, 0, 0, 0.15);
@@ -1407,7 +1408,7 @@ textarea {
 .t-modern .resume-section-title {
     font-size: 0.9rem;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--resume-accent-color);
     text-transform: uppercase;
     letter-spacing: 1.5px;
     border-right: 1px solid #e5e7eb;
@@ -1518,7 +1519,7 @@ textarea {
     font-size: 1.1rem;
     font-weight: 700;
     color: #111827;
-    border-bottom: 1px solid #9ca3af;
+    border-bottom: 2px solid var(--resume-accent-color);
     padding-bottom: 3px;
     margin-bottom: 10px;
     text-transform: uppercase;
@@ -1657,7 +1658,7 @@ textarea {
     color: #0f172a;
     text-transform: uppercase;
     letter-spacing: 1px;
-    border-bottom: 2px solid #0f172a;
+    border-bottom: 2px solid var(--resume-accent-color);
     padding-bottom: 4px;
 }
 
@@ -2476,7 +2477,7 @@ textarea {
     font-size: 1rem;
     font-weight: 700;
     color: #0f172a;
-    border-bottom: 1px solid #cbd5e1;
+    border-bottom: 2px solid var(--resume-accent-color);
     padding-bottom: 4px;
     margin-bottom: 10px;
     text-transform: uppercase;
@@ -2568,7 +2569,7 @@ textarea {
     font-size: 0.95rem;
     font-weight: 700;
     color: #000;
-    border-bottom: 1.5px solid #000;
+    border-bottom: 2px solid var(--resume-accent-color);
     padding-bottom: 2px;
     margin-bottom: 8px;
     text-transform: uppercase;
@@ -4366,6 +4367,7 @@ h1, h2, h3, h4, h5, h6, .logo-text, .accordion-title span, .toolbar-group button
 .resume-sheet, .cover-letter-sheet {
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    --resume-accent-color: #6366f1;
 }
 .resume-sheet:hover, .cover-letter-sheet:hover {
     box-shadow: 0 35px 80px rgba(99, 102, 241, 0.12), 0 0 0 1px rgba(99, 102, 241, 0.25) !important;

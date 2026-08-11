@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=70.0">
+    <link rel="stylesheet" href="style.css?v=71.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -215,6 +215,19 @@
                                     <span id="val-padding" style="font-size:0.75rem; font-weight:600; color:var(--primary);">60px</span>
                                 </div>
                                 <input type="range" id="slider-padding" min="20" max="80" step="2" value="60" style="width:100%;" oninput="window.changeLayoutMetric('padding', this.value)">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="margin:0 0 6px 0; font-size:0.75rem; display:block;">Template Accent Color</label>
+                                <div class="layout-accent-picker" style="display:flex; gap:10px; align-items:center;">
+                                    <button class="theme-bubble active" data-color="#6366f1" style="background:#6366f1; border:2px solid white;" onclick="window.changeResumeAccent('#6366f1', this)" title="Indigo"></button>
+                                    <button class="theme-bubble" data-color="#10b981" style="background:#10b981; border:2px solid transparent;" onclick="window.changeResumeAccent('#10b981', this)" title="Emerald"></button>
+                                    <button class="theme-bubble" data-color="#ef4444" style="background:#ef4444; border:2px solid transparent;" onclick="window.changeResumeAccent('#ef4444', this)" title="Crimson"></button>
+                                    <button class="theme-bubble" data-color="#f59e0b" style="background:#f59e0b; border:2px solid transparent;" onclick="window.changeResumeAccent('#f59e0b', this)" title="Amber"></button>
+                                    <button class="theme-bubble" data-color="#0ea5e9" style="background:#0ea5e9; border:2px solid transparent;" onclick="window.changeResumeAccent('#0ea5e9', this)" title="Sky Blue"></button>
+                                    <button class="theme-bubble" data-color="#a855f7" style="background:#a855f7; border:2px solid transparent;" onclick="window.changeResumeAccent('#a855f7', this)" title="Amethyst"></button>
+                                    <button class="theme-bubble" data-color="#1f2937" style="background:#1f2937; border:2px solid transparent;" onclick="window.changeResumeAccent('#1f2937', this)" title="Obsidian"></button>
+                                </div>
                             </div>
                             
                             <div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 4px;">
@@ -1211,8 +1224,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=70.0"></script>
-    <script src="ats.js?v=70.0"></script>
-    <script type="module" src="app.js?v=70.0"></script>
+    <script src="ai.js?v=71.0"></script>
+    <script src="ats.js?v=71.0"></script>
+    <script type="module" src="app.js?v=71.0"></script>
 </body>
 </html>

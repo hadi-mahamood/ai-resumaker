@@ -2163,6 +2163,9 @@ function applyLayoutMetrics() {
         sheet.style.setProperty("--resume-font-size", `${layoutState.fontSize}px`);
         sheet.style.setProperty("--resume-line-height", `${layoutState.lineHeight}`);
         sheet.style.setProperty("--resume-padding", `${layoutState.padding}px`);
+        if (layoutState.accentColor) {
+            sheet.style.setProperty("--resume-accent-color", layoutState.accentColor);
+        }
     });
     
     const clSheets = document.querySelectorAll(".cover-letter-sheet");
@@ -2170,7 +2173,25 @@ function applyLayoutMetrics() {
         sheet.style.setProperty("--resume-font-size", `${layoutState.fontSize}px`);
         sheet.style.setProperty("--resume-line-height", `${layoutState.lineHeight}`);
         sheet.style.setProperty("--resume-padding", `${layoutState.padding}px`);
+        if (layoutState.accentColor) {
+            sheet.style.setProperty("--resume-accent-color", layoutState.accentColor);
+        }
     });
+
+    // Sync UI bubbles
+    if (layoutState.accentColor) {
+        const bubbles = document.querySelectorAll(".layout-accent-picker .theme-bubble");
+        bubbles.forEach(bubble => {
+            const color = bubble.getAttribute("data-color");
+            if (color === layoutState.accentColor) {
+                bubble.classList.add("active");
+                bubble.style.borderColor = "white";
+            } else {
+                bubble.classList.remove("active");
+                bubble.style.borderColor = "transparent";
+            }
+        });
+    }
 
     const fLabel = document.getElementById("val-font-size");
     if (fLabel) fLabel.innerText = `${layoutState.fontSize}px`;
@@ -2182,6 +2203,32 @@ function applyLayoutMetrics() {
     if (pLabel) pLabel.innerText = `${layoutState.padding}px`;
 }
 
+window.changeResumeAccent = function(color, btnEl) {
+    layoutState.accentColor = color;
+    localStorage.setItem('resumake_layout', JSON.stringify(layoutState));
+    
+    const sheets = document.querySelectorAll(".resume-sheet");
+    sheets.forEach(sheet => {
+        sheet.style.setProperty("--resume-accent-color", color);
+    });
+    const clSheets = document.querySelectorAll(".cover-letter-sheet");
+    clSheets.forEach(sheet => {
+        sheet.style.setProperty("--resume-accent-color", color);
+    });
+    
+    const bubbles = document.querySelectorAll(".layout-accent-picker .theme-bubble");
+    bubbles.forEach(bubble => {
+        bubble.classList.remove("active");
+        bubble.style.borderColor = "transparent";
+    });
+    
+    if (btnEl) {
+        btnEl.classList.add("active");
+        btnEl.style.borderColor = "white";
+    }
+    showToast("Template accent color updated!");
+};
+
 function changeLayoutMetric(key, val) {
     layoutState[key] = parseFloat(val);
     localStorage.setItem('resumake_layout', JSON.stringify(layoutState));
@@ -2189,7 +2236,7 @@ function changeLayoutMetric(key, val) {
 }
 
 function resetLayoutMetrics() {
-    layoutState = { fontSize: 11, lineHeight: 1.4, padding: 60 };
+    layoutState = { fontSize: 11, lineHeight: 1.4, padding: 60, accentColor: "#6366f1" };
     localStorage.setItem('resumake_layout', JSON.stringify(layoutState));
     
     if (document.getElementById("slider-font-size")) document.getElementById("slider-font-size").value = 11;
