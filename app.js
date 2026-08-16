@@ -3431,6 +3431,12 @@ function loadSampleResumeData() {
     autoSave();
     updateSidebarBadges();
     renderResumePreview();
+    
+    // Reset wizard view back to step 1 to display loaded personal details
+    if (window.setWizardStep) {
+        window.setWizardStep(1);
+    }
+
     if (window.showToast) {
         showToast(`Sample ${state.title} resume loaded!`);
     } else {
