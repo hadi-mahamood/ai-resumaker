@@ -765,18 +765,28 @@ textarea {
 }
 
 .left-group {
-    flex: 0 1 auto;
+    flex: 1 1 0%;
     min-width: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .middle-group {
+    flex: 0 0 auto;
+    display: flex;
     justify-content: center;
-    flex: 0 1 auto;
-    margin: 0 auto;
+    align-items: center;
+    gap: 6px;
 }
 
 .right-group {
-    flex: 0 0 auto;
+    flex: 1 1 0%;
+    min-width: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
 }
 
 .ats-score-pill {
@@ -3445,6 +3455,9 @@ body.ats-simulator-active #resume-sheet-scaler {
     .middle-group::-webkit-scrollbar {
         display: none !important;
     }
+    .left-group, .right-group {
+        flex: 0 1 auto !important;
+    }
 }
 
 @media screen and (max-width: 600px) {
@@ -3613,6 +3626,7 @@ body.ats-simulator-active #resume-sheet-scaler {
     
     .toolbar-group {
         flex-shrink: 0 !important;
+        flex: 0 1 auto !important;
     }
     
     .preview-workspace {
