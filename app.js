@@ -2206,6 +2206,23 @@ window.selectTemplateOption = function(val, labelText) {
     
     const label = document.getElementById("current-template-label");
     if (label) label.innerText = labelText;
+    
+    // Sync template chips in the toolbar
+    const chips = document.querySelectorAll(".template-quick-switcher .template-chip");
+    chips.forEach(chip => {
+        const onclickAttr = chip.getAttribute("onclick");
+        if (onclickAttr && onclickAttr.includes(`'${val}'`)) {
+            chip.classList.add("active");
+            chip.style.borderColor = "var(--primary)";
+            chip.style.background = "rgba(99, 102, 241, 0.12)";
+            chip.style.color = "white";
+        } else {
+            chip.classList.remove("active");
+            chip.style.borderColor = "var(--border-color)";
+            chip.style.background = "rgba(255, 255, 255, 0.02)";
+            chip.style.color = "var(--text-secondary)";
+        }
+    });
 };
 
 document.addEventListener("click", (e) => {
