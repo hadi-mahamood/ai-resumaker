@@ -2253,16 +2253,41 @@ window.toggleRegionalDropdown = function(e) {
     const menu = document.getElementById("regional-dropdown-menu");
     if (!menu) return;
     
+    // Close other dropdowns
+    const aiMenu = document.getElementById("ai-dropdown-menu");
+    if (aiMenu) aiMenu.style.display = "none";
+
+    const isShowing = menu.style.display === "block";
+    menu.style.display = isShowing ? "none" : "block";
+    if (e) e.stopPropagation();
+};
+
+window.toggleAIDropdown = function(e) {
+    const menu = document.getElementById("ai-dropdown-menu");
+    if (!menu) return;
+    
+    // Close other dropdowns
+    const regMenu = document.getElementById("regional-dropdown-menu");
+    if (regMenu) regMenu.style.display = "none";
+
     const isShowing = menu.style.display === "block";
     menu.style.display = isShowing ? "none" : "block";
     if (e) e.stopPropagation();
 };
 
 document.addEventListener("click", (e) => {
-    const container = document.getElementById("regional-dropdown-container");
-    const menu = document.getElementById("regional-dropdown-menu");
-    if (container && menu && !container.contains(e.target)) {
-        menu.style.display = "none";
+    // Regional Dropdown outside click
+    const regContainer = document.getElementById("regional-dropdown-container");
+    const regMenu = document.getElementById("regional-dropdown-menu");
+    if (regContainer && regMenu && !regContainer.contains(e.target)) {
+        regMenu.style.display = "none";
+    }
+
+    // AI Dropdown outside click
+    const aiContainer = document.getElementById("ai-dropdown-container");
+    const aiMenu = document.getElementById("ai-dropdown-menu");
+    if (aiContainer && aiMenu && !aiContainer.contains(e.target)) {
+        aiMenu.style.display = "none";
     }
 });
 
