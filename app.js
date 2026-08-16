@@ -86,6 +86,78 @@ function toggleAccordion(itemId) {
     // Toggle target
     if (!isActive) {
         item.classList.add('active');
+        
+        // Premium UX: Auto-scroll the preview workspace to the matching section
+        setTimeout(() => {
+            scrollToResumeSection(itemId);
+        }, 100); // small delay to allow CSS transitions to initialize
+    }
+}
+
+function scrollToResumeSection(itemId) {
+    const workspace = document.querySelector(".preview-workspace");
+    const sheet = document.getElementById("resume-sheet");
+    if (!workspace || !sheet) return;
+
+    let targetTitleText = "";
+    if (itemId === "sec-name" || itemId === "sec-contact") {
+        workspace.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+    } else if (itemId === "sec-target") {
+        workspace.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+    } else if (itemId === "sec-regional") {
+        targetTitleText = "Regional"; 
+    } else if (itemId === "sec-experience") {
+        targetTitleText = "Experience";
+    } else if (itemId === "sec-education") {
+        targetTitleText = "Education";
+    } else if (itemId === "sec-skills") {
+        targetTitleText = "Skills";
+    } else if (itemId === "sec-projects") {
+        targetTitleText = "Projects";
+    } else if (itemId === "sec-languages") {
+        targetTitleText = "Languages";
+    }
+
+    if (!targetTitleText) return;
+
+    // Find section headers inside A4 sheet
+    const sectionTitles = sheet.querySelectorAll(".resume-section-title, h2, h3, h4");
+    let targetEl = null;
+
+    for (let titleEl of sectionTitles) {
+        const text = titleEl.textContent.trim().toLowerCase();
+        if (text.includes(targetTitleText.toLowerCase()) || 
+            (targetTitleText === "Skills" && text.includes("competencies")) || 
+            (targetTitleText === "Languages" && text.includes("languages"))) {
+            targetEl = titleEl;
+            break;
+        }
+    }
+
+    if (targetEl) {
+        const workspaceRect = workspace.getBoundingClientRect();
+        const targetRect = targetEl.getBoundingClientRect();
+        const currentScroll = workspace.scrollTop;
+        
+        const targetScroll = currentScroll + (targetRect.top - workspaceRect.top) - 100;
+
+        workspace.scrollTo({
+            top: Math.max(0, targetScroll),
+            behavior: "smooth"
+        });
+
+        // Flash target section briefly with a premium subtle highlight
+        const sectionContainer = targetEl.closest(".resume-section") || targetEl.parentElement;
+        if (sectionContainer) {
+            const originalBg = sectionContainer.style.backgroundColor;
+            sectionContainer.style.transition = "background-color 0.4s ease";
+            sectionContainer.style.backgroundColor = "rgba(99, 102, 241, 0.05)";
+            setTimeout(() => {
+                sectionContainer.style.backgroundColor = originalBg || "transparent";
+            }, 800);
+        }
     }
 }
 
@@ -2247,15 +2319,52 @@ function resetLayoutMetrics() {
 }
 
 function optimizeLayoutForOnePage() {
-    layoutState = { fontSize: 10, lineHeight: 1.25, padding: 40 };
+    const sheet = document.getElementById("resume-sheet");
+    if (!sheet) return;
+
+    let fSize = 11.5;
+    let lHeight = 1.45;
+    let pad = 64;
+
+    // Reset to maximum values first
+    layoutState.fontSize = fSize;
+    layoutState.lineHeight = lHeight;
+    layoutState.padding = pad;
+    applyLayoutMetrics();
+
+    let iterations = 0;
+    const maxIterations = 20;
+
+    // Iteratively compress margins, line height, and font size until content fits on a single page (1123px)
+    while (sheet.scrollHeight > 1125 && iterations < maxIterations) {
+        if (pad > 32) {
+            pad -= 4;
+        } else if (lHeight > 1.20) {
+            lHeight -= 0.05;
+        } else if (fSize > 9.0) {
+            fSize -= 0.5;
+        } else {
+            break;
+        }
+
+        layoutState.fontSize = fSize;
+        layoutState.lineHeight = lHeight;
+        layoutState.padding = pad;
+        applyLayoutMetrics();
+        iterations++;
+    }
+
     localStorage.setItem('resumake_layout', JSON.stringify(layoutState));
     
-    if (document.getElementById("slider-font-size")) document.getElementById("slider-font-size").value = 10;
-    if (document.getElementById("slider-line-height")) document.getElementById("slider-line-height").value = 1.25;
-    if (document.getElementById("slider-padding")) document.getElementById("slider-padding").value = 40;
+    if (document.getElementById("slider-font-size")) document.getElementById("slider-font-size").value = fSize;
+    if (document.getElementById("slider-line-height")) document.getElementById("slider-line-height").value = lHeight;
+    if (document.getElementById("slider-padding")) document.getElementById("slider-padding").value = pad;
     
-    applyLayoutMetrics();
-    showToast("Layout optimized to fit single-page constraint!");
+    if (sheet.scrollHeight <= 1125) {
+        showToast("Auto-Fit: Layout adjusted perfectly to exactly 1 page!");
+    } else {
+        showToast("Auto-Fit: Layout compressed to maximize single-page content!");
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -3210,3 +3319,17 @@ function updateCompletenessProgress() {
 }
 
 window.updateCompletenessProgress = updateCompletenessProgress;
+
+window.toggleFloatingHub = function() {
+    const menu = document.getElementById("fab-menu");
+    const triggerIcon = document.querySelector(".fab-trigger i");
+    if (!menu || !triggerIcon) return;
+    
+    if (menu.style.display === "none" || menu.style.display === "") {
+        menu.style.display = "flex";
+        triggerIcon.className = "fa-solid fa-xmark";
+    } else {
+        menu.style.display = "none";
+        triggerIcon.className = "fa-solid fa-bolt";
+    }
+};

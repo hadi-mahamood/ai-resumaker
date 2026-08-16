@@ -2497,7 +2497,7 @@ window.toggleATSSimulator = function() {
     if (atsSimulatorActive) {
         document.body.classList.add("ats-simulator-active");
         toggleBtn.classList.add("active");
-        toggleBtn.style.background = "var(--primary-color)";
+        toggleBtn.style.background = "var(--primary)";
         toggleBtn.style.color = "white";
         
         scaler.style.display = "none";
@@ -2546,8 +2546,8 @@ window.focusSidebarInput = function(inputId, sectionId) {
             
             const originalBorder = input.style.borderColor;
             const originalShadow = input.style.boxShadow;
-            input.style.borderColor = "var(--primary-color)";
-            input.style.boxShadow = "0 0 12px var(--primary-color)";
+            input.style.borderColor = "var(--primary)";
+            input.style.boxShadow = "0 0 12px var(--primary)";
             
             setTimeout(() => {
                 input.style.borderColor = originalBorder;
