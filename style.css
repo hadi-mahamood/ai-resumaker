@@ -752,21 +752,27 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 16px;
     z-index: 5;
     box-sizing: border-box;
-    overflow: visible;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.toolbar::-webkit-scrollbar {
+    display: none;
 }
 
 .toolbar-group {
     display: flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0;
 }
 
 .left-group {
-    flex: 1 1 0%;
-    min-width: 0;
+    flex: 0 0 auto;
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -781,8 +787,7 @@ textarea {
 }
 
 .right-group {
-    flex: 1 1 0%;
-    min-width: 0;
+    flex: 0 0 auto;
     display: flex;
     justify-content: flex-end;
     align-items: center;
