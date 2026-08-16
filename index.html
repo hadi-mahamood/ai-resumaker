@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=78.0">
+    <link rel="stylesheet" href="style.css?v=79.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -766,28 +766,46 @@
                     <button class="menu-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar Menu" style="margin-right: 4px;">
                         <i class="fa-solid fa-bars"></i>
                     </button>
-                    <div class="template-quick-switcher" style="display: flex; gap: 8px; align-items: center; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
-                        <button class="template-chip active" onclick="window.selectTemplateOption('modern', 'Modern (Global Tech)')" style="white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--primary); background: rgba(99, 102, 241, 0.12); color: white; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                    <div class="template-quick-switcher" style="display: flex; gap: 8px; align-items: center; overflow: visible;">
+                        <button class="template-chip active" id="chip-modern" onclick="window.selectTemplateOption('modern', 'Modern (Global Tech)')" style="white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--primary); background: rgba(99, 102, 241, 0.12); color: white; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
                             <i class="fa-solid fa-laptop-code"></i> Modern
                         </button>
-                        <button class="template-chip" onclick="window.selectTemplateOption('classic', 'Classic (Traditional Business)')" style="white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.02); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                        <button class="template-chip" id="chip-classic" onclick="window.selectTemplateOption('classic', 'Classic (Traditional Business)')" style="white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.02); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
                             <i class="fa-solid fa-briefcase"></i> Classic
                         </button>
-                        <button class="template-chip" onclick="window.selectTemplateOption('executive', 'Executive (Two-Column Corporate)')" style="white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.02); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                        <button class="template-chip" id="chip-executive" onclick="window.selectTemplateOption('executive', 'Executive (Two-Column Corporate)')" style="white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.02); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
                             <i class="fa-solid fa-user-tie"></i> Executive
                         </button>
-                        <button class="template-chip" onclick="window.selectTemplateOption('gcc', 'GCC (Middle East / Gulf)')" style="white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.02); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
-                            <i class="fa-solid fa-globe"></i> GCC
-                        </button>
-                        <button class="template-chip" onclick="window.selectTemplateOption('india', 'India (Academic & Declaration)')" style="white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.02); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
-                            <i class="fa-solid fa-graduation-cap"></i> India
-                        </button>
-                        <button class="template-chip" onclick="window.selectTemplateOption('europe', 'Europe (Europass / CEFR)')" style="white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.02); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
-                            <i class="fa-solid fa-euro-sign"></i> Europe
-                        </button>
-                        <button class="template-chip" onclick="window.selectTemplateOption('us', 'US / Canada (Chronological)')" style="white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.02); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
-                            <i class="fa-solid fa-flag-usa"></i> US
-                        </button>
+                        
+                        <!-- Regional Dropdown -->
+                        <div class="custom-dropdown-container" id="regional-dropdown-container" style="position: relative; display: inline-block;">
+                            <button class="template-chip" id="chip-regional-dropdown" onclick="window.toggleRegionalDropdown(event)" style="white-space: nowrap; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.02); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                                <i class="fa-solid fa-globe"></i> <span id="regional-dropdown-label">International</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.55rem; margin-left: 2px;"></i>
+                            </button>
+                            <div class="custom-dropdown-menu" id="regional-dropdown-menu" style="display: none; position: absolute; top: calc(100% + 6px); left: 0; background: #0f172a; border: 1px solid var(--border-color); border-radius: 8px; padding: 6px; width: 220px; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                                <div class="dropdown-item" onclick="window.selectTemplateOption('gcc', 'GCC (Middle East / Gulf)')" style="padding: 8px 12px; font-size: 0.76rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.2s;">
+                                    <i class="fa-solid fa-globe"></i> GCC (Middle East)
+                                </div>
+                                <div class="dropdown-item" onclick="window.selectTemplateOption('india', 'India (Academic & Declaration)')" style="padding: 8px 12px; font-size: 0.76rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.2s;">
+                                    <i class="fa-solid fa-graduation-cap"></i> India (Academic)
+                                </div>
+                                <div class="dropdown-item" onclick="window.selectTemplateOption('europe', 'Europe (Europass / CEFR)')" style="padding: 8px 12px; font-size: 0.76rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.2s;">
+                                    <i class="fa-solid fa-euro-sign"></i> Europe (Europass)
+                                </div>
+                                <div class="dropdown-item" onclick="window.selectTemplateOption('us', 'US / Canada (Chronological)')" style="padding: 8px 12px; font-size: 0.76rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.2s;">
+                                    <i class="fa-solid fa-flag-usa"></i> US / Canada
+                                </div>
+                                <div class="dropdown-item" onclick="window.selectTemplateOption('uk', 'UK / Commonwealth')" style="padding: 8px 12px; font-size: 0.76rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.2s;">
+                                    <i class="fa-solid fa-crown"></i> UK / Commonwealth
+                                </div>
+                                <div class="dropdown-item" onclick="window.selectTemplateOption('asia', 'Asia / Pacific (Certifications)')" style="padding: 8px 12px; font-size: 0.76rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.2s;">
+                                    <i class="fa-solid fa-certificate"></i> Asia / Pacific
+                                </div>
+                                <div class="dropdown-item" onclick="window.selectTemplateOption('latam', 'Latin America (Formal Details)')" style="padding: 8px 12px; font-size: 0.76rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.2s;">
+                                    <i class="fa-solid fa-address-card"></i> Latin America
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1247,8 +1265,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=78.0"></script>
-    <script src="ats.js?v=78.0"></script>
-    <script type="module" src="app.js?v=78.0"></script>
+    <script src="ai.js?v=79.0"></script>
+    <script src="ats.js?v=79.0"></script>
+    <script type="module" src="app.js?v=79.0"></script>
 </body>
 </html>

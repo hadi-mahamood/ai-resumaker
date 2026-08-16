@@ -2199,37 +2199,70 @@ window.toggleTemplateDropdown = function(e) {
 };
 
 window.selectTemplateOption = function(val, labelText) {
-    const menu = document.getElementById("template-dropdown-menu");
-    if (menu) menu.classList.remove("show");
+    const menu = document.getElementById("regional-dropdown-menu");
+    if (menu) menu.style.display = "none";
     
     switchTemplate(val);
     
-    const label = document.getElementById("current-template-label");
-    if (label) label.innerText = labelText;
+    // Update general active chips
+    const generalTemplates = ["modern", "classic", "executive"];
+    const isGeneral = generalTemplates.includes(val);
     
-    // Sync template chips in the toolbar
-    const chips = document.querySelectorAll(".template-quick-switcher .template-chip");
-    chips.forEach(chip => {
-        const onclickAttr = chip.getAttribute("onclick");
-        if (onclickAttr && onclickAttr.includes(`'${val}'`)) {
-            chip.classList.add("active");
-            chip.style.borderColor = "var(--primary)";
-            chip.style.background = "rgba(99, 102, 241, 0.12)";
-            chip.style.color = "white";
-        } else {
-            chip.classList.remove("active");
-            chip.style.borderColor = "var(--border-color)";
-            chip.style.background = "rgba(255, 255, 255, 0.02)";
-            chip.style.color = "var(--text-secondary)";
+    // Reset all general chips
+    generalTemplates.forEach(tId => {
+        const chip = document.getElementById(`chip-${tId}`);
+        if (chip) {
+            if (tId === val) {
+                chip.classList.add("active");
+                chip.style.borderColor = "var(--primary)";
+                chip.style.background = "rgba(99, 102, 241, 0.12)";
+                chip.style.color = "white";
+            } else {
+                chip.classList.remove("active");
+                chip.style.borderColor = "var(--border-color)";
+                chip.style.background = "rgba(255, 255, 255, 0.02)";
+                chip.style.color = "var(--text-secondary)";
+            }
         }
     });
+    
+    // Update regional dropdown button state
+    const regLabel = document.getElementById("regional-dropdown-label");
+    const regBtn = document.getElementById("chip-regional-dropdown");
+    
+    if (regBtn && regLabel) {
+        if (!isGeneral) {
+            // A regional template was selected from the dropdown
+            regBtn.classList.add("active");
+            regBtn.style.borderColor = "var(--primary)";
+            regBtn.style.background = "rgba(99, 102, 241, 0.12)";
+            regBtn.style.color = "white";
+            regLabel.innerText = labelText.split(" (")[0];
+        } else {
+            // A general template was selected, reset dropdown state
+            regBtn.classList.remove("active");
+            regBtn.style.borderColor = "var(--border-color)";
+            regBtn.style.background = "rgba(255, 255, 255, 0.02)";
+            regBtn.style.color = "var(--text-secondary)";
+            regLabel.innerText = "International";
+        }
+    }
+};
+
+window.toggleRegionalDropdown = function(e) {
+    const menu = document.getElementById("regional-dropdown-menu");
+    if (!menu) return;
+    
+    const isShowing = menu.style.display === "block";
+    menu.style.display = isShowing ? "none" : "block";
+    if (e) e.stopPropagation();
 };
 
 document.addEventListener("click", (e) => {
-    const container = document.getElementById("template-dropdown-container");
-    const menu = document.getElementById("template-dropdown-menu");
+    const container = document.getElementById("regional-dropdown-container");
+    const menu = document.getElementById("regional-dropdown-menu");
     if (container && menu && !container.contains(e.target)) {
-        menu.classList.remove("show");
+        menu.style.display = "none";
     }
 });
 
