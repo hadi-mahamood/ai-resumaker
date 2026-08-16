@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=73.0">
+    <link rel="stylesheet" href="style.css?v=74.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -215,6 +215,16 @@
                                     <span id="val-padding" style="font-size:0.75rem; font-weight:600; color:var(--primary);">60px</span>
                                 </div>
                                 <input type="range" id="slider-padding" min="20" max="80" step="2" value="60" style="width:100%;" oninput="window.changeLayoutMetric('padding', this.value)">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 6px;">
+                                <label style="margin:0; font-size:0.75rem;">Typography Font Family</label>
+                                <select id="slider-font-family" class="form-input" style="width: 100%; box-sizing: border-box; background: #0f172a; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 6px; color: white; font-size: 0.78rem;" onchange="window.changeLayoutMetric('fontFamily', this.value)">
+                                    <option value="Outfit, sans-serif" selected>Outfit / Inter (Tech Modern)</option>
+                                    <option value="Georgia, serif">Georgia / Lora (Elegant Serif)</option>
+                                    <option value="system-ui, sans-serif">Roboto / System UI (Classic Corporate)</option>
+                                    <option value="Courier New, monospace">Courier / Space Mono (Developer Tech)</option>
+                                </select>
                             </div>
                             
                             <div class="form-group" style="margin-bottom: 0;">
@@ -1237,8 +1247,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=73.0"></script>
-    <script src="ats.js?v=73.0"></script>
-    <script type="module" src="app.js?v=73.0"></script>
+    <script src="ai.js?v=74.0"></script>
+    <script src="ats.js?v=74.0"></script>
+    <script type="module" src="app.js?v=74.0"></script>
 </body>
 </html>

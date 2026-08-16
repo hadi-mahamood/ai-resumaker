@@ -2238,6 +2238,9 @@ function applyLayoutMetrics() {
         if (layoutState.accentColor) {
             sheet.style.setProperty("--resume-accent-color", layoutState.accentColor);
         }
+        if (layoutState.fontFamily) {
+            sheet.style.setProperty("--resume-font-family", layoutState.fontFamily);
+        }
     });
     
     const clSheets = document.querySelectorAll(".cover-letter-sheet");
@@ -2247,6 +2250,9 @@ function applyLayoutMetrics() {
         sheet.style.setProperty("--resume-padding", `${layoutState.padding}px`);
         if (layoutState.accentColor) {
             sheet.style.setProperty("--resume-accent-color", layoutState.accentColor);
+        }
+        if (layoutState.fontFamily) {
+            sheet.style.setProperty("--resume-font-family", layoutState.fontFamily);
         }
     });
 
@@ -2263,6 +2269,12 @@ function applyLayoutMetrics() {
                 bubble.style.borderColor = "transparent";
             }
         });
+    }
+
+    // Sync Font Family selector
+    const fontDropdown = document.getElementById("slider-font-family");
+    if (fontDropdown && layoutState.fontFamily) {
+        fontDropdown.value = layoutState.fontFamily;
     }
 
     const fLabel = document.getElementById("val-font-size");
@@ -2302,18 +2314,19 @@ window.changeResumeAccent = function(color, btnEl) {
 };
 
 function changeLayoutMetric(key, val) {
-    layoutState[key] = parseFloat(val);
+    layoutState[key] = (key === 'fontFamily') ? val : parseFloat(val);
     localStorage.setItem('resumake_layout', JSON.stringify(layoutState));
     applyLayoutMetrics();
 }
 
 function resetLayoutMetrics() {
-    layoutState = { fontSize: 11, lineHeight: 1.4, padding: 60, accentColor: "#6366f1" };
+    layoutState = { fontSize: 11, lineHeight: 1.4, padding: 60, accentColor: "#6366f1", fontFamily: "Outfit, sans-serif" };
     localStorage.setItem('resumake_layout', JSON.stringify(layoutState));
     
     if (document.getElementById("slider-font-size")) document.getElementById("slider-font-size").value = 11;
     if (document.getElementById("slider-line-height")) document.getElementById("slider-line-height").value = 1.4;
     if (document.getElementById("slider-padding")) document.getElementById("slider-padding").value = 60;
+    if (document.getElementById("slider-font-family")) document.getElementById("slider-font-family").value = "Outfit, sans-serif";
     
     applyLayoutMetrics();
 }
@@ -2373,6 +2386,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("slider-font-size")) document.getElementById("slider-font-size").value = layoutState.fontSize;
     if (document.getElementById("slider-line-height")) document.getElementById("slider-line-height").value = layoutState.lineHeight;
     if (document.getElementById("slider-padding")) document.getElementById("slider-padding").value = layoutState.padding;
+    if (document.getElementById("slider-font-family") && layoutState.fontFamily) {
+        document.getElementById("slider-font-family").value = layoutState.fontFamily;
+    }
 });
 
 // Bind module-scoped variables and functions to window scope for index.html compatibility

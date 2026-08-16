@@ -1119,6 +1119,8 @@ textarea {
     padding: var(--resume-padding, 60px);
     font-size: var(--resume-font-size, 11px);
     line-height: var(--resume-line-height, 1.4);
+    font-family: var(--resume-font-family, 'Outfit', sans-serif);
+    --resume-font-family: 'Outfit', sans-serif;
     --resume-accent-color: #6366f1;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 
                 0 12px 24px -8px rgba(0, 0, 0, 0.4), 
@@ -4368,6 +4370,7 @@ h1, h2, h3, h4, h5, h6, .logo-text, .accordion-title span, .toolbar-group button
 .resume-sheet, .cover-letter-sheet {
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    --resume-font-family: 'Outfit', sans-serif;
     --resume-accent-color: #6366f1;
 }
 .resume-sheet:hover, .cover-letter-sheet:hover {
