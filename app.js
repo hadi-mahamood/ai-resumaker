@@ -3020,53 +3020,337 @@ function detectPrefixFromLocation(locText) {
 
 window.detectPrefixFromLocation = detectPrefixFromLocation;
 
+function getSampleDataByJobTitle(jobTitle) {
+    const title = jobTitle.trim().toLowerCase();
+    
+    // 1. Data Science / Analytics / Machine Learning / AI
+    if (title.includes("data") || title.includes("machine learning") || title.includes("ai ") || title.includes("artificial intelligence") || title.includes("analyst")) {
+        return {
+            name: "Sarah Chen",
+            title: jobTitle,
+            email: "sarah.chen@gmail.com",
+            phone: "+1 415-555-0144",
+            location: "San Francisco, CA, USA",
+            website: "linkedin.com/in/sarahchen-data",
+            dob: "04-05-1996",
+            nationality: "Canadian",
+            visaStatus: "H1-B Visa",
+            maritalStatus: "Single / Female",
+            languages: "English (Native), Mandarin (Fluent)",
+            skills: ["Python", "SQL", "TensorFlow", "PyTorch", "Pandas & NumPy", "Tableau", "Git", "Spark"],
+            experience: [
+                {
+                    id: "exp-1",
+                    company: "Insight Analytics Corp",
+                    role: "Lead Data Scientist",
+                    date: "Mar 2023 - Present",
+                    desc: "- Designed and deployed ML models that optimized search relevance, increasing conversion by 20%.\n- Led a team of 3 analysts to build dynamic dashboards that saved 15+ hours of manual reporting weekly.\n- Engineered automated data pipeline flows in Spark, reducing ETL latency by 45%."
+                },
+                {
+                    id: "exp-2",
+                    company: "DataWave Technologies",
+                    role: "Data Analyst",
+                    date: "Jun 2021 - Feb 2023",
+                    desc: "- Conducted regression analyses to predict user churn, lowering customer attrition rate by 12%.\n- Queried databases to clean and structure 5M+ row analytics logs using SQL.\n- Built key predictive visualizations in Tableau for C-suite executive roadmap briefings."
+                }
+            ],
+            education: [
+                {
+                    id: "edu-1",
+                    institution: "Stanford University",
+                    degree: "Master of Science in Statistics (Data Science track)",
+                    date: "2019 - 2021",
+                    desc: "Focus on Machine Learning, Statistical Inference, and Deep Architectures."
+                }
+            ],
+            projects: [
+                {
+                    id: "proj-1",
+                    title: "Fraud Detection Engine",
+                    role: "Lead Researcher",
+                    desc: "An open-source anomaly detection library that identifies invalid payment tokens in financial datasets using XGBoost."
+                }
+            ]
+        };
+    }
+    
+    // 2. Product / Project Management
+    if (title.includes("product") || title.includes("project manager") || title.includes("scrum") || title.includes("program manager")) {
+        return {
+            name: "Marcus Vance",
+            title: jobTitle,
+            email: "marcus.vance@gmail.com",
+            phone: "+1 212-555-0188",
+            location: "New York, NY, USA",
+            website: "linkedin.com/in/marcusvance-pm",
+            dob: "18-09-1994",
+            nationality: "American",
+            visaStatus: "Citizen",
+            maritalStatus: "Married / Male",
+            languages: "English (Native), French (Conversational)",
+            skills: ["Product Strategy", "Agile/Scrum Roadmap", "User Research", "JIRA & Confluence", "Amplitude & SQL", "A/B Testing"],
+            experience: [
+                {
+                    id: "exp-1",
+                    company: "InnovateTech Labs",
+                    role: "Senior Product Manager",
+                    date: "Feb 2023 - Present",
+                    desc: "- Managed product roadmap for mobile checkout application, boosting daily active users (DAU) by 40%.\n- Collaborated with engineering and design leads to release 12 features using Agile sprints.\n- Formulated pricing model strategies that increased average checkout basket size by 18%."
+                },
+                {
+                    id: "exp-2",
+                    company: "Apex Enterprise Systems",
+                    role: "Associate Product Manager",
+                    date: "Jan 2021 - Jan 2023",
+                    desc: "- Translated customer pain points into functional PRDs, reducing engineering rework by 25%.\n- Coordinated user testing initiatives for billing dashboard redesigns with 200+ global beta testers.\n- Monitored product health KPI trackers using SQL queries and Amplitude boards."
+                }
+            ],
+            education: [
+                {
+                    id: "edu-1",
+                    institution: "Wharton School, UPenn",
+                    degree: "Bachelor of Science in Economics & Business Management",
+                    date: "2016 - 2020",
+                    desc: "Graduated Magna Cum Laude. President of the University Product Association."
+                }
+            ],
+            projects: [
+                {
+                    id: "proj-1",
+                    title: "SaaS Feedback Portal",
+                    role: "Creator",
+                    desc: "A widget-based customer feedback portal that maps text sentiments directly to JIRA ticketing systems."
+                }
+            ]
+        };
+    }
+    
+    // 3. Sales / Marketing
+    if (title.includes("sale") || title.includes("market") || title.includes("marketing") || title.includes("seo") || title.includes("account executive")) {
+        return {
+            name: "Emily Rodriguez",
+            title: jobTitle,
+            email: "emily.rodriguez@gmail.com",
+            phone: "+1 312-555-0155",
+            location: "Chicago, IL, USA",
+            website: "linkedin.com/in/emilyrodriguez",
+            dob: "22-03-1997",
+            nationality: "Mexican-American",
+            visaStatus: "Citizen",
+            maritalStatus: "Single / Female",
+            languages: "English (Native), Spanish (Native)",
+            skills: ["Digital Marketing", "SEO Strategy", "Salesforce CRM", "Google Analytics", "Content Copywriting", "Lead Generation"],
+            experience: [
+                {
+                    id: "exp-1",
+                    company: "GrowthSpark Media",
+                    role: "Digital Marketing Manager",
+                    date: "Aug 2023 - Present",
+                    desc: "- Spearheaded localized SEO and Google Ads campaigns that generated $150K+ in new ARR.\n- Redesigned brand email sequences, improving marketing open rates from 14% to 28%.\n- Managed digital ad spend of $12K monthly, decreasing average customer acquisition cost (CAC) by 20%."
+                },
+                {
+                    id: "exp-2",
+                    company: "BrandBoosters Inc",
+                    role: "Marketing Assistant",
+                    date: "Sep 2021 - Jul 2023",
+                    desc: "- Coordinated content calendars for Instagram, LinkedIn, and TikTok, growing followers by 65%.\n- Drafted B2B outreach templates that raised outbound conversion rates by 15%.\n- Analyzed traffic patterns in Google Analytics, submitting weekly report summaries to VP."
+                }
+            ],
+            education: [
+                {
+                    id: "edu-1",
+                    institution: "Northwestern University",
+                    degree: "Bachelor of Science in Communication & Marketing",
+                    date: "2017 - 2021",
+                    desc: "Specialized in Integrated Marketing Communications. GPA: 3.82."
+                }
+            ],
+            projects: [
+                {
+                    id: "proj-1",
+                    title: "LeadGen Campaign Hub",
+                    role: "Campaign Designer",
+                    desc: "Designed and launched an automated digital newsletter hub that acquired 10K+ active subscribers in 3 months."
+                }
+            ]
+        };
+    }
+    
+    // 4. Human Resources / Recruiting
+    if (title.includes("hr ") || title.includes("human resource") || title.includes("recruit") || title.includes("talent")) {
+        return {
+            name: "David Kim",
+            title: jobTitle,
+            email: "david.kim@gmail.com",
+            phone: "+1 213-555-0122",
+            location: "Los Angeles, CA, USA",
+            website: "linkedin.com/in/davidkim-hr",
+            dob: "15-11-1995",
+            nationality: "American",
+            visaStatus: "Citizen",
+            maritalStatus: "Single / Male",
+            languages: "English (Native), Korean (Fluent)",
+            skills: ["Talent Acquisition", "Employee Onboarding", "ATS Management", "Conflict Resolution", "HR Operations", "Compensation Analysis"],
+            experience: [
+                {
+                    id: "exp-1",
+                    company: "PeopleFirst Solutions",
+                    role: "HR Specialist",
+                    date: "Nov 2022 - Present",
+                    desc: "- Managed end-to-end recruitment workflows for 50+ tech positions, lowering average time-to-hire by 18 days.\n- Facilitated monthly company-wide onboarding bootcamps, improving 90-day retention index by 15%.\n- Resolved employee complaints and conflict cases, ensuring 100% compliance with labor regulations."
+                },
+                {
+                    id: "exp-2",
+                    company: "TalentSource Staffing",
+                    role: "Junior Recruiter",
+                    date: "Jul 2020 - Oct 2022",
+                    desc: "- Sourced candidates using LinkedIn Recruiter and job boards, feeding pipeline with 80+ qualified resumes monthly.\n- Maintained candidate status updates in ATS, ensuring clear documentation of feedback.\n- Coordinated interviewing schedules and background checks for client placements."
+                }
+            ],
+            education: [
+                {
+                    id: "edu-1",
+                    institution: "University of California, Los Angeles (UCLA)",
+                    degree: "Bachelor of Arts in Psychology & Human Resources",
+                    date: "2016 - 2020",
+                    desc: "Dean's List. Recipient of the HR Professional scholarship award."
+                }
+            ],
+            projects: [
+                {
+                    id: "proj-1",
+                    title: "Automated Interview Scheduler",
+                    role: "Project Lead",
+                    desc: "Initiated a third-party calendar widget integration that saved the HR team 8 hours of manual scheduling weekly."
+                }
+            ]
+        };
+    }
+    
+    // 5. Healthcare / Nursing / Medical
+    if (title.includes("nurse") || title.includes("medical") || title.includes("doctor") || title.includes("clinic") || title.includes("healthcare")) {
+        return {
+            name: "Jessica Taylor, BSN",
+            title: jobTitle,
+            email: "jessica.taylor.ns@gmail.com",
+            phone: "+1 617-555-0176",
+            location: "Boston, MA, USA",
+            website: "linkedin.com/in/jessicataylor-nurse",
+            dob: "12-07-1994",
+            nationality: "American",
+            visaStatus: "Citizen",
+            maritalStatus: "Married / Female",
+            languages: "English (Native)",
+            skills: ["Patient Triage", "EMR Databases", "Clinical Care", "BLS & ACLS Certified", "Wound Care", "IV Administration"],
+            experience: [
+                {
+                    id: "exp-1",
+                    company: "Boston General Hospital",
+                    role: "Registered Emergency Nurse",
+                    date: "May 2021 - Present",
+                    desc: "- Delivered critical triage and medical nursing care in a fast-paced 30-bed emergency room.\n- Administered IVs, blood transfusions, and clinical medications as directed by attending physicians.\n- Updated patient status documentation logs in EMR database system with 100% precision."
+                },
+                {
+                    id: "exp-2",
+                    company: "Valley Care Clinic",
+                    role: "Clinical Medical Assistant",
+                    date: "Sep 2019 - Apr 2021",
+                    desc: "- Assisted doctors during family care checkups, measuring patient vitals and health baselines.\n- Coordinated patient schedules and billing records in compliance with HIPAA privacy standards.\n- Managed sterilization of emergency clinical instruments and surgical trays."
+                }
+            ],
+            education: [
+                {
+                    id: "edu-1",
+                    institution: "Boston College",
+                    degree: "Bachelor of Science in Nursing (BSN)",
+                    date: "2015 - 2019",
+                    desc: "Licensed RN. Graduated with honors. Specialized in Critical Emergency Care."
+                }
+            ],
+            projects: [
+                {
+                    id: "proj-1",
+                    title: "Triage Flow Optimization",
+                    role: "Committee Member",
+                    desc: "Redesigned emergency check-in workflows, reducing waiting room triage latency by 12%."
+                }
+            ]
+        };
+    }
+
+    // 6. DEFAULT FALLBACK: Customize template dynamically to fit their custom title
+    const formattedTitle = jobTitle ? jobTitle.trim().charAt(0).toUpperCase() + jobTitle.trim().slice(1) : "Professional Specialist";
+    return {
+        name: "Alex Mercer",
+        title: formattedTitle,
+        email: "alex.mercer@gmail.com",
+        phone: "+1 555-0199",
+        location: "Seattle, WA, USA",
+        website: "linkedin.com/in/alexmercer",
+        dob: "12-10-1998",
+        nationality: "American",
+        visaStatus: "Citizen",
+        maritalStatus: "Single / Male",
+        languages: "English (Native), Spanish (Fluent)",
+        skills: ["Strategy", "Operations", "Critical Thinking", "Communication", "Problem Solving", "Collaboration", "Project Tools", "Execution"],
+        experience: [
+            {
+                id: "exp-1",
+                company: "Pinnacle Enterprise Solutions",
+                role: `Senior ${formattedTitle}`,
+                date: "Jan 2024 - Present",
+                desc: `- Spearheaded strategic operations as a Senior ${formattedTitle}, improving productivity by 35%.\n- Collaborated with 5 senior team leads to optimize project workflows and align targets.\n- Integrated modern tracking standards, increasing team delivery reliability by 25%.`
+            },
+            {
+                id: "exp-2",
+                company: "Startup Core Systems",
+                role: `${formattedTitle}`,
+                date: "Jun 2022 - Dec 2023",
+                desc: `- Developed and maintained core programs, resolving critical issues weekly.\n- Revamped main operational portals, boosting overall project performance by 15%.\n- Contributed to key client projects, ensuring 100% on-time milestone delivery.`
+            }
+        ],
+        education: [
+            {
+                id: "edu-1",
+                institution: "State University",
+                degree: `Bachelor of Science in ${formattedTitle.replace(/senior|lead/gi, "").trim()} Administration`,
+                date: "2018 - 2022",
+                desc: "Graduated with Honors. Specialized in Organizational Leadership and Strategic Administration."
+            }
+        ],
+        projects: [
+            {
+                id: "proj-1",
+                title: `${formattedTitle} Toolkit`,
+                role: "Creator",
+                desc: `An open-source library that automates standard procedures for ${formattedTitle} teams. Gained positive industry recognition.`
+            }
+        ]
+    };
+}
+
 function loadSampleResumeData() {
-    state.targetJob = "Senior Full Stack Software Engineer";
-    state.name = "Alex Mercer";
-    state.title = "Senior Full Stack Software Engineer";
-    state.email = "alex.mercer@gmail.com";
-    state.phone = "+1 555-0199";
-    state.location = "Seattle, WA, USA";
-    state.website = "linkedin.com/in/alexmercer";
-    state.dob = "12-10-1998";
-    state.nationality = "American";
-    state.visaStatus = "Citizen";
-    state.maritalStatus = "Single / Male";
-    state.languages = "English (Native), Spanish (Fluent)";
-    state.skills = ["React.js", "JavaScript (ES6+)", "Node.js", "Python", "REST APIs", "SQL", "Git/GitHub", "Docker"];
-    state.experience = [
-        {
-            id: "exp-1",
-            company: "TechNova Solutions",
-            role: "Software Engineer",
-            date: "Jan 2024 - Present",
-            desc: "- Spearheaded development of core web application dashboard, improving speed by 35%.\n- Collaborated with 5 engineers to design REST API endpoints and integrate them with React UI.\n- Integrated automated unit tests, increasing system reliability by 25%."
-        },
-        {
-            id: "exp-2",
-            company: "Quantum Code Inc",
-            role: "Junior Web Developer",
-            date: "Jun 2022 - Dec 2023",
-            desc: "- Developed and maintained robust websites for client projects using JavaScript, HTML, and CSS.\n- Revamped the main e-commerce portal, boosting overall mobile conversion rate by 15%.\n- Debugged production issues, resolving an average of 10+ critical issues weekly."
-        }
-    ];
-    state.education = [
-        {
-            id: "edu-1",
-            institution: "University of Washington",
-            degree: "Bachelor of Science in Computer Science",
-            date: "2018 - 2022",
-            desc: "Graduated with Honors. Specialized in Software Architecture and Database Systems."
-        }
-    ];
-    state.projects = [
-        {
-            id: "proj-1",
-            title: "DevPortfolio Generator",
-            role: "Creator",
-            desc: "An open-source portfolio generator that turns markdown files into gorgeous, responsive portfolio sites. Gained 150+ stars on GitHub."
-        }
-    ];
+    const jobTitleInput = document.getElementById("target-job-input");
+    const jobTitle = (jobTitleInput ? jobTitleInput.value.trim() : "") || state.targetJob || "Senior Full Stack Software Engineer";
+    
+    const dataset = getSampleDataByJobTitle(jobTitle);
+    
+    state.targetJob = jobTitle;
+    state.name = dataset.name;
+    state.title = dataset.title;
+    state.email = dataset.email;
+    state.phone = dataset.phone;
+    state.location = dataset.location;
+    state.website = dataset.website;
+    state.dob = dataset.dob;
+    state.nationality = dataset.nationality;
+    state.visaStatus = dataset.visaStatus;
+    state.maritalStatus = dataset.maritalStatus;
+    state.languages = dataset.languages;
+    state.skills = dataset.skills;
+    state.experience = dataset.experience;
+    state.education = dataset.education;
+    state.projects = dataset.projects;
     
     // Set form fields
     setFormFields();
@@ -3082,7 +3366,7 @@ function loadSampleResumeData() {
     updateSidebarBadges();
     renderResumePreview();
     if (window.showToast) {
-        showToast("Sample premium resume loaded successfully!");
+        showToast(`Sample ${state.title} resume loaded!`);
     } else {
         alert("Sample premium resume loaded successfully!");
     }
