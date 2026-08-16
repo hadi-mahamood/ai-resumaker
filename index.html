@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=76.0">
+    <link rel="stylesheet" href="style.css?v=77.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -48,6 +48,20 @@
             </div>
 
             <div class="sidebar-content">
+                <!-- Setup Wizard Step Tracker (Super User Friendly) -->
+                <div class="wizard-steps-container" style="margin: 8px 16px 12px 16px; background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; position: relative; z-index: 2;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--accent); letter-spacing: 0.5px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Step-by-Step Wizard</span>
+                        <span id="wizard-step-indicator" style="font-size: 0.68rem; font-weight: 600; color: var(--text-secondary);">Step 1 of 4</span>
+                    </div>
+                    <div style="display: flex; gap: 6px; width: 100%;">
+                        <button class="wizard-step-btn active" id="wizard-btn-1" onclick="window.setWizardStep(1)" style="flex: 1; padding: 6px 4px; border-radius: 6px; border: none; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: all 0.3s;" title="Personal Info"><i class="fa-solid fa-user"></i> Info</button>
+                        <button class="wizard-step-btn" id="wizard-btn-2" onclick="window.setWizardStep(2)" style="flex: 1; padding: 6px 4px; border-radius: 6px; border: none; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: all 0.3s;" title="Work Experience"><i class="fa-solid fa-briefcase"></i> Work</button>
+                        <button class="wizard-step-btn" id="wizard-btn-3" onclick="window.setWizardStep(3)" style="flex: 1; padding: 6px 4px; border-radius: 6px; border: none; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: all 0.3s;" title="Education & Projects"><i class="fa-solid fa-graduation-cap"></i> Academics</button>
+                        <button class="wizard-step-btn" id="wizard-btn-4" onclick="window.setWizardStep(4)" style="flex: 1; padding: 6px 4px; border-radius: 6px; border: none; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: all 0.3s;" title="Design & Accent"><i class="fa-solid fa-palette"></i> Design</button>
+                    </div>
+                </div>
+
                 <!-- Global Profile Completeness Gauge -->
                 <div class="profile-completeness-card" style="margin: 12px 16px 4px 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.15); position: relative; z-index: 2;">
                     <div style="display: flex; flex-direction: column; gap: 4px;">
@@ -721,6 +735,12 @@
                     </div>
                 </div>
 
+                <!-- Wizard Navigation Footer (Super User Friendly) -->
+                <div class="wizard-nav-footer" style="padding: 16px; display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; border-top: 1px solid var(--border-color); background: rgba(255,255,255,0.01); border-radius: 8px;">
+                    <button class="ai-btn ai-btn-outline" id="wizard-prev-btn" onclick="window.prevWizardStep()" style="flex: 1; justify-content: center; font-size: 0.78rem; padding: 10px; cursor: pointer; border-radius: 6px;"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                    <button class="ai-btn" id="wizard-next-btn" onclick="window.nextWizardStep()" style="flex: 1; justify-content: center; font-size: 0.78rem; padding: 10px; cursor: pointer; border-radius: 6px; background: var(--primary-gradient);">Next Step <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+
                 <!-- Dev-Focused Ad Banner (EthicalAds/Carbon Mock) -->
                 <div class="developer-ad-container" style="margin-top: auto; padding: 16px 4px 4px 4px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;">
                     <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; display: flex; gap: 10px; align-items: center; position: relative; overflow: hidden; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
@@ -1247,8 +1267,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=76.0"></script>
-    <script src="ats.js?v=76.0"></script>
-    <script type="module" src="app.js?v=76.0"></script>
+    <script src="ai.js?v=77.0"></script>
+    <script src="ats.js?v=77.0"></script>
+    <script type="module" src="app.js?v=77.0"></script>
 </body>
 </html>

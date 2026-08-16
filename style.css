@@ -4493,3 +4493,20 @@ h1, h2, h3, h4, h5, h6, .logo-text, .accordion-title span, .toolbar-group button
     }
 }
 
+/* Setup Wizard Styles */
+.wizard-step-btn {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: var(--text-secondary) !important;
+}
+.wizard-step-btn:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: white !important;
+}
+.wizard-step-btn.active {
+    background: var(--primary-gradient) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+}
+

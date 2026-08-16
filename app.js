@@ -3633,3 +3633,94 @@ window.toggleFloatingHub = function() {
         triggerIcon.className = "fa-solid fa-bolt";
     }
 };
+
+let currentWizardStep = 1;
+
+window.setWizardStep = function(stepNum) {
+    if (stepNum < 1 || stepNum > 4) return;
+    currentWizardStep = stepNum;
+    
+    // Update step buttons active class
+    document.querySelectorAll(".wizard-step-btn").forEach(btn => {
+        btn.classList.remove("active");
+    });
+    const activeBtn = document.getElementById(`wizard-btn-${stepNum}`);
+    if (activeBtn) activeBtn.classList.add("active");
+    
+    // Update step indicator label
+    const indicator = document.getElementById("wizard-step-indicator");
+    if (indicator) indicator.innerText = `Step ${stepNum} of 4`;
+    
+    // Define visibility groups
+    const groups = {
+        1: ["sec-personal", "sec-regional"],
+        2: ["sec-experience"],
+        3: ["sec-education", "sec-skills", "sec-projects"],
+        4: ["sec-layout", "sec-visibility"]
+    };
+    
+    // Toggle accordions visibility
+    const allIds = ["sec-personal", "sec-regional", "sec-experience", "sec-education", "sec-skills", "sec-projects", "sec-layout", "sec-visibility"];
+    allIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (groups[stepNum].includes(id)) {
+                el.style.display = "";
+            } else {
+                el.style.display = "none";
+            }
+            // Deactivate all first
+            el.classList.remove("active");
+        }
+    });
+    
+    // Auto-expand the first accordion of the current step
+    const firstAccordionId = groups[stepNum][0];
+    const firstAccordion = document.getElementById(firstAccordionId);
+    if (firstAccordion) {
+        firstAccordion.classList.add("active");
+        // Scroll the preview window to highlight the corresponding section
+        if (window.scrollToResumeSection) {
+            window.scrollToResumeSection(firstAccordionId);
+        }
+    }
+    
+    // Update Back and Next buttons
+    const prevBtn = document.getElementById("wizard-prev-btn");
+    const nextBtn = document.getElementById("wizard-next-btn");
+    
+    if (prevBtn) {
+        prevBtn.style.display = (stepNum === 1) ? "none" : "";
+    }
+    
+    if (nextBtn) {
+        if (stepNum === 4) {
+            nextBtn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> Download PDF`;
+            nextBtn.style.background = "linear-gradient(135deg, #10b981, #059669)";
+            nextBtn.onclick = function() { window.exportPDF(); };
+        } else {
+            nextBtn.innerHTML = `Next Step <i class="fa-solid fa-arrow-right"></i>`;
+            nextBtn.style.background = "var(--primary-gradient)";
+            nextBtn.onclick = function() { window.nextWizardStep(); };
+        }
+    }
+};
+
+window.nextWizardStep = function() {
+    if (currentWizardStep < 4) {
+        window.setWizardStep(currentWizardStep + 1);
+    }
+};
+
+window.prevWizardStep = function() {
+    if (currentWizardStep > 1) {
+        window.setWizardStep(currentWizardStep - 1);
+    }
+};
+
+// Initialize wizard to step 1 automatically on load
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        window.setWizardStep(1);
+    }, 200);
+});
