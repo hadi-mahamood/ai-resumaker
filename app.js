@@ -1700,47 +1700,49 @@ function bindInlineEditEvents() {
    ========================================== */
 
 window.updateATSScore = function() {
-    const report = ATSAuditor.audit(state);
-    
-    // Update toolbar indicator
-    const tbBadge = document.getElementById("toolbar-ats-badge");
-    const tbStatus = document.getElementById("toolbar-ats-status");
-    const radialFill = document.getElementById("ats-radial-progress");
-    
-    if (tbBadge && tbStatus) {
-        tbBadge.innerText = report.score;
-        tbStatus.innerText = report.status;
-        
-        // Update SVG circle percent fill
-        if (radialFill) {
-            radialFill.setAttribute("stroke-dasharray", `${report.score}, 100`);
+    if (typeof window.runATSBackgroundAudit === "function") {
+        window.runATSBackgroundAudit(state, (report) => {
+            // Update toolbar indicator
+            const tbBadge = document.getElementById("toolbar-ats-badge");
+            const tbStatus = document.getElementById("toolbar-ats-status");
+            const radialFill = document.getElementById("ats-radial-progress");
             
-            // Set dynamic stroke colors
-            if (report.score < 60) {
-                radialFill.setAttribute("stroke", "#ef4444");
-            } else if (report.score < 80) {
-                radialFill.setAttribute("stroke", "#f59e0b");
-            } else {
-                radialFill.setAttribute("stroke", "#10b981");
+            if (tbBadge && tbStatus) {
+                tbBadge.innerText = report.score;
+                tbStatus.innerText = report.status;
+                
+                // Update SVG circle percent fill
+                if (radialFill) {
+                    radialFill.setAttribute("stroke-dasharray", `${report.score}, 100`);
+                    
+                    // Set dynamic stroke colors
+                    if (report.score < 60) {
+                        radialFill.setAttribute("stroke", "#ef4444");
+                    } else if (report.score < 80) {
+                        radialFill.setAttribute("stroke", "#f59e0b");
+                    } else {
+                        radialFill.setAttribute("stroke", "#10b981");
+                    }
+                }
+                
+                const pill = tbBadge.closest(".ats-score-pill");
+                if (pill) {
+                    pill.className = "ats-score-pill";
+                    if (report.score < 60) {
+                        pill.classList.add("low");
+                        pill.style.borderColor = "rgba(239, 68, 68, 0.3)";
+                    } else if (report.score < 80) {
+                        pill.classList.add("medium");
+                        pill.style.borderColor = "rgba(245, 158, 11, 0.3)";
+                    } else {
+                        pill.style.borderColor = "rgba(16, 185, 129, 0.3)";
+                    }
+                }
             }
-        }
-        
-        const pill = tbBadge.closest(".ats-score-pill");
-        if (pill) {
-            pill.className = "ats-score-pill";
-            if (report.score < 60) {
-                pill.classList.add("low");
-                pill.style.borderColor = "rgba(239, 68, 68, 0.3)";
-            } else if (report.score < 80) {
-                pill.classList.add("medium");
-                pill.style.borderColor = "rgba(245, 158, 11, 0.3)";
-            } else {
-                pill.style.borderColor = "rgba(16, 185, 129, 0.3)";
+            if (window.syncATSSuggestionsPanel) {
+                window.syncATSSuggestionsPanel();
             }
-        }
-    }
-    if (window.syncATSSuggestionsPanel) {
-        window.syncATSSuggestionsPanel();
+        });
     }
 }
 

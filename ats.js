@@ -617,70 +617,70 @@ window.calculateJDMatch = function() {
     state.jobDescription = jdText;
     saveState();
     
-    const auditResult = ATSAuditor.audit(state);
-    
-    // Update Match Score
-    const matchScoreElement = document.getElementById("ats-jd-match-score");
-    let matchScore = auditResult.jdMode ? Math.round((auditResult.matchedKeywords.length / auditResult.extractedKeywords.length) * 100) : 0;
-    if (matchScoreElement) {
-        matchScoreElement.innerText = `${matchScore}%`;
-        if (matchScore >= 80) matchScoreElement.style.color = "var(--success)";
-        else if (matchScore >= 50) matchScoreElement.style.color = "var(--warning)";
-        else matchScoreElement.style.color = "var(--danger)";
-    }
-    
-    // Sync to Sidebar Match Progress Gauge
-    const sidebarPct = document.getElementById("sidebar-ats-pct");
-    const sidebarBar = document.getElementById("sidebar-ats-progress-bar");
-    const sidebarBarContainer = document.getElementById("sidebar-ats-progress-container");
-    if (sidebarPct && sidebarBar && sidebarBarContainer) {
-        if (auditResult.jdMode && auditResult.extractedKeywords.length > 0) {
-            sidebarBarContainer.style.display = "block";
-            sidebarPct.style.display = "inline";
-            sidebarPct.innerText = `${matchScore}%`;
-            sidebarBar.style.width = `${matchScore}%`;
-            if (matchScore >= 80) {
-                sidebarBar.style.backgroundColor = "var(--success)";
-                sidebarPct.style.color = "var(--success)";
-            } else if (matchScore >= 50) {
-                sidebarBar.style.backgroundColor = "var(--warning)";
-                sidebarPct.style.color = "var(--warning)";
+    window.runATSBackgroundAudit(state, (auditResult) => {
+        // Update Match Score
+        const matchScoreElement = document.getElementById("ats-jd-match-score");
+        let matchScore = auditResult.jdMode ? Math.round((auditResult.matchedKeywords.length / auditResult.extractedKeywords.length) * 100) : 0;
+        if (matchScoreElement) {
+            matchScoreElement.innerText = `${matchScore}%`;
+            if (matchScore >= 80) matchScoreElement.style.color = "var(--success)";
+            else if (matchScore >= 50) matchScoreElement.style.color = "var(--warning)";
+            else matchScoreElement.style.color = "var(--danger)";
+        }
+        
+        // Sync to Sidebar Match Progress Gauge
+        const sidebarPct = document.getElementById("sidebar-ats-pct");
+        const sidebarBar = document.getElementById("sidebar-ats-progress-bar");
+        const sidebarBarContainer = document.getElementById("sidebar-ats-progress-container");
+        if (sidebarPct && sidebarBar && sidebarBarContainer) {
+            if (auditResult.jdMode && auditResult.extractedKeywords.length > 0) {
+                sidebarBarContainer.style.display = "block";
+                sidebarPct.style.display = "inline";
+                sidebarPct.innerText = `${matchScore}%`;
+                sidebarBar.style.width = `${matchScore}%`;
+                if (matchScore >= 80) {
+                    sidebarBar.style.backgroundColor = "var(--success)";
+                    sidebarPct.style.color = "var(--success)";
+                } else if (matchScore >= 50) {
+                    sidebarBar.style.backgroundColor = "var(--warning)";
+                    sidebarPct.style.color = "var(--warning)";
+                } else {
+                    sidebarBar.style.backgroundColor = "var(--danger)";
+                    sidebarPct.style.color = "var(--danger)";
+                }
             } else {
-                sidebarBar.style.backgroundColor = "var(--danger)";
-                sidebarPct.style.color = "var(--danger)";
+                sidebarBarContainer.style.display = "none";
+                sidebarPct.style.display = "none";
             }
-        } else {
-            sidebarBarContainer.style.display = "none";
-            sidebarPct.style.display = "none";
         }
-    }
-    
-    // Render Matched
-    const matchedContainer = document.getElementById("ats-matched-keywords");
-    if (matchedContainer) {
-        matchedContainer.innerHTML = "";
-        if (auditResult.matchedKeywords.length > 0) {
-            auditResult.matchedKeywords.forEach(kw => {
-                matchedContainer.innerHTML += `<span class="keyword-chip matched"><i class="fa-solid fa-check"></i> ${kw}</span>`;
-            });
+        
+        // Render Matched
+        const matchedContainer = document.getElementById("ats-matched-keywords");
+        if (matchedContainer) {
+            matchedContainer.innerHTML = "";
+            if (auditResult.matchedKeywords.length > 0) {
+                auditResult.matchedKeywords.forEach(kw => {
+                    matchedContainer.innerHTML += `<span class="keyword-chip matched"><i class="fa-solid fa-check"></i> ${kw}</span>`;
+                });
+            }
         }
-    }
-    
-    // Render sidebar matched & missing keywords
-    const sidebarKeywordsContainer = document.getElementById("sidebar-job-keywords");
-    if (sidebarKeywordsContainer) {
-        sidebarKeywordsContainer.innerHTML = "";
-        if (auditResult.jdMode && auditResult.extractedKeywords.length > 0) {
-            auditResult.matchedKeywords.forEach(kw => {
-                sidebarKeywordsContainer.innerHTML += `<span class="keyword-chip matched" style="font-size: 0.65rem; padding: 2px 6px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-check"></i> ${kw}</span>`;
-            });
-            auditResult.missingKeywords.forEach(kw => {
-                sidebarKeywordsContainer.innerHTML += `<span class="keyword-chip missing" onclick="window.injectKeyword('${kw.replace(/'/g, "\\'")}')" style="font-size: 0.65rem; padding: 2px 6px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Click to add skill to resume"><i class="fa-solid fa-plus"></i> ${kw}</span>`;
-            });
-        } else {
-            sidebarKeywordsContainer.innerHTML = `<span style="font-size: 0.7rem; color: var(--text-secondary); font-style: italic;">Paste a job description to trigger parser alignment.</span>`;
+        
+        // Render sidebar matched & missing keywords
+        const sidebarKeywordsContainer = document.getElementById("sidebar-job-keywords");
+        if (sidebarKeywordsContainer) {
+            sidebarKeywordsContainer.innerHTML = "";
+            if (auditResult.jdMode && auditResult.extractedKeywords.length > 0) {
+                auditResult.matchedKeywords.forEach(kw => {
+                    sidebarKeywordsContainer.innerHTML += `<span class="keyword-chip matched" style="font-size: 0.65rem; padding: 2px 6px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-check"></i> ${kw}</span>`;
+                });
+                auditResult.missingKeywords.forEach(kw => {
+                    sidebarKeywordsContainer.innerHTML += `<span class="keyword-chip missing" onclick="window.injectKeyword('${kw.replace(/'/g, "\\'")}')" style="font-size: 0.65rem; padding: 2px 6px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Click to add skill to resume"><i class="fa-solid fa-plus"></i> ${kw}</span>`;
+                });
+            } else {
+                sidebarKeywordsContainer.innerHTML = `<span style="font-size: 0.7rem; color: var(--text-secondary); font-style: italic;">Paste a job description to trigger parser alignment.</span>`;
+            }
         }
-    }
+    });
 };
 
 window.addSkillDirectly = function(kw) {
@@ -2949,6 +2949,42 @@ window.resizeCoverLetterPreview = function() {
         scaler.style.width = "794px";
         scaler.style.justifyContent = "center";
     }
+};
+
+let atsWorker = null;
+
+function getATSWorker() {
+    if (!atsWorker) {
+        // Serialize ATSAuditor parameters and algorithms dynamically
+        const stopWordsArray = Array.from(ATSAuditor.stopWords);
+        const workerCode = `
+            const ATSAuditor = {
+                skillsLexicon: ${JSON.stringify(ATSAuditor.skillsLexicon)},
+                stopWords: new Set(${JSON.stringify(stopWordsArray)}),
+                keywordsMap: ${JSON.stringify(ATSAuditor.keywordsMap)},
+                detectCategory: ${ATSAuditor.detectCategory.toString()},
+                extractKeywordsFromJD: ${ATSAuditor.extractKeywordsFromJD.toString()},
+                audit: ${ATSAuditor.audit.toString()}
+            };
+
+            self.onmessage = function(e) {
+                const { resumeData } = e.data;
+                const result = ATSAuditor.audit(resumeData);
+                self.postMessage(result);
+            };
+        `;
+        const blob = new Blob([workerCode], { type: "application/javascript" });
+        atsWorker = new Worker(URL.createObjectURL(blob));
+    }
+    return atsWorker;
+}
+
+window.runATSBackgroundAudit = function(resumeData, callback) {
+    const worker = getATSWorker();
+    worker.onmessage = function(e) {
+        if (callback) callback(e.data);
+    };
+    worker.postMessage({ resumeData });
 };
 
 window.ATSAuditor = ATSAuditor;
