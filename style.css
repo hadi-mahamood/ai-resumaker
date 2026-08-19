@@ -4546,15 +4546,15 @@ h1, h2, h3, h4, h5, h6, .logo-text, .accordion-title span, .toolbar-group button
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(2px);
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     z-index: 100001;
-    pointer-events: all;
+    pointer-events: none;
     display: none;
-    transition: opacity 0.3s ease;
 }
 .tour-tooltip-card {
-    position: fixed;
+    position: absolute;
     background: #0f172a;
     border: 1.5px solid rgba(139, 92, 246, 0.4);
     border-radius: 12px;

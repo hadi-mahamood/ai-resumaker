@@ -4327,43 +4327,49 @@ function showTourStep(index) {
     if (!tooltip) return;
 
     if (target) {
-        target.classList.add("tour-highlight");
+        // Scroll target into view smoothly so the beginner can see it immediately
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
         
-        // Render tooltip content
-        document.getElementById("tour-title").innerHTML = step.title;
-        document.getElementById("tour-text").innerText = step.text;
-        
-        // Show card
-        tooltip.style.display = "flex";
-        
-        // Calculate position relative to target
-        const rect = target.getBoundingClientRect();
-        const tooltipWidth = 280;
-        const tooltipHeight = 120;
-        
-        let top = 0;
-        let left = 0;
-        
-        if (step.position === "bottom") {
-            top = rect.bottom + 12;
-            left = rect.left + (rect.width - tooltipWidth) / 2;
-        } else if (step.position === "left") {
-            top = rect.top + (rect.height - tooltipHeight) / 2;
-            left = rect.left - tooltipWidth - 12;
-        } else if (step.position === "right") {
-            top = rect.top + (rect.height - tooltipHeight) / 2;
-            left = rect.right + 12;
-        } else if (step.position === "top") {
-            top = rect.top - tooltipHeight - 12;
-            left = rect.left + (rect.width - tooltipWidth) / 2;
-        }
-        
-        // Keep inside screen boundaries
-        left = Math.max(12, Math.min(window.innerWidth - tooltipWidth - 12, left));
-        top = Math.max(12, Math.min(window.innerHeight - tooltipHeight - 12, top));
-        
-        tooltip.style.top = `${top}px`;
-        tooltip.style.left = `${left}px`;
+        // Short delay to let the scroll settle before calculating absolute positions
+        setTimeout(() => {
+            target.classList.add("tour-highlight");
+            
+            // Render tooltip content
+            document.getElementById("tour-title").innerHTML = step.title;
+            document.getElementById("tour-text").innerText = step.text;
+            
+            // Show card
+            tooltip.style.display = "flex";
+            
+            // Calculate position relative to target
+            const rect = target.getBoundingClientRect();
+            const tooltipWidth = 280;
+            const tooltipHeight = 120;
+            
+            let top = 0;
+            let left = 0;
+            
+            if (step.position === "bottom") {
+                top = rect.bottom + window.scrollY + 12;
+                left = rect.left + window.scrollX + (rect.width - tooltipWidth) / 2;
+            } else if (step.position === "left") {
+                top = rect.top + window.scrollY + (rect.height - tooltipHeight) / 2;
+                left = rect.left + window.scrollX - tooltipWidth - 12;
+            } else if (step.position === "right") {
+                top = rect.top + window.scrollY + (rect.height - tooltipHeight) / 2;
+                left = rect.right + window.scrollX + 12;
+            } else if (step.position === "top") {
+                top = rect.top + window.scrollY - tooltipHeight - 12;
+                left = rect.left + window.scrollX + (rect.width - tooltipWidth) / 2;
+            }
+            
+            // Keep inside screen boundaries (relative to document dimensions)
+            left = Math.max(12, Math.min(document.documentElement.scrollWidth - tooltipWidth - 12, left));
+            top = Math.max(12, Math.min(document.documentElement.scrollHeight - tooltipHeight - 12, top));
+            
+            tooltip.style.top = `${top}px`;
+            tooltip.style.left = `${left}px`;
+        }, 400);
     }
 
     // Toggle back button visibility
