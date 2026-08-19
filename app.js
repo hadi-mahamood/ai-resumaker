@@ -1324,12 +1324,23 @@ function deleteProject(id) {
 function switchTemplate(templateName) {
     state.activeTemplate = templateName;
     
-    // Sync custom dropdown active label
-    const label = document.getElementById("current-template-label");
-    if (label) {
-        const activeItem = document.querySelector(`.dropdown-item[data-value="${templateName}"]`);
-        if (activeItem) {
-            label.innerText = activeItem.textContent.trim();
+    // Sync templates dropdown label
+    const templatesLabel = document.getElementById("templates-dropdown-label");
+    if (templatesLabel) {
+        const templateTitles = {
+            modern: "Modern",
+            classic: "Classic",
+            executive: "Executive",
+            gcc: "GCC (Middle East)",
+            india: "India (Academic)",
+            europe: "Europe (Europass)",
+            us: "US / Canada",
+            uk: "UK / Commonwealth",
+            asia: "Asia / Pacific",
+            latam: "Latin America"
+        };
+        if (templateTitles[templateName]) {
+            templatesLabel.innerText = templateTitles[templateName];
         }
     }
     
@@ -2250,59 +2261,22 @@ window.toggleTemplateDropdown = function(e) {
 };
 
 window.selectTemplateOption = function(val, labelText) {
-    const menu = document.getElementById("regional-dropdown-menu");
+    const menu = document.getElementById("templates-dropdown-menu");
     if (menu) menu.style.display = "none";
     
     switchTemplate(val);
     
-    // Update general active chips
-    const generalTemplates = ["modern", "classic", "executive"];
-    const isGeneral = generalTemplates.includes(val);
-    
-    // Reset all general chips
-    generalTemplates.forEach(tId => {
-        const chip = document.getElementById(`chip-${tId}`);
-        if (chip) {
-            if (tId === val) {
-                chip.classList.add("active");
-                chip.style.borderColor = "var(--primary)";
-                chip.style.background = "rgba(99, 102, 241, 0.12)";
-                chip.style.color = "white";
-            } else {
-                chip.classList.remove("active");
-                chip.style.borderColor = "var(--border-color)";
-                chip.style.background = "rgba(255, 255, 255, 0.02)";
-                chip.style.color = "var(--text-secondary)";
-            }
-        }
-    });
-    
-    // Update regional dropdown button state
-    const regLabel = document.getElementById("regional-dropdown-label");
-    const regBtn = document.getElementById("chip-regional-dropdown");
-    
-    if (regBtn && regLabel) {
-        if (!isGeneral) {
-            // A regional template was selected from the dropdown
-            regBtn.classList.add("active");
-            regBtn.style.borderColor = "var(--primary)";
-            regBtn.style.background = "rgba(99, 102, 241, 0.12)";
-            regBtn.style.color = "white";
-            regLabel.innerText = labelText.split(" (")[0];
-        } else {
-            // A general template was selected, reset dropdown state
-            regBtn.classList.remove("active");
-            regBtn.style.borderColor = "var(--border-color)";
-            regBtn.style.background = "rgba(255, 255, 255, 0.02)";
-            regBtn.style.color = "var(--text-secondary)";
-            regLabel.innerText = "International";
-        }
+    // Update templates dropdown button state text
+    const btn = document.getElementById("chip-templates-dropdown");
+    const label = document.getElementById("templates-dropdown-label");
+    if (btn && label) {
+        label.innerText = labelText.split(" (")[0];
     }
 };
 
-window.toggleRegionalDropdown = function(e) {
-    const menu = document.getElementById("regional-dropdown-menu");
-    const btn = document.getElementById("chip-regional-dropdown");
+window.toggleTemplatesDropdown = function(e) {
+    const menu = document.getElementById("templates-dropdown-menu");
+    const btn = document.getElementById("chip-templates-dropdown");
     if (!menu || !btn) return;
     
     // Close other dropdowns
@@ -2329,8 +2303,8 @@ window.toggleAIDropdown = function(e) {
     if (!menu || !btn) return;
     
     // Close other dropdowns
-    const regMenu = document.getElementById("regional-dropdown-menu");
-    if (regMenu) regMenu.style.display = "none";
+    const templatesMenu = document.getElementById("templates-dropdown-menu");
+    if (templatesMenu) templatesMenu.style.display = "none";
 
     const isShowing = menu.style.display === "block";
     if (isShowing) {
@@ -2348,11 +2322,11 @@ window.toggleAIDropdown = function(e) {
 };
 
 document.addEventListener("click", (e) => {
-    // Regional Dropdown outside click
-    const regContainer = document.getElementById("regional-dropdown-container");
-    const regMenu = document.getElementById("regional-dropdown-menu");
-    if (regContainer && regMenu && !regContainer.contains(e.target) && !regMenu.contains(e.target)) {
-        regMenu.style.display = "none";
+    // Templates Dropdown outside click
+    const templatesContainer = document.getElementById("templates-dropdown-container");
+    const templatesMenu = document.getElementById("templates-dropdown-menu");
+    if (templatesContainer && templatesMenu && !templatesContainer.contains(e.target) && !templatesMenu.contains(e.target)) {
+        templatesMenu.style.display = "none";
     }
 
     // AI Dropdown outside click
@@ -2365,8 +2339,8 @@ document.addEventListener("click", (e) => {
 
 // Auto-hide dropdowns on window resize to avoid detached menus
 window.addEventListener("resize", () => {
-    const regMenu = document.getElementById("regional-dropdown-menu");
-    if (regMenu) regMenu.style.display = "none";
+    const templatesMenu = document.getElementById("templates-dropdown-menu");
+    if (templatesMenu) templatesMenu.style.display = "none";
     const aiMenu = document.getElementById("ai-dropdown-menu");
     if (aiMenu) aiMenu.style.display = "none";
 });
@@ -2376,8 +2350,8 @@ setTimeout(() => {
     const toolbar = document.querySelector(".toolbar");
     if (toolbar) {
         toolbar.addEventListener("scroll", () => {
-            const regMenu = document.getElementById("regional-dropdown-menu");
-            if (regMenu) regMenu.style.display = "none";
+            const templatesMenu = document.getElementById("templates-dropdown-menu");
+            if (templatesMenu) templatesMenu.style.display = "none";
             const aiMenu = document.getElementById("ai-dropdown-menu");
             if (aiMenu) aiMenu.style.display = "none";
         }, { passive: true });
