@@ -3884,10 +3884,21 @@ window.prevWizardStep = function() {
     }
 };
 
-// Initialize wizard to step 1 automatically on load
+// Initialize wizard to step 1 and auto-start onboarding tour for new users on load
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         window.setWizardStep(1);
+        
+        // Check if first-time user and trigger onboarding guide automatically
+        const tourSeen = localStorage.getItem("resumake_tour_seen");
+        if (!tourSeen) {
+            localStorage.setItem("resumake_tour_seen", "true");
+            setTimeout(() => {
+                if (window.startInteractiveTour) {
+                    window.startInteractiveTour();
+                }
+            }, 600);
+        }
     }, 200);
 });
 
