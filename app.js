@@ -2315,9 +2315,9 @@ window.toggleRegionalDropdown = function(e) {
     } else {
         menu.style.display = "block";
         const rect = btn.getBoundingClientRect();
-        menu.style.position = "fixed";
-        menu.style.top = `${rect.bottom + 6}px`;
-        menu.style.left = `${rect.left}px`;
+        menu.style.position = "absolute";
+        menu.style.top = `${rect.bottom + window.scrollY + 6}px`;
+        menu.style.left = `${rect.left + window.scrollX}px`;
         menu.style.zIndex = "100000";
     }
     if (e) e.stopPropagation();
@@ -2338,10 +2338,10 @@ window.toggleAIDropdown = function(e) {
     } else {
         menu.style.display = "block";
         const rect = btn.getBoundingClientRect();
-        menu.style.position = "fixed";
-        menu.style.top = `${rect.bottom + 6}px`;
+        menu.style.position = "absolute";
+        menu.style.top = `${rect.bottom + window.scrollY + 6}px`;
         // Align right edge of menu to right edge of button (menu width is 200px)
-        menu.style.left = `${rect.right - 200}px`;
+        menu.style.left = `${rect.right + window.scrollX - 200}px`;
         menu.style.zIndex = "100000";
     }
     if (e) e.stopPropagation();
@@ -2351,31 +2351,38 @@ document.addEventListener("click", (e) => {
     // Regional Dropdown outside click
     const regContainer = document.getElementById("regional-dropdown-container");
     const regMenu = document.getElementById("regional-dropdown-menu");
-    if (regContainer && regMenu && !regContainer.contains(e.target)) {
+    if (regContainer && regMenu && !regContainer.contains(e.target) && !regMenu.contains(e.target)) {
         regMenu.style.display = "none";
     }
 
     // AI Dropdown outside click
     const aiContainer = document.getElementById("ai-dropdown-container");
     const aiMenu = document.getElementById("ai-dropdown-menu");
-    if (aiContainer && aiMenu && !aiContainer.contains(e.target)) {
+    if (aiContainer && aiMenu && !aiContainer.contains(e.target) && !aiMenu.contains(e.target)) {
         aiMenu.style.display = "none";
     }
 });
 
-// Auto-hide dropdowns on window resize or scroll to avoid detached menus
+// Auto-hide dropdowns on window resize to avoid detached menus
 window.addEventListener("resize", () => {
     const regMenu = document.getElementById("regional-dropdown-menu");
     if (regMenu) regMenu.style.display = "none";
     const aiMenu = document.getElementById("ai-dropdown-menu");
     if (aiMenu) aiMenu.style.display = "none";
 });
-window.addEventListener("scroll", () => {
-    const regMenu = document.getElementById("regional-dropdown-menu");
-    if (regMenu) regMenu.style.display = "none";
-    const aiMenu = document.getElementById("ai-dropdown-menu");
-    if (aiMenu) aiMenu.style.display = "none";
-}, { passive: true });
+
+// Dismiss dropdowns when toolbar scrolls horizontally to keep alignment synchronized
+setTimeout(() => {
+    const toolbar = document.querySelector(".toolbar");
+    if (toolbar) {
+        toolbar.addEventListener("scroll", () => {
+            const regMenu = document.getElementById("regional-dropdown-menu");
+            if (regMenu) regMenu.style.display = "none";
+            const aiMenu = document.getElementById("ai-dropdown-menu");
+            if (aiMenu) aiMenu.style.display = "none";
+        }, { passive: true });
+    }
+}, 500);
 
 // Typography & Layout custom variable state management
 let layoutState = {
