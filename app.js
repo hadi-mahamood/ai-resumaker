@@ -2287,27 +2287,48 @@ window.selectTemplateOption = function(val, labelText) {
 
 window.toggleRegionalDropdown = function(e) {
     const menu = document.getElementById("regional-dropdown-menu");
-    if (!menu) return;
+    const btn = document.getElementById("chip-regional-dropdown");
+    if (!menu || !btn) return;
     
     // Close other dropdowns
     const aiMenu = document.getElementById("ai-dropdown-menu");
     if (aiMenu) aiMenu.style.display = "none";
 
     const isShowing = menu.style.display === "block";
-    menu.style.display = isShowing ? "none" : "block";
+    if (isShowing) {
+        menu.style.display = "none";
+    } else {
+        menu.style.display = "block";
+        const rect = btn.getBoundingClientRect();
+        menu.style.position = "fixed";
+        menu.style.top = `${rect.bottom + 6}px`;
+        menu.style.left = `${rect.left}px`;
+        menu.style.zIndex = "100000";
+    }
     if (e) e.stopPropagation();
 };
 
 window.toggleAIDropdown = function(e) {
     const menu = document.getElementById("ai-dropdown-menu");
-    if (!menu) return;
+    const btn = document.getElementById("chip-ai-dropdown");
+    if (!menu || !btn) return;
     
     // Close other dropdowns
     const regMenu = document.getElementById("regional-dropdown-menu");
     if (regMenu) regMenu.style.display = "none";
 
     const isShowing = menu.style.display === "block";
-    menu.style.display = isShowing ? "none" : "block";
+    if (isShowing) {
+        menu.style.display = "none";
+    } else {
+        menu.style.display = "block";
+        const rect = btn.getBoundingClientRect();
+        menu.style.position = "fixed";
+        menu.style.top = `${rect.bottom + 6}px`;
+        // Align right edge of menu to right edge of button (menu width is 200px)
+        menu.style.left = `${rect.right - 200}px`;
+        menu.style.zIndex = "100000";
+    }
     if (e) e.stopPropagation();
 };
 
@@ -2326,6 +2347,20 @@ document.addEventListener("click", (e) => {
         aiMenu.style.display = "none";
     }
 });
+
+// Auto-hide dropdowns on window resize or scroll to avoid detached menus
+window.addEventListener("resize", () => {
+    const regMenu = document.getElementById("regional-dropdown-menu");
+    if (regMenu) regMenu.style.display = "none";
+    const aiMenu = document.getElementById("ai-dropdown-menu");
+    if (aiMenu) aiMenu.style.display = "none";
+});
+window.addEventListener("scroll", () => {
+    const regMenu = document.getElementById("regional-dropdown-menu");
+    if (regMenu) regMenu.style.display = "none";
+    const aiMenu = document.getElementById("ai-dropdown-menu");
+    if (aiMenu) aiMenu.style.display = "none";
+}, { passive: true });
 
 // Typography & Layout custom variable state management
 let layoutState = {
