@@ -37,7 +37,12 @@ function debounce(func, wait) {
 // Debounced wrapper for preview rendering to keep typing butter-smooth
 const debouncedRenderPreview = debounce(() => {
     renderResumePreview();
-}, 150);
+}, 350);
+
+// Decoupled, longer-debounced ATS score calculator to prevent heavy main-thread freezes
+const debouncedUpdateATS = debounce(() => {
+    updateATSScore();
+}, 800);
 
 /**
  * ResuMake AI - Main Application Controller
@@ -1416,8 +1421,8 @@ function renderResumePreview() {
         sheet.innerHTML = compileLATAMTemplate(state);
     }
     
-    // Trigger score checking
-    updateATSScore();
+    // Trigger score checking (decoupled from the render path to avoid keystroke lag)
+    debouncedUpdateATS();
     // Scale sheet dynamically
     resizeResumePreview();
     // Setup contenteditable attributes on personal fields
@@ -2129,43 +2134,53 @@ function updateSidebarBadges() {
 
 window.previewZoom = 100;
 
+let resizePending = false;
 function resizeResumePreview() {
-    const workspace = document.querySelector(".preview-workspace");
-    const scaler = document.getElementById("resume-sheet-scaler");
-    const sheet = document.getElementById("resume-sheet");
-    if (!workspace || !scaler || !sheet) return;
-
-    const pad = parseFloat(window.getComputedStyle(workspace).paddingLeft) * 2;
-    const workspaceWidth = workspace.clientWidth - pad;
-    const sheetWidth = 794;
+    if (resizePending) return;
+    resizePending = true;
     
-    const zoomFactor = (window.previewZoom || 100) / 100;
+    requestAnimationFrame(() => {
+        resizePending = false;
+        
+        const workspace = document.querySelector(".preview-workspace");
+        const scaler = document.getElementById("resume-sheet-scaler");
+        const sheet = document.getElementById("resume-sheet");
+        if (!workspace || !scaler || !sheet) return;
 
-    if (workspaceWidth < sheetWidth) {
-        const autoScale = workspaceWidth / sheetWidth;
-        const scale = autoScale * zoomFactor;
-        sheet.style.transform = `scale(${scale})`;
-        sheet.style.transformOrigin = "top center";
-        const scaledHeight = sheet.offsetHeight * scale;
-        scaler.style.height = `${scaledHeight}px`;
-        sheet.style.marginBottom = `${-sheet.offsetHeight * (1 - scale)}px`;
-        scaler.style.width = "100%";
-        scaler.style.justifyContent = "center";
-    } else {
-        const scale = zoomFactor;
-        sheet.style.transform = scale === 1 ? "none" : `scale(${scale})`;
-        sheet.style.transformOrigin = "top center";
-        const scaledHeight = sheet.offsetHeight * scale;
-        scaler.style.height = scale === 1 ? "auto" : `${scaledHeight}px`;
-        sheet.style.marginBottom = scale === 1 ? "0px" : `${-sheet.offsetHeight * (1 - scale)}px`;
-        scaler.style.width = scale === 1 ? "794px" : "100%";
-        scaler.style.justifyContent = "center";
-    }
-    
-    // Call PDF page count & overflow advisor helper
-    if (window.updatePDFPageAdvisor) {
-        window.updatePDFPageAdvisor();
-    }
+        // Perform all layout reads first to prevent forced synchronous layouts
+        const pad = parseFloat(window.getComputedStyle(workspace).paddingLeft) * 2;
+        const workspaceWidth = workspace.clientWidth - pad;
+        const sheetWidth = 794;
+        const sheetHeight = sheet.offsetHeight;
+        const zoomFactor = (window.previewZoom || 100) / 100;
+
+        // Apply visual scale writes cleanly
+        if (workspaceWidth < sheetWidth) {
+            const autoScale = workspaceWidth / sheetWidth;
+            const scale = autoScale * zoomFactor;
+            sheet.style.transform = `scale(${scale})`;
+            sheet.style.transformOrigin = "top center";
+            const scaledHeight = sheetHeight * scale;
+            scaler.style.height = `${scaledHeight}px`;
+            sheet.style.marginBottom = `${-sheetHeight * (1 - scale)}px`;
+            scaler.style.width = "100%";
+            scaler.style.justifyContent = "center";
+        } else {
+            const scale = zoomFactor;
+            sheet.style.transform = scale === 1 ? "none" : `scale(${scale})`;
+            sheet.style.transformOrigin = "top center";
+            const scaledHeight = sheetHeight * scale;
+            scaler.style.height = scale === 1 ? "auto" : `${scaledHeight}px`;
+            sheet.style.marginBottom = scale === 1 ? "0px" : `${-sheetHeight * (1 - scale)}px`;
+            scaler.style.width = scale === 1 ? "794px" : "100%";
+            scaler.style.justifyContent = "center";
+        }
+        
+        // Call PDF page count & overflow advisor helper
+        if (window.updatePDFPageAdvisor) {
+            window.updatePDFPageAdvisor();
+        }
+    });
 }
 
 window.adjustPreviewZoom = function(amount) {
