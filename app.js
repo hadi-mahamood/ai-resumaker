@@ -2291,7 +2291,15 @@ window.toggleTemplatesDropdown = function(e) {
         const rect = btn.getBoundingClientRect();
         menu.style.position = "absolute";
         menu.style.top = `${rect.bottom + window.scrollY + 6}px`;
-        menu.style.left = `${rect.left + window.scrollX}px`;
+        
+        // Prevent menu from overflowing right edge of screen on narrow viewports
+        let left = rect.left + window.scrollX;
+        const menuWidth = 230;
+        const screenWidth = window.innerWidth;
+        if (left + menuWidth > screenWidth) {
+            left = screenWidth - menuWidth - 12;
+        }
+        menu.style.left = `${Math.max(12, left)}px`;
         menu.style.zIndex = "100000";
     }
     if (e) e.stopPropagation();
@@ -2314,8 +2322,15 @@ window.toggleAIDropdown = function(e) {
         const rect = btn.getBoundingClientRect();
         menu.style.position = "absolute";
         menu.style.top = `${rect.bottom + window.scrollY + 6}px`;
-        // Align right edge of menu to right edge of button (menu width is 200px)
-        menu.style.left = `${rect.right + window.scrollX - 200}px`;
+        
+        // Prevent menu from overflowing right edge of screen on narrow viewports
+        let left = rect.right + window.scrollX - 200;
+        const menuWidth = 200;
+        const screenWidth = window.innerWidth;
+        if (left + menuWidth > screenWidth) {
+            left = screenWidth - menuWidth - 12;
+        }
+        menu.style.left = `${Math.max(12, left)}px`;
         menu.style.zIndex = "100000";
     }
     if (e) e.stopPropagation();
