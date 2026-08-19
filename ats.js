@@ -522,7 +522,7 @@ const ATSAuditor = {
             themeReason = "premium hospitality, luxury branding, VIP services, or executive fashion requiring elegance";
         }
 
-        const activeTheme = localStorage.getItem("resumake_theme_accent") || "cobalt";
+        const activeTheme = (resumeData && resumeData.activeTheme) || (typeof localStorage !== "undefined" ? localStorage.getItem("resumake_theme_accent") : null) || "cobalt";
         if (activeTheme === recommendedTheme) {
             suggestions.push({
                 type: "success",
@@ -2962,9 +2962,9 @@ function getATSWorker() {
                 skillsLexicon: ${JSON.stringify(ATSAuditor.skillsLexicon)},
                 stopWords: new Set(${JSON.stringify(stopWordsArray)}),
                 keywordsMap: ${JSON.stringify(ATSAuditor.keywordsMap)},
-                detectCategory: ${ATSAuditor.detectCategory.toString()},
-                extractKeywordsFromJD: ${ATSAuditor.extractKeywordsFromJD.toString()},
-                audit: ${ATSAuditor.audit.toString()}
+                ${ATSAuditor.detectCategory.toString()},
+                ${ATSAuditor.extractKeywordsFromJD.toString()},
+                ${ATSAuditor.audit.toString()}
             };
 
             self.onmessage = function(e) {
@@ -2984,6 +2984,9 @@ window.runATSBackgroundAudit = function(resumeData, callback) {
     worker.onmessage = function(e) {
         if (callback) callback(e.data);
     };
+    if (resumeData && typeof localStorage !== "undefined") {
+        resumeData.activeTheme = localStorage.getItem("resumake_theme_accent") || "cobalt";
+    }
     worker.postMessage({ resumeData });
 };
 
