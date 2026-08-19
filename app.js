@@ -4240,3 +4240,149 @@ window.applyCopilotSuggestion = function(targetKey, text) {
         if (window.showToast) showToast("Copied to clipboard!");
     }
 };
+
+// Interactive Onboarding Tour Controller
+let currentTourStep = 0;
+const TOUR_STEPS = [
+    {
+        element: "wizard-btn-1",
+        title: "1. Step-by-Step Wizard 🪄",
+        text: "We group forms into 4 logical steps (Info, Work, Academics, Design) to make setup simple and clean.",
+        position: "bottom"
+    },
+    {
+        element: "beginner-onboarding-card",
+        title: "2. Beginner Quick-Start 🚀",
+        text: "Click 'Auto-Fill' to pre-populate a complete professional resume in 1 click, then just customize the text!",
+        position: "bottom"
+    },
+    {
+        element: "resume-sheet",
+        title: "3. Direct A4 Editor ✍️",
+        text: "You can click and type directly on the resume paper! Hover elements to see the outline, click to edit.",
+        position: "left"
+    },
+    {
+        element: "chip-ai-dropdown",
+        title: "4. Gemini AI Copilot 🔮",
+        text: "Audit keywords for ATS, write cover letters, or practice mock interview questions with our integrated AI coach.",
+        position: "bottom"
+    }
+];
+
+window.startInteractiveTour = function() {
+    currentTourStep = 0;
+    
+    // Show overlay
+    const overlay = document.getElementById("tour-overlay");
+    if (overlay) {
+        overlay.style.display = "block";
+        overlay.style.opacity = "1";
+    }
+
+    // Set wizard back to step 1 to focus setup wizard
+    if (window.setWizardStep) {
+        window.setWizardStep(1);
+    }
+    
+    showTourStep(0);
+};
+
+window.endInteractiveTour = function() {
+    // Remove highlights
+    const highlights = document.querySelectorAll(".tour-highlight");
+    highlights.forEach(el => el.classList.remove("tour-highlight"));
+
+    // Hide overlays & tooltips
+    const overlay = document.getElementById("tour-overlay");
+    if (overlay) overlay.style.display = "none";
+    const tooltip = document.getElementById("tour-tooltip-card");
+    if (tooltip) tooltip.style.display = "none";
+};
+
+window.nextTourStep = function() {
+    if (currentTourStep < TOUR_STEPS.length - 1) {
+        currentTourStep++;
+        // If third step is edit sheet, switch wizard to show preview if on mobile
+        if (currentTourStep === 2 && window.innerWidth <= 768) {
+            window.switchMobileTab("preview");
+        }
+        showTourStep(currentTourStep);
+    } else {
+        window.endInteractiveTour();
+        if (window.showToast) showToast("Tour completed! Enjoy building!");
+    }
+};
+
+window.prevTourStep = function() {
+    if (currentTourStep > 0) {
+        currentTourStep--;
+        if (currentTourStep === 0 && window.innerWidth <= 768) {
+            window.switchMobileTab("edit");
+        }
+        showTourStep(currentTourStep);
+    }
+};
+
+function showTourStep(index) {
+    // Remove other highlights
+    const highlights = document.querySelectorAll(".tour-highlight");
+    highlights.forEach(el => el.classList.remove("tour-highlight"));
+
+    const step = TOUR_STEPS[index];
+    const target = document.getElementById(step.element);
+    const tooltip = document.getElementById("tour-tooltip-card");
+    if (!tooltip) return;
+
+    if (target) {
+        target.classList.add("tour-highlight");
+        
+        // Render tooltip content
+        document.getElementById("tour-title").innerHTML = step.title;
+        document.getElementById("tour-text").innerText = step.text;
+        
+        // Show card
+        tooltip.style.display = "flex";
+        
+        // Calculate position relative to target
+        const rect = target.getBoundingClientRect();
+        const tooltipWidth = 280;
+        const tooltipHeight = 120;
+        
+        let top = 0;
+        let left = 0;
+        
+        if (step.position === "bottom") {
+            top = rect.bottom + 12;
+            left = rect.left + (rect.width - tooltipWidth) / 2;
+        } else if (step.position === "left") {
+            top = rect.top + (rect.height - tooltipHeight) / 2;
+            left = rect.left - tooltipWidth - 12;
+        } else if (step.position === "right") {
+            top = rect.top + (rect.height - tooltipHeight) / 2;
+            left = rect.right + 12;
+        } else if (step.position === "top") {
+            top = rect.top - tooltipHeight - 12;
+            left = rect.left + (rect.width - tooltipWidth) / 2;
+        }
+        
+        // Keep inside screen boundaries
+        left = Math.max(12, Math.min(window.innerWidth - tooltipWidth - 12, left));
+        top = Math.max(12, Math.min(window.innerHeight - tooltipHeight - 12, top));
+        
+        tooltip.style.top = `${top}px`;
+        tooltip.style.left = `${left}px`;
+    }
+
+    // Toggle back button visibility
+    const prevBtn = document.getElementById("tour-prev-btn");
+    if (prevBtn) {
+        prevBtn.style.display = (index === 0) ? "none" : "block";
+    }
+
+    // Next button label
+    const nextBtn = document.getElementById("tour-next-btn");
+    if (nextBtn) {
+        nextBtn.innerHTML = (index === TOUR_STEPS.length - 1) ? "Finish" : "Next";
+    }
+}

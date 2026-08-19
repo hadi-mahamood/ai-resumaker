@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=89.0">
+    <link rel="stylesheet" href="style.css?v=90.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -69,9 +69,14 @@
                     <p style="margin: 0 0 8px 0; font-size: 0.7rem; color: var(--text-secondary); line-height: 1.35;">
                         Click below to instantly fill a premium sample resume. Then edit the details step-by-step to make it yours!
                     </p>
-                    <button class="ai-btn" onclick="window.loadSampleResumeData()" style="width: 100%; justify-content: center; font-size: 0.72rem; padding: 6px 10px; border-radius: 6px; background: var(--primary-gradient); color: white; border: none; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(99,102,241,0.25);">
-                        <i class="fa-solid fa-magic"></i> Auto-Fill Sample Resume
-                    </button>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="ai-btn" onclick="window.loadSampleResumeData()" style="flex: 1.2; justify-content: center; font-size: 0.72rem; padding: 6px 10px; border-radius: 6px; background: var(--primary-gradient); color: white; border: none; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(99,102,241,0.25);">
+                            <i class="fa-solid fa-magic"></i> Auto-Fill
+                        </button>
+                        <button class="ai-btn ai-btn-outline" onclick="window.startInteractiveTour()" style="flex: 1; justify-content: center; font-size: 0.72rem; padding: 6px 10px; border-radius: 6px; border: 1.5px solid var(--border-color); color: var(--text-secondary); cursor: pointer;">
+                            <i class="fa-solid fa-compass"></i> Start Tour
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Global Profile Completeness Gauge -->
@@ -1265,6 +1270,20 @@
         </div>
     </div>
 
+    <!-- Interactive Tour Overlay and Tooltip Card -->
+    <div class="tour-overlay" id="tour-overlay" onclick="window.endInteractiveTour()"></div>
+    <div class="tour-tooltip-card" id="tour-tooltip-card">
+        <h4 id="tour-title" style="margin: 0; font-size: 0.85rem; color: white; display: flex; align-items: center; gap: 6px;"></h4>
+        <p id="tour-text" style="margin: 6px 0 10px 0; font-size: 0.72rem; color: var(--text-secondary); line-height: 1.4;"></p>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+            <button class="ai-btn ai-btn-outline" onclick="window.endInteractiveTour()" style="padding: 4px 8px; font-size: 0.65rem; border-radius: 4px; cursor: pointer;">Skip</button>
+            <div style="display: flex; gap: 6px;">
+                <button class="ai-btn ai-btn-outline" id="tour-prev-btn" onclick="window.prevTourStep()" style="padding: 4px 8px; font-size: 0.65rem; border-radius: 4px; cursor: pointer;">Back</button>
+                <button class="ai-btn" id="tour-next-btn" onclick="window.nextTourStep()" style="padding: 4px 10px; font-size: 0.65rem; border-radius: 4px; background: var(--primary-gradient); color: white; border: none; font-weight: 600; cursor: pointer;">Next</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Cloud Authentication Modal -->
     <div class="ats-modal" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
         <div class="ats-modal-card ats-modal-card-compact" style="max-width: 420px;">
@@ -1337,8 +1356,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=89.0"></script>
-    <script src="ats.js?v=89.0"></script>
-    <script type="module" src="app.js?v=89.0"></script>
+    <script src="ai.js?v=90.0"></script>
+    <script src="ats.js?v=90.0"></script>
+    <script type="module" src="app.js?v=90.0"></script>
 </body>
 </html>

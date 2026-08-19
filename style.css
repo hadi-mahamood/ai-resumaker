@@ -4533,3 +4533,38 @@ h1, h2, h3, h4, h5, h6, .logo-text, .accordion-title span, .toolbar-group button
     }
 }
 
+/* Interactive Onboarding Tour Guide Styles */
+.tour-highlight {
+    outline: 3px solid var(--accent) !important;
+    box-shadow: 0 0 15px var(--accent) !important;
+    position: relative;
+    z-index: 100002 !important;
+}
+.tour-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 100001;
+    pointer-events: all;
+    display: none;
+    transition: opacity 0.3s ease;
+}
+.tour-tooltip-card {
+    position: fixed;
+    background: #0f172a;
+    border: 1.5px solid rgba(139, 92, 246, 0.4);
+    border-radius: 12px;
+    padding: 16px;
+    width: 280px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    z-index: 100003;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    animation: dropdownFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
