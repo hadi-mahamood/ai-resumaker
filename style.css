@@ -3423,6 +3423,12 @@ body.ats-simulator-active #resume-sheet-scaler {
         overflow-x: hidden !important;
         max-width: 100vw !important;
     }
+    .sidebar {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+    }
     .preview-container {
         width: 100% !important;
         height: auto !important;
