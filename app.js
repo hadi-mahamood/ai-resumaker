@@ -3457,8 +3457,20 @@ function getSampleDataByJobTitle(jobTitle) {
 }
 
 function loadSampleResumeData() {
+    let jobTitle = prompt("Enter your target job title to load a matched template (e.g. Software Engineer, Product Manager, Nurse, Accountant, Teacher):");
+    
+    // Abort if user cancelled the prompt
+    if (jobTitle === null) return;
+    
+    jobTitle = jobTitle.trim();
+    if (!jobTitle) {
+        jobTitle = "Senior Full Stack Software Engineer";
+    }
+
     const jobTitleInput = document.getElementById("target-job-input");
-    const jobTitle = (jobTitleInput ? jobTitleInput.value.trim() : "") || state.targetJob || "Senior Full Stack Software Engineer";
+    if (jobTitleInput) {
+        jobTitleInput.value = jobTitle;
+    }
     
     const dataset = getSampleDataByJobTitle(jobTitle);
     
