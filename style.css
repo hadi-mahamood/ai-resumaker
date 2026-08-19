@@ -755,9 +755,7 @@ textarea {
     gap: 16px;
     z-index: 5;
     box-sizing: border-box;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
+    overflow: visible;
 }
 
 .toolbar::-webkit-scrollbar {
@@ -3600,21 +3598,19 @@ body.ats-simulator-active #resume-sheet-scaler {
     }
     
     .toolbar {
-        height: 56px !important;
+        height: auto !important;
         min-height: 56px !important;
         border-bottom: 1px solid var(--border-color) !important;
         background: #0d101a !important;
         display: flex !important;
         flex-direction: row !important;
-        flex-wrap: nowrap !important;
+        flex-wrap: wrap !important;
         align-items: center !important;
         justify-content: flex-start !important;
-        padding: 0 12px !important;
+        padding: 8px 12px !important;
         gap: 12px !important;
         width: 100vw !important;
-        overflow-x: auto !important;
-        scrollbar-width: none !important;
-        -webkit-overflow-scrolling: touch !important;
+        overflow: visible !important;
     }
     .toolbar::-webkit-scrollbar {
         display: none !important;
