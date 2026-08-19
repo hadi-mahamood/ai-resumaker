@@ -1087,9 +1087,14 @@ function renderExperienceList() {
             <div class="form-group">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                     <label>Description / Accomplishments</label>
-                    <button class="ai-btn ai-btn-accent" style="padding: 2px 8px; font-size: 0.7rem; border-radius: 4px;" onclick="openAIEngine('${exp.id}')">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI Rewrite
-                    </button>
+                    <div style="display:flex; gap:6px;">
+                        <button class="ai-btn ai-btn-outline" style="padding: 2px 8px; font-size: 0.7rem; border-radius: 4px; border: 1.5px solid var(--border-color); color: var(--text-secondary); cursor: pointer;" onclick="window.openBulletLibrary('${exp.id}')">
+                            <i class="fa-solid fa-list-check"></i> Suggest Bullets
+                        </button>
+                        <button class="ai-btn ai-btn-accent" style="padding: 2px 8px; font-size: 0.7rem; border-radius: 4px;" onclick="openAIEngine('${exp.id}')">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI Rewrite
+                        </button>
+                    </div>
                 </div>
                 <textarea id="exp-desc-${exp.id}" oninput="updateExperience('${exp.id}', 'desc', this.value)" placeholder="e.g. Rebuilt database index mapping, decreasing query latency by 40% (Press Enter for new bullet)...">${exp.desc}</textarea>
             </div>
@@ -1354,6 +1359,35 @@ function switchTemplate(templateName) {
     renderResumePreview();
 }
 
+function drawPageBreakGuideline() {
+    const sheet = document.getElementById("resume-sheet");
+    if (!sheet) return;
+    
+    // Remove any existing guides first
+    sheet.querySelectorAll(".page-break-guide").forEach(el => el.remove());
+    
+    // Add guideline at 1120px (slightly before 1123px boundary)
+    const guide = document.createElement("div");
+    guide.className = "page-break-guide";
+    guide.style.position = "absolute";
+    guide.style.top = "1120px";
+    guide.style.left = "0";
+    guide.style.right = "0";
+    guide.style.borderTop = "2.5px dashed rgba(99, 102, 241, 0.4)";
+    guide.style.pointerEvents = "none";
+    guide.style.textAlign = "center";
+    guide.style.fontSize = "0.68rem";
+    guide.style.color = "var(--primary)";
+    guide.style.fontWeight = "700";
+    guide.style.paddingTop = "6px";
+    guide.style.zIndex = "100";
+    guide.style.fontFamily = "var(--font-sans)";
+    guide.style.letterSpacing = "0.5px";
+    guide.innerHTML = `<i class="fa-solid fa-scissors"></i> A4 PAGE 1 ENDS HERE (PDF CUT-OFF LINE)`;
+    
+    sheet.appendChild(guide);
+}
+
 function renderResumePreview() {
     const sheet = document.getElementById("resume-sheet");
     sheet.innerHTML = "";
@@ -1388,6 +1422,8 @@ function renderResumePreview() {
     resizeResumePreview();
     // Setup contenteditable attributes on personal fields
     makePreviewSheetEditable();
+    // Render visual page break guideline
+    drawPageBreakGuideline();
     // Apply user chosen typography metrics
     if (window.applyLayoutMetrics) window.applyLayoutMetrics();
     // Apply layout section visibility toggles
@@ -3811,3 +3847,334 @@ document.addEventListener("DOMContentLoaded", () => {
         window.setWizardStep(1);
     }, 200);
 });
+
+// Pre-Written Accomplishments Library Database
+const BULLET_LIBRARY = {
+    tech: [
+        { role: "Software Developer", bullets: [
+            "Designed and implemented high-throughput REST APIs, reducing server response times by 35%.",
+            "Refactored legacy database models and migrations, decreasing backup latency by 45%.",
+            "Coordinated with QA teams to implement automated CI/CD pipelines, reducing deployment errors by 20%.",
+            "Developed fully responsive UI layouts using React and Tailwind CSS, increasing page load speed by 1.5s."
+        ]},
+        { role: "IT Support Specialist", bullets: [
+            "Resolved 120+ monthly support tickets targeting network issues, backup failures, and hardware configurations.",
+            "Maintained localized Active Directory servers and DNS routes, ensuring 99.9% hardware availability.",
+            "Conducted comprehensive audit schedules on user credentials, enforcing security protocols across 200+ terminals.",
+            "Deployed and configured remote work workspaces for 50+ staff members, boosting productivity metrics."
+        ]}
+    ],
+    pm: [
+        { role: "Product Manager", bullets: [
+            "Spearheaded the development roadmap for a new mobile commerce product, increasing user retention by 28%.",
+            "Conducted user research interviews with 50+ clients, identifying 12 core features that boosted engagement by 15%.",
+            "Managed cross-functional scrum groups of 12 developers and designers, delivering features 2 weeks ahead of schedule.",
+            "Defined and tracked product launch metrics, reporting weekly progress directly to executive sponsors."
+        ]},
+        { role: "Project Manager", bullets: [
+            "Coordinated project scope definitions and milestone tracking for 5 enterprise contracts worth $2.5M+.",
+            "Managed resource allocations across 3 parallel project lines, preventing burn-out and decreasing delay fees to 0%.",
+            "Facilitated daily standups, sprint planning sessions, and retrospectives to boost developer efficiency by 22%.",
+            "Mitigated project scheduling conflicts by optimizing dependency maps, cutting delivery cycle times by 18%."
+        ]}
+    ],
+    sales: [
+        { role: "Sales Representative", bullets: [
+            "Exceeded quarterly sales targets by 125% for 4 consecutive periods, bringing in $400K+ in new ARR.",
+            "Nurtured relationships with 60+ B2B prospect accounts, converting leads into active contracts at a 15% rate.",
+            "Negotiated pricing terms and service levels with corporate procurement agents, increasing deal sizes by 12%.",
+            "Delivered premium product demonstration schedules to prospective buyers, accelerating lead conversion speed."
+        ]},
+        { role: "Marketing Specialist", bullets: [
+            "Managed a monthly ad campaign budget of $15K across search and social ads, driving a 3.4x ROI conversion increase.",
+            "Coordinated email marketing newsletter campaigns, lifting open rates from 14% to 26% within 3 months.",
+            "Analyzed SEO search keyword volumes and optimized article structures, expanding organic web traffic by 45%.",
+            "Organized quarterly trade show sponsor events, capturing 500+ high-intent lead signups."
+        ]}
+    ],
+    data: [
+        { role: "Data Analyst", bullets: [
+            "Built interactive Tableau dashboard reporting panels for operations leaders, cutting executive reporting time by 12h/week.",
+            "Analyzed client retention cohorts and user churn rates, uncovering structural bottlenecks to save $50K in ARR.",
+            "Performed deep-dive SQL queries on 10M+ transaction rows, extracting growth trends to guide inventory plans.",
+            "Automated ETL pipeline queries using Python scripts, saving 8 hours of manual data preparation weekly."
+        ]},
+        { role: "Accountant", bullets: [
+            "Managed month-end financial closing schedules and general ledger audits, reducing accounting entry errors by 18%.",
+            "Coordinated tax filings and internal balance sheets audits, ensuring 100% compliance with GAAP regulations.",
+            "Analyzed operating expenses profiles and identified cost-saving options, reducing office expenditures by 12%.",
+            "Processed monthly accounts payable and receivable invoices, maintaining client dispute resolution times under 24h."
+        ]}
+    ],
+    ops: [
+        { role: "HR Specialist", bullets: [
+            "Managed end-to-end recruitment pipelines for 40+ hires, reducing overall time-to-hire by 14 days.",
+            "Coordinated company-wide onboarding training events, boosting first-year employee satisfaction indexes by 20%.",
+            "Drafted and synchronized employee policy updates, ensuring alignment with regional labor regulations.",
+            "Facilitated conflict resolution discussions, fostering a supportive work environment and lowering churn by 8%."
+        ]},
+        { role: "Operations Assistant", bullets: [
+            "Coordinated logistics schedules and inventory shipping cycles, improving delivery speeds by 15%.",
+            "Managed third-party vendor contracts and supplies procurement, negotiating a 10% unit cost reduction.",
+            "Supervised office equipment installations and software licensing syncs, cutting technical downtime by 30%.",
+            "Streamlined departmental communication procedures, cutting task handoff friction by 25%."
+        ]}
+    ],
+    design: [
+        { role: "UI/UX Designer", bullets: [
+            "Created high-fidelity Figma design mockups and wireframes, speeding up developer handoff by 30%.",
+            "Conducted user testing sessions on 20+ testers, optimizing conversion check-out flows by 14%.",
+            "Designed and maintained the company design system UI library, improving brand consistency across web and mobile apps.",
+            "Collaborated closely with product leads to map user journey flows, maximizing product accessibility."
+        ]},
+        { role: "Graphic Designer", bullets: [
+            "Designed 50+ custom digital brand assets and marketing materials monthly, boosting banner ad click-throughs by 18%.",
+            "Produced custom vector illustrations and brand packages, defining guidelines for 3 major product launches.",
+            "Optimized image asset sizes and print color models, improving layout clarity on public print banners.",
+            "Collaborated with product copywriters to design layout layouts for brochures and promotional print materials."
+        ]}
+    ]
+};
+
+window.activeBulletExpId = null;
+window.activeBulletCategory = "tech";
+
+window.openBulletLibrary = function(expId) {
+    window.activeBulletExpId = expId;
+    const modal = document.getElementById("bullet-library-modal");
+    if (modal) modal.classList.add("show");
+    window.switchBulletCategory(window.activeBulletCategory);
+};
+
+window.closeBulletLibrary = function() {
+    const modal = document.getElementById("bullet-library-modal");
+    if (modal) modal.classList.remove("show");
+};
+
+window.switchBulletCategory = function(catId) {
+    window.activeBulletCategory = catId;
+    
+    // Toggle active classes on category buttons
+    const btns = document.querySelectorAll(".bullet-cat-btn");
+    btns.forEach(btn => {
+        if (btn.id === `bullet-cat-${catId}`) {
+            btn.classList.add("active");
+            btn.style.background = "rgba(99, 102, 241, 0.1)";
+            btn.style.borderColor = "rgba(99, 102, 241, 0.25)";
+            btn.style.color = "white";
+        } else {
+            btn.classList.remove("active");
+            btn.style.background = "none";
+            btn.style.borderColor = "transparent";
+            btn.style.color = "var(--text-secondary)";
+        }
+    });
+
+    renderBulletItems(BULLET_LIBRARY[catId]);
+};
+
+function renderBulletItems(rolesArray) {
+    const container = document.getElementById("bullet-library-list");
+    if (!container) return;
+    container.innerHTML = "";
+
+    rolesArray.forEach(roleData => {
+        const section = document.createElement("div");
+        section.style.marginBottom = "16px";
+        section.innerHTML = `
+            <div style="font-size: 0.8rem; font-weight: 700; color: white; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px;">
+                <i class="fa-solid fa-user-tag" style="color: var(--accent); margin-right: 4px;"></i> ${roleData.role}
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                ${roleData.bullets.map(b => {
+                    const cleanBullet = b.replace(/'/g, "\\'");
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; transition: all 0.2s;" onmouseover="this.style.background='rgba(99,102,241,0.04)'; this.style.borderColor='rgba(99,102,241,0.15)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='var(--border-color)';">
+                            <span style="flex: 1;">${b}</span>
+                            <button class="ai-btn ai-btn-outline" onclick="window.insertBullet('${cleanBullet}')" style="padding: 2px 8px; font-size: 0.65rem; border-radius: 4px; border: 1px solid var(--border-color); cursor: pointer; flex-shrink: 0;"><i class="fa-solid fa-plus"></i> Add</button>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+        container.appendChild(section);
+    });
+}
+
+window.insertBullet = function(bulletText) {
+    if (!window.activeBulletExpId) return;
+    const textarea = document.getElementById(`exp-desc-${window.activeBulletExpId}`);
+    if (textarea) {
+        let currentText = textarea.value.trim();
+        if (currentText) {
+            // Check if last character is newline, otherwise add one
+            if (!currentText.endsWith('\n')) {
+                currentText += '\n';
+            }
+            currentText += `• ${bulletText}\n`;
+        } else {
+            currentText = `• ${bulletText}\n`;
+        }
+        textarea.value = currentText;
+        window.updateExperience(window.activeBulletExpId, 'desc', currentText);
+    }
+    window.closeBulletLibrary();
+    if (window.showToast) {
+        showToast("Accomplishment bullet added!");
+    }
+};
+
+window.filterBulletLibrary = function(query) {
+    const q = query.toLowerCase().trim();
+    if (!q) {
+        // Reset back to selected category
+        window.switchBulletCategory(window.activeBulletCategory);
+        return;
+    }
+
+    // Search across ALL categories
+    const matchingRoles = [];
+    Object.keys(BULLET_LIBRARY).forEach(cat => {
+        BULLET_LIBRARY[cat].forEach(roleData => {
+            if (roleData.role.toLowerCase().includes(q)) {
+                matchingRoles.push(roleData);
+            } else {
+                // Check if any bullet matches
+                const matchingBullets = roleData.bullets.filter(b => b.toLowerCase().includes(q));
+                if (matchingBullets.length > 0) {
+                    matchingRoles.push({
+                        role: roleData.role,
+                        bullets: matchingBullets
+                    });
+                }
+            }
+        });
+    });
+
+    renderBulletItems(matchingRoles);
+};
+
+// AI Copilot Conversational Assistant Drawer
+window.openAICopilotModal = function() {
+    const modal = document.getElementById("ai-copilot-modal");
+    if (modal) modal.classList.add("show");
+};
+
+window.closeAICopilotModal = function() {
+    const modal = document.getElementById("ai-copilot-modal");
+    if (modal) modal.classList.remove("show");
+};
+
+window.sendCopilotPreset = function(promptText) {
+    const input = document.getElementById("ai-copilot-input");
+    if (input) input.value = promptText;
+    window.sendCopilotMessage();
+};
+
+window.sendCopilotMessage = async function() {
+    const input = document.getElementById("ai-copilot-input");
+    if (!input) return;
+    const msgText = input.value.trim();
+    if (!msgText) return;
+
+    // Clear input
+    input.value = "";
+
+    const chatLogs = document.getElementById("ai-copilot-chat-logs");
+    if (!chatLogs) return;
+
+    // 1. Render User Message bubble
+    const userBubble = document.createElement("div");
+    userBubble.style.alignSelf = "flex-end";
+    userBubble.style.background = "rgba(99, 102, 241, 0.15)";
+    userBubble.style.border = "1px solid rgba(99, 102, 241, 0.3)";
+    userBubble.style.color = "white";
+    userBubble.style.padding = "8px 12px";
+    userBubble.style.borderRadius = "8px 8px 0 8px";
+    userBubble.style.maxWidth = "80%";
+    userBubble.style.fontSize = "0.76rem";
+    userBubble.style.lineHeight = "1.4";
+    userBubble.style.marginLeft = "auto";
+    userBubble.style.marginBottom = "8px";
+    userBubble.innerHTML = msgText.replace(/\n/g, "<br>");
+    chatLogs.appendChild(userBubble);
+    chatLogs.scrollTop = chatLogs.scrollHeight;
+
+    // 2. Render AI Loading bubble
+    const aiBubble = document.createElement("div");
+    aiBubble.style.alignSelf = "flex-start";
+    aiBubble.style.background = "rgba(255, 255, 255, 0.03)";
+    aiBubble.style.border = "1px solid var(--border-color)";
+    aiBubble.style.color = "var(--text-secondary)";
+    aiBubble.style.padding = "8px 12px";
+    aiBubble.style.borderRadius = "8px 8px 8px 0";
+    aiBubble.style.maxWidth = "80%";
+    aiBubble.style.fontSize = "0.76rem";
+    aiBubble.style.lineHeight = "1.4";
+    aiBubble.style.marginBottom = "8px";
+    aiBubble.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Writing suggestion...`;
+    chatLogs.appendChild(aiBubble);
+    chatLogs.scrollTop = chatLogs.scrollHeight;
+
+    // 3. Perform Gemini API call via active provider
+    try {
+        const systemPrompt = `You are a helpful, professional AI Resume Copilot. The user's active resume details are:
+Name: ${state.name || ""}
+Job Title: ${state.title || ""}
+Skills: ${state.skills ? state.skills.join(", ") : ""}
+The user has requested assistance: "${msgText}".
+Write a high-quality, professional resume response that is direct and ATS-friendly. Keep the response under 100 words. Do not write introductory chatter, just give the rephrased bullets, bio summary, or answers.`;
+
+        let resultText = "";
+        const onChunk = (chunk) => {
+            resultText += chunk;
+            // Clean markdown bold tags for raw DOM viewing
+            aiBubble.innerHTML = resultText
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                .replace(/\n/g, "<br>");
+            chatLogs.scrollTop = chatLogs.scrollHeight;
+        };
+
+        const provider = window.AIService.activeProvider;
+        if (provider === "webgpu") {
+            await window.AIService.callWebGPULLM(systemPrompt, onChunk);
+        } else {
+            await window.AIService.callGeminiAPI(systemPrompt, onChunk, "", state.targetJob || "");
+        }
+
+        // Add Apply options after completion
+        const applyContainer = document.createElement("div");
+        applyContainer.style.marginTop = "8px";
+        applyContainer.style.display = "flex";
+        applyContainer.style.gap = "6px";
+        
+        // Clean result text single quotes
+        const safeText = resultText.replace(/'/g, "\\'").replace(/\n/g, "\\n");
+
+        applyContainer.innerHTML = `
+            <button onclick="window.applyCopilotSuggestion('summary', '${safeText}')" style="padding: 4px 8px; font-size: 0.65rem; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); color: white; border-radius: 4px; cursor: pointer;">Apply to Summary</button>
+            <button onclick="window.applyCopilotSuggestion('copy', '${safeText}')" style="padding: 4px 8px; font-size: 0.65rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 4px; cursor: pointer;"><i class="fa-solid fa-copy"></i> Copy</button>
+        `;
+        aiBubble.appendChild(applyContainer);
+        chatLogs.scrollTop = chatLogs.scrollHeight;
+
+    } catch (err) {
+        aiBubble.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="color: var(--danger);"></i> Error writing suggestion: ${err.message}`;
+    }
+};
+
+window.applyCopilotSuggestion = function(targetKey, text) {
+    if (targetKey === "summary") {
+        state.summary = text;
+        const summaryInput = document.getElementById("input-summary") || document.getElementById("exp-desc-summary");
+        if (summaryInput) summaryInput.value = text;
+        
+        autoSave();
+        debouncedRenderPreview();
+        window.closeAICopilotModal();
+        if (window.showToast) showToast("Applied to professional summary!");
+    } else if (targetKey === "copy") {
+        navigator.clipboard.writeText(text);
+        if (window.showToast) showToast("Copied to clipboard!");
+    }
+};

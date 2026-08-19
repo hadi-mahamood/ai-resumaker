@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=85.0">
+    <link rel="stylesheet" href="style.css?v=86.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -836,6 +836,9 @@
                             <div class="dropdown-item" onclick="window.openInterviewPracticeModal(); document.getElementById('ai-dropdown-menu').classList.remove('show');" style="padding: 8px 12px; font-size: 0.76rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.2s;">
                                 <i class="fa-solid fa-comments"></i> Practice Interview
                             </div>
+                            <div class="dropdown-item" onclick="window.openAICopilotModal(); document.getElementById('ai-dropdown-menu').classList.remove('show');" style="padding: 8px 12px; font-size: 0.76rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.2s; border-top: 1px solid rgba(255,255,255,0.06);">
+                                <i class="fa-solid fa-comments" style="color: var(--accent);"></i> Chat with Copilot
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1195,6 +1198,73 @@
         <span id="toast-message">Resume Auto-saved!</span>
     </div>
 
+    <!-- Pre-Written Accomplishments Library Modal (Super User Friendly) -->
+    <div class="ats-modal" id="bullet-library-modal" role="dialog" aria-modal="true" aria-labelledby="bullet-library-title">
+        <div class="ats-modal-card" style="max-width: 700px; height: 80vh;">
+            <div class="ats-modal-header">
+                <div>
+                    <h3 id="bullet-library-title" style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">💡 Pre-Written Accomplishments Library</h3>
+                    <p style="margin: 4px 0 0 0; font-size: 0.72rem; color: var(--text-secondary);">Select a role and click bullets to instantly add them to your resume!</p>
+                </div>
+                <button class="ats-modal-close" onclick="window.closeBulletLibrary()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div style="padding: 12px 20px; border-bottom: 1px solid var(--border-color); display: flex; gap: 10px;">
+                <input type="text" id="bullet-search-input" oninput="window.filterBulletLibrary(this.value)" placeholder="Search roles or keywords (e.g. Developer, Project Manager)..." style="flex: 1; padding: 8px 12px; font-size: 0.8rem; background: rgba(0,0,0,0.2); border: 1.5px solid var(--border-color); color: white; border-radius: 6px; outline: none;">
+            </div>
+
+            <div class="ats-modal-body" style="padding: 0; overflow: hidden; display: flex; flex: 1; height: calc(100% - 130px);">
+                <!-- Categories Left Sidebar -->
+                <div style="width: 200px; background: rgba(0,0,0,0.15); border-right: 1px solid var(--border-color); overflow-y: auto; display: flex; flex-direction: column; padding: 8px; flex-shrink: 0;">
+                    <button class="bullet-cat-btn active" id="bullet-cat-tech" onclick="window.switchBulletCategory('tech')" style="padding: 8px 12px; text-align: left; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: white; border-radius: 6px; font-size: 0.76rem; font-weight: 600; cursor: pointer; margin-bottom: 6px; outline: none; transition: all 0.2s;"><i class="fa-solid fa-laptop-code"></i> Software & IT</button>
+                    <button class="bullet-cat-btn" id="bullet-cat-pm" onclick="window.switchBulletCategory('pm')" style="padding: 8px 12px; text-align: left; background: none; border: 1px solid transparent; color: var(--text-secondary); border-radius: 6px; font-size: 0.76rem; font-weight: 600; cursor: pointer; margin-bottom: 6px; outline: none; transition: all 0.2s;"><i class="fa-solid fa-clipboard-list"></i> Product & Project</button>
+                    <button class="bullet-cat-btn" id="bullet-cat-sales" onclick="window.switchBulletCategory('sales')" style="padding: 8px 12px; text-align: left; background: none; border: 1px solid transparent; color: var(--text-secondary); border-radius: 6px; font-size: 0.76rem; font-weight: 600; cursor: pointer; margin-bottom: 6px; outline: none; transition: all 0.2s;"><i class="fa-solid fa-chart-line"></i> Sales & Marketing</button>
+                    <button class="bullet-cat-btn" id="bullet-cat-data" onclick="window.switchBulletCategory('data')" style="padding: 8px 12px; text-align: left; background: none; border: 1px solid transparent; color: var(--text-secondary); border-radius: 6px; font-size: 0.76rem; font-weight: 600; cursor: pointer; margin-bottom: 6px; outline: none; transition: all 0.2s;"><i class="fa-solid fa-database"></i> Finance & Data</button>
+                    <button class="bullet-cat-btn" id="bullet-cat-ops" onclick="window.switchBulletCategory('ops')" style="padding: 8px 12px; text-align: left; background: none; border: 1px solid transparent; color: var(--text-secondary); border-radius: 6px; font-size: 0.76rem; font-weight: 600; cursor: pointer; margin-bottom: 6px; outline: none; transition: all 0.2s;"><i class="fa-solid fa-users-gear"></i> HR & Operations</button>
+                    <button class="bullet-cat-btn" id="bullet-cat-design" onclick="window.switchBulletCategory('design')" style="padding: 8px 12px; text-align: left; background: none; border: 1px solid transparent; color: var(--text-secondary); border-radius: 6px; font-size: 0.76rem; font-weight: 600; cursor: pointer; margin-bottom: 6px; outline: none; transition: all 0.2s;"><i class="fa-solid fa-palette"></i> Design & Creative</button>
+                </div>
+                <!-- Bullets List Area -->
+                <div id="bullet-library-list" style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Copilot Chat Drawer Modal (Super User Friendly) -->
+    <div class="ats-modal" id="ai-copilot-modal" role="dialog" aria-modal="true" aria-labelledby="ai-copilot-title">
+        <div class="ats-modal-card" style="max-width: 500px; height: 85vh; right: 20px; position: fixed; margin: 0; bottom: 20px;">
+            <div class="ats-modal-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent); font-size: 1.2rem;"></i>
+                    <div>
+                        <h3 id="ai-copilot-title" style="font-weight: 600; margin: 0; font-size: 1.1rem; color: white;">AI Resume Copilot</h3>
+                        <span style="font-size: 0.65rem; color: var(--success); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><span style="width: 6px; height: 6px; background: var(--success); border-radius: 50%; display: inline-block;"></span> Online & Ready</span>
+                    </div>
+                </div>
+                <button class="ats-modal-close" onclick="window.closeAICopilotModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Chat Logs Container -->
+            <div class="ats-modal-body" id="ai-copilot-chat-logs" style="padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; flex: 1; height: calc(100% - 140px); background: rgba(0,0,0,0.1);">
+                <div style="background: rgba(99, 102, 241, 0.05); border: 1.5px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 12px; font-size: 0.76rem; color: var(--text-secondary); line-height: 1.45;">
+                    👋 **Welcome! I'm your AI Resume Copilot.** I can help you craft descriptions, write a bio, or suggest strong action verbs.
+                    <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
+                        <button onclick="window.sendCopilotPreset('Write a professional summary profile for my resume')" style="text-align: left; padding: 6px 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: white; font-size: 0.72rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-pencil"></i> Write a professional summary</button>
+                        <button onclick="window.sendCopilotPreset('Rewrite my work experience bullet points to sound senior and impactful')" style="text-align: left; padding: 6px 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: white; font-size: 0.72rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-briefcase"></i> Rephrase work experience bullets</button>
+                        <button onclick="window.sendCopilotPreset('Give me a list of 10 strong action verbs for software engineering')" style="text-align: left; padding: 6px 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: white; font-size: 0.72rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-fire"></i> Suggest strong action verbs</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Row -->
+            <div style="padding: 12px; border-top: 1px solid var(--border-color); background: #0f172a; display: flex; gap: 8px; align-items: center;">
+                <input type="text" id="ai-copilot-input" onkeydown="if(event.key==='Enter') window.sendCopilotMessage()" placeholder="Type a message or request (e.g. Rewrite this summary)..." style="flex: 1; padding: 8px 12px; font-size: 0.8rem; background: rgba(0,0,0,0.2); border: 1.5px solid var(--border-color); color: white; border-radius: 6px; outline: none;">
+                <button onclick="window.sendCopilotMessage()" style="padding: 8px 14px; background: var(--primary-gradient); border: none; color: white; font-size: 0.8rem; font-weight: 600; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
     <!-- Cloud Authentication Modal -->
     <div class="ats-modal" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
         <div class="ats-modal-card ats-modal-card-compact" style="max-width: 420px;">
@@ -1267,8 +1337,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=85.0"></script>
-    <script src="ats.js?v=85.0"></script>
-    <script type="module" src="app.js?v=85.0"></script>
+    <script src="ai.js?v=86.0"></script>
+    <script src="ats.js?v=86.0"></script>
+    <script type="module" src="app.js?v=86.0"></script>
 </body>
 </html>

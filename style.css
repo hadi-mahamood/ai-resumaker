@@ -4506,3 +4506,26 @@ h1, h2, h3, h4, h5, h6, .logo-text, .accordion-title span, .toolbar-group button
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
 }
 
+/* Contenteditable Guided Highlights */
+[contenteditable="true"] {
+    transition: all 0.2s ease;
+    position: relative;
+}
+[contenteditable="true"]:hover {
+    background: rgba(99, 102, 241, 0.08) !important;
+    outline: 1.5px dashed var(--primary) !important;
+    border-radius: 4px;
+    cursor: text;
+}
+[contenteditable="true"]:focus {
+    background: rgba(99, 102, 241, 0.05) !important;
+    outline: 1.5px solid var(--primary) !important;
+    border-radius: 4px;
+}
+
+@media print {
+    .page-break-guide {
+        display: none !important;
+    }
+}
+
