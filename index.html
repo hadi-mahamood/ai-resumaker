@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <title>ResuMake AI - Premium AI Resume Builder</title>
-    <link rel="stylesheet" href="style.css?v=83.0">
+    <link rel="stylesheet" href="style.css?v=84.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -60,6 +60,18 @@
                         <button class="wizard-step-btn" id="wizard-btn-3" onclick="window.setWizardStep(3)" style="flex: 1; padding: 6px 4px; border-radius: 6px; border: none; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: all 0.3s;" title="Education & Projects"><i class="fa-solid fa-graduation-cap"></i> Academics</button>
                         <button class="wizard-step-btn" id="wizard-btn-4" onclick="window.setWizardStep(4)" style="flex: 1; padding: 6px 4px; border-radius: 6px; border: none; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: all 0.3s;" title="Design & Accent"><i class="fa-solid fa-palette"></i> Design</button>
                     </div>
+                </div>
+
+                <!-- Beginner Quick-Start Onboarding Card (Super User Friendly) -->
+                <div class="onboarding-card" id="beginner-onboarding-card" style="margin: 4px 16px 12px 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08)); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 10px; padding: 12px; position: relative; box-shadow: 0 6px 20px rgba(99, 102, 241, 0.1); z-index: 2; transition: all 0.3s ease;">
+                    <button onclick="document.getElementById('beginner-onboarding-card').style.display='none'" style="position: absolute; top: 6px; right: 8px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; padding: 2px;" title="Dismiss Guide"><i class="fa-solid fa-xmark"></i></button>
+                    <h4 style="margin: 0 0 4px 0; font-size: 0.78rem; color: white; display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-graduation-cap" style="color: var(--accent);"></i> New to ResuMake?</h4>
+                    <p style="margin: 0 0 8px 0; font-size: 0.7rem; color: var(--text-secondary); line-height: 1.35;">
+                        Click below to instantly fill a premium sample resume. Then edit the details step-by-step to make it yours!
+                    </p>
+                    <button class="ai-btn" onclick="window.loadSampleResumeData()" style="width: 100%; justify-content: center; font-size: 0.72rem; padding: 6px 10px; border-radius: 6px; background: var(--primary-gradient); color: white; border: none; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(99,102,241,0.25);">
+                        <i class="fa-solid fa-magic"></i> Auto-Fill Sample Resume
+                    </button>
                 </div>
 
                 <!-- Global Profile Completeness Gauge -->
@@ -1269,8 +1281,8 @@
     </div>
 
     <!-- Script dependencies -->
-    <script src="ai.js?v=83.0"></script>
-    <script src="ats.js?v=83.0"></script>
-    <script type="module" src="app.js?v=83.0"></script>
+    <script src="ai.js?v=84.0"></script>
+    <script src="ats.js?v=84.0"></script>
+    <script type="module" src="app.js?v=84.0"></script>
 </body>
 </html>

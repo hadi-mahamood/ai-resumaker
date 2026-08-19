@@ -3462,6 +3462,12 @@ function loadSampleResumeData() {
         window.setWizardStep(1);
     }
 
+    // Dismiss beginner onboarding card
+    const onboardingCard = document.getElementById("beginner-onboarding-card");
+    if (onboardingCard) {
+        onboardingCard.style.display = "none";
+    }
+
     if (window.showToast) {
         showToast(`Sample ${state.title} resume loaded!`);
     } else {
