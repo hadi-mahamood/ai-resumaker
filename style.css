@@ -4568,3 +4568,162 @@ h1, h2, h3, h4, h5, h6, .logo-text, .accordion-title span, .toolbar-group button
     animation: dropdownFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Minimalist Onboarding Card & Wizard Containers */
+.onboarding-card {
+    margin: 4px 16px 12px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+.onboarding-dismiss-btn {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px;
+    transition: color 0.2s;
+}
+.onboarding-dismiss-btn:hover {
+    color: var(--text-primary);
+}
+.onboarding-card-title {
+    margin: 0 0 4px 0;
+    font-size: 0.78rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+.onboarding-card-title i {
+    color: var(--accent);
+}
+.onboarding-card-text {
+    margin: 0 0 8px 0;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    line-height: 1.35;
+}
+.onboarding-autofill-btn {
+    flex: 1.2;
+    justify-content: center;
+    font-size: 0.72rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.onboarding-autofill-btn:hover {
+    opacity: 0.9;
+}
+.onboarding-tour-btn {
+    flex: 1;
+    justify-content: center;
+    font-size: 0.72rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.onboarding-tour-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+}
+
+.wizard-steps-container {
+    margin: 8px 16px 12px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+/* Minimalist floating Action Hub buttons overrides */
+.fab-trigger {
+    background: #1e293b !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+    color: #f8fafc !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+}
+.fab-trigger:hover {
+    background: #334155 !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4) !important;
+}
+.fab-menu .fab-btn {
+    background: #334155 !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    color: #cbd5e1 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+.fab-menu .fab-btn:hover {
+    background: #475569 !important;
+    color: #f8fafc !important;
+}
+
+/* Light Theme overrides for minimalist UI Elements */
+body.light-theme .onboarding-card {
+    background: rgba(15, 23, 42, 0.02);
+    border-color: rgba(15, 23, 42, 0.08);
+}
+body.light-theme .onboarding-tour-btn:hover {
+    background: rgba(15, 23, 42, 0.04);
+}
+body.light-theme .wizard-steps-container {
+    background: rgba(15, 23, 42, 0.02);
+    border-color: rgba(15, 23, 42, 0.08);
+}
+body.light-theme .fab-trigger {
+    background: #ffffff !important;
+    border: 1.5px solid rgba(15, 23, 42, 0.08) !important;
+    color: #334155 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+}
+body.light-theme .fab-trigger:hover {
+    background: #f8fafc !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12) !important;
+}
+body.light-theme .fab-menu .fab-btn {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    color: #475569 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+body.light-theme .fab-menu .fab-btn:hover {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+body.light-theme ::-webkit-scrollbar-thumb {
+    background: rgba(71, 85, 105, 0.2);
+    box-shadow: none;
+}
+body.light-theme ::-webkit-scrollbar-thumb:hover {
+    background: rgba(71, 85, 105, 0.4);
+}
+body.light-theme input:focus, body.light-theme select:focus, body.light-theme textarea:focus {
+    border-color: rgba(15, 23, 42, 0.18) !important;
+    box-shadow: none !important;
+}
+
